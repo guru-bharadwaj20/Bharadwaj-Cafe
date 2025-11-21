@@ -2,8 +2,17 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const api = {
   // Menu APIs
-  getMenu: async () => {
-    const response = await fetch(`${API_URL}/menu`);
+  getMenu: async (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.search) params.append('search', filters.search);
+    if (filters.category) params.append('category', filters.category);
+    if (filters.dietary && filters.dietary.length > 0) params.append('dietary', filters.dietary.join(','));
+    if (filters.minPrice) params.append('minPrice', filters.minPrice);
+    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+    if (filters.sortBy) params.append('sortBy', filters.sortBy);
+    
+    const url = params.toString() ? `${API_URL}/menu?${params}` : `${API_URL}/menu`;
+    const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to fetch menu');
     return response.json();
   },
@@ -249,6 +258,318 @@ export const api = {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to verify email');
     }
+    return response.json();
+  },
+
+  // Review APIs
+  getMenuItemReviews: async (menuItemId) => {
+    const response = await fetch(`${API_URL}/reviews/menu/${menuItemId}`);
+    if (!response.ok) throw new Error('Failed to fetch reviews');
+    return response.json();
+  },
+
+  createReview: async (reviewData, token) => {
+    const response = await fetch(`${API_URL}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reviewData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create review');
+    }
+    return response.json();
+  },
+
+  updateReview: async (reviewId, reviewData, token) => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reviewData),
+    });
+    if (!response.ok) throw new Error('Failed to update review');
+    return response.json();
+  },
+
+  deleteReview: async (reviewId, token) => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to delete review');
+    return response.json();
+  },
+
+  markReviewHelpful: async (reviewId, token) => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}/helpful`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to mark review as helpful');
+    return response.json();
+  },
+
+  // Address APIs
+  getAddresses: async (token) => {
+    const response = await fetch(`${API_URL}/addresses`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch addresses');
+    return response.json();
+  },
+
+  createAddress: async (addressData, token) => {
+    const response = await fetch(`${API_URL}/addresses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(addressData),
+    });
+    if (!response.ok) throw new Error('Failed to create address');
+    return response.json();
+  },
+
+  updateAddress: async (addressId, addressData, token) => {
+    const response = await fetch(`${API_URL}/addresses/${addressId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(addressData),
+    });
+    if (!response.ok) throw new Error('Failed to update address');
+    return response.json();
+  },
+
+  deleteAddress: async (addressId, token) => {
+    const response = await fetch(`${API_URL}/addresses/${addressId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to delete address');
+    return response.json();
+  },
+
+  setDefaultAddress: async (addressId, token) => {
+    const response = await fetch(`${API_URL}/addresses/${addressId}/default`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to set default address');
+    return response.json();
+  },
+
+  // Wishlist APIs
+  getWishlist: async (token) => {
+    const response = await fetch(`${API_URL}/wishlist`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch wishlist');
+    return response.json();
+  },
+
+  addToWishlist: async (menuItemId, token) => {
+    const response = await fetch(`${API_URL}/wishlist`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ menuItemId }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to add to wishlist');
+    }
+    return response.json();
+  },
+
+  removeFromWishlist: async (itemId, token) => {
+    const response = await fetch(`${API_URL}/wishlist/${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to remove from wishlist');
+    return response.json();
+  },
+
+  clearWishlist: async (token) => {
+    const response = await fetch(`${API_URL}/wishlist`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to clear wishlist');
+    return response.json();
+  },
+
+  // Loyalty APIs
+  getLoyaltyInfo: async (token) => {
+    const response = await fetch(`${API_URL}/loyalty`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch loyalty info');
+    return response.json();
+  },
+
+  redeemPoints: async (pointsData, token) => {
+    const response = await fetch(`${API_URL}/loyalty/redeem`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(pointsData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to redeem points');
+    }
+    return response.json();
+  },
+
+  getRewards: async (token) => {
+    const response = await fetch(`${API_URL}/loyalty/rewards`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch rewards');
+    return response.json();
+  },
+
+  // Blog APIs
+  getBlogs: async (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    const response = await fetch(`${API_URL}/blogs?${params}`);
+    if (!response.ok) throw new Error('Failed to fetch blogs');
+    return response.json();
+  },
+
+  getBlogBySlug: async (slug) => {
+    const response = await fetch(`${API_URL}/blogs/${slug}`);
+    if (!response.ok) throw new Error('Failed to fetch blog');
+    return response.json();
+  },
+
+  createBlog: async (blogData, token) => {
+    const response = await fetch(`${API_URL}/blogs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(blogData),
+    });
+    if (!response.ok) throw new Error('Failed to create blog');
+    return response.json();
+  },
+
+  updateBlog: async (blogId, blogData, token) => {
+    const response = await fetch(`${API_URL}/blogs/${blogId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(blogData),
+    });
+    if (!response.ok) throw new Error('Failed to update blog');
+    return response.json();
+  },
+
+  deleteBlog: async (blogId, token) => {
+    const response = await fetch(`${API_URL}/blogs/${blogId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to delete blog');
+    return response.json();
+  },
+
+  likeBlog: async (blogId, token) => {
+    const response = await fetch(`${API_URL}/blogs/${blogId}/like`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to like blog');
+    return response.json();
+  },
+
+  // Chat APIs
+  getUserChat: async (token) => {
+    const response = await fetch(`${API_URL}/chat`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch chat');
+    return response.json();
+  },
+
+  sendChatMessage: async (messageData, token) => {
+    const response = await fetch(`${API_URL}/chat/message`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(messageData),
+    });
+    if (!response.ok) throw new Error('Failed to send message');
+    return response.json();
+  },
+
+  getAllChats: async (token) => {
+    const response = await fetch(`${API_URL}/chat/admin`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch chats');
+    return response.json();
+  },
+
+  sendAdminMessage: async (chatId, messageData, token) => {
+    const response = await fetch(`${API_URL}/chat/${chatId}/admin-message`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(messageData),
+    });
+    if (!response.ok) throw new Error('Failed to send admin message');
     return response.json();
   },
 };

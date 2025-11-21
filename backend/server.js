@@ -9,6 +9,12 @@ import orderRoutes from './routes/orderRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import addressRoutes from './routes/addressRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
+import blogRoutes from './routes/blogRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import loyaltyRoutes from './routes/loyaltyRoutes.js';
 
 dotenv.config();
 
@@ -41,6 +47,12 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/addresses', addressRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/blogs', blogRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/loyalty', loyaltyRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -51,6 +63,12 @@ app.get('/api/health', (req, res) => {
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
+  // Join user-specific room
+  socket.on('joinRoom', (userId) => {
+    socket.join(`user_${userId}`);
+    console.log(`User ${userId} joined room`);
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });
@@ -58,6 +76,15 @@ io.on('connection', (socket) => {
   socket.on('orderPlaced', (orderData) => {
     // Broadcast new order to all connected clients (admin dashboard)
     io.emit('newOrder', orderData);
+  });
+
+  // Chat events
+  socket.on('sendMessage', (data) => {
+    io.emit('newMessage', data);
+  });
+
+  socket.on('adminMessage', (data) => {
+    io.to(`user_${data.userId}`).emit('adminMessage', data);
   });
 });
 

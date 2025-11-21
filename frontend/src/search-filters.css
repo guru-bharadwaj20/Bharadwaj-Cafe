@@ -1,0 +1,173 @@
+/* Search and Filter Styles */
+.search-filters {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.search-bar {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-bar i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary-color);
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 12px 12px 45px;
+  border: 2px solid #3a3a3a;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: var(--white-color);
+  font-size: var(--font-size-n);
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+}
+
+.filters-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  background: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.filter-group label {
+  display: block;
+  color: var(--secondary-color);
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: var(--font-size-s);
+}
+
+.filter-group select,
+.filter-group input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
+  background: #1a1a1a;
+  color: var(--white-color);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal;
+  color: var(--white-color);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-inputs input {
+  width: 80px;
+}
+
+.btn-clear-filters {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: end;
+  transition: all 0.3s ease;
+}
+
+.btn-clear-filters:hover {
+  background: #d32f2f;
+}
+
+/* Wishlist button on menu items */
+.menu-item {
+  position: relative;
+}
+
+.btn-wishlist {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--white-color);
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.btn-wishlist:hover {
+  background: var(--secondary-color);
+  color: #000;
+  transform: scale(1.1);
+}
+
+.dietary-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.dietary-tag {
+  background: var(--secondary-color);
+  color: #000;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.menu-item .rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--secondary-color);
+  font-size: var(--font-size-s);
+  margin: 5px 0;
+}
+
+.menu-item .rating i {
+  color: var(--secondary-color);
+}
+
+.menu-item .rating span {
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .filters-container {
+    grid-template-columns: 1fr;
+  }
+}

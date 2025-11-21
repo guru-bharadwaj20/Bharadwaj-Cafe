@@ -1,11 +1,48 @@
 import MenuItem from '../models/MenuItem.js';
 
-// @desc    Get all menu items
+// @desc    Get all menu items with search and filters
 // @route   GET /api/menu
 // @access  Public
 export const getMenuItems = async (req, res) => {
   try {
-    const menuItems = await MenuItem.find({ available: true });
+    const { search, category, dietary, minPrice, maxPrice, sortBy } = req.query;
+    
+    let query = { available: true };
+
+    // Search by name or description
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { tags: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Filter by category
+    if (category) {
+      query.category = category;
+    }
+
+    // Filter by dietary preferences
+    if (dietary) {
+      query.dietary = { $in: dietary.split(',') };
+    }
+
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // Build sort options
+    let sort = '-createdAt'; // Default sort
+    if (sortBy === 'price-low') sort = 'price';
+    else if (sortBy === 'price-high') sort = '-price';
+    else if (sortBy === 'rating') sort = '-rating';
+    else if (sortBy === 'popular') sort = '-reviewCount';
+
+    const menuItems = await MenuItem.find(query).sort(sort);
     res.json(menuItems);
   } catch (error) {
     res.status(500).json({ message: error.message });

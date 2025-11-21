@@ -19,6 +19,11 @@ import Cart from './pages/Cart';
 import MerchandisePage from './pages/MerchandisePage';
 import AdminDashboard from './pages/AdminDashboard';
 import OrderHistory from './pages/OrderHistory';
+import WishlistPage from './pages/WishlistPage';
+import AddressManagement from './pages/AddressManagement';
+import LoyaltyPage from './pages/LoyaltyPage';
+import { BlogList, BlogDetail } from './pages/BlogPages';
+import ChatWidget from './components/ChatWidget';
 import './style.css';
 import './cart.css';
 import './merchandise.css';
@@ -31,6 +36,13 @@ import './landing.css';
 import './profile.css';
 import './admin.css';
 import './order-history.css';
+import './search-filters.css';
+import './wishlist.css';
+import './address.css';
+import './loyalty.css';
+import './reviews.css';
+import './blog.css';
+import './chat.css';
 
 function App() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -156,10 +168,66 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                  <WishlistPage />
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/addresses"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                  <AddressManagement />
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/loyalty"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                  <LoyaltyPage />
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blog"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                  <BlogList />
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blog/:slug"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                  <BlogDetail />
+                </>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Redirect any unknown routes to landing */}
           <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <ChatWidget />
         </Router>
       </CartProvider>
     </AuthProvider>

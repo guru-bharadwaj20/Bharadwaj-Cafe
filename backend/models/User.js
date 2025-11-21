@@ -38,6 +38,23 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpire: {
       type: Date,
     },
+    loyaltyPoints: {
+      type: Number,
+      default: 0,
+    },
+    loyaltyTier: {
+      type: String,
+      enum: ['Bronze', 'Silver', 'Gold', 'Platinum'],
+      default: 'Bronze',
+    },
+    totalSpent: {
+      type: Number,
+      default: 0,
+    },
+    socialLinks: {
+      google: String,
+      facebook: String,
+    },
   },
   { timestamps: true }
 );

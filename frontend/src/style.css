@@ -258,12 +258,27 @@ header .navbar {
   display: none;
 }
 
+.navbar .mobile-icons {
+  display: none;
+}
+
 #menu-open-button {
   background: none;
   border: none;
   color: var(--white-color);
   cursor: pointer;
   z-index: 6;
+  font-size: var(--font-size-l);
+}
+
+.mobile-cart-btn {
+  background: none;
+  border: none;
+  color: var(--white-color);
+  cursor: pointer;
+  font-size: var(--font-size-l);
+  position: relative;
+  margin-right: 15px;
 }
 
 #menu-close-button {
@@ -375,6 +390,12 @@ header .navbar {
     width: 100%;
     backdrop-filter: blur(2px);
     background: rgba(0, 0, 0, 0.2);
+  }
+
+  .navbar .mobile-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .navbar :where(#menu-close-button, #menu-open-button) {

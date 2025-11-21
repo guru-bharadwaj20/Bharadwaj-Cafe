@@ -1,4 +1,5 @@
 import Order from '../models/Order.js';
+import { updateLoyalty } from './loyaltyController.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -100,14 +101,22 @@ export const updateOrderStatus = async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (order) {
+      const oldStatus = order.status;
       order.status = req.body.status || order.status;
       const updatedOrder = await order.save();
+
+      // Award loyalty points when order is delivered
+      if (oldStatus !== 'delivered' && updatedOrder.status === 'delivered' && updatedOrder.user) {
+        const pointsEarned = await updateLoyalty(updatedOrder.user, updatedOrder.totalAmount);
+        console.log(`Awarded ${pointsEarned} loyalty points for order ${updatedOrder._id}`);
+      }
 
       // Emit socket event for real-time status update
       const io = req.app.get('io');
       io.emit('orderStatusUpdated', {
         orderId: updatedOrder._id,
         status: updatedOrder.status,
+        userId: updatedOrder.user
       });
 
       res.json(updatedOrder);

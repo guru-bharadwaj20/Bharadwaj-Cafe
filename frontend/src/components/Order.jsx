@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import SearchFilters from './SearchFilters';
 
 const Order = () => {
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const [addedItems, setAddedItems] = useState({});
+  const [filters, setFilters] = useState({});
 
   const handleAddToCart = (item) => {
     addToCart(item);
@@ -63,17 +67,16 @@ const Order = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchMenu();
-  }, []);
-
-  const fetchMenu = async () => {
+  const fetchMenu = async (filterParams = {}) => {
     try {
       setLoading(true);
-      const data = await api.getMenu();
+      const data = await api.getMenu(filterParams);
+      
       // If database has items, use them; otherwise use default
       if (data && data.length > 0) {
         setMenuItems(data);
+      } else {
+        setMenuItems(defaultMenuItems);
       }
       setError(null);
     } catch (err) {
@@ -82,6 +85,29 @@ const Order = () => {
       setMenuItems(defaultMenuItems);
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMenu();
+  }, []);
+
+  const handleFilterChange = (newFilters) => {
+    console.log('Filters changed:', newFilters);
+    setFilters(newFilters);
+    fetchMenu(newFilters);
+  };
+
+  const handleAddToWishlist = async (itemId) => {
+    if (!user) {
+      alert('Please login to add to wishlist');
+      return;
+    }
+    try {
+      await api.addToWishlist(itemId, user.token);
+      alert('Added to wishlist!');
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -110,14 +136,35 @@ const Order = () => {
   return (
     <section className="order-section" id="order">
       <h2 className="section-title">Our Menu</h2>
+      <SearchFilters onFilterChange={handleFilterChange} />
       <div className="section-content">
         <ul className="menu-list">
           {menuItems.map((item) => (
             <li className="menu-item" key={item._id}>
+              <button 
+                className="btn-wishlist"
+                onClick={() => handleAddToWishlist(item._id)}
+                title="Add to Wishlist"
+              >
+                <i className="fas fa-heart"></i>
+              </button>
               <img src={item.image} alt={item.name} className="menu-image" />
               <div className="menu-details">
                 <h3 className="name">{item.name}</h3>
                 <p className="text">{item.description}</p>
+                {item.dietary && item.dietary.length > 0 && (
+                  <div className="dietary-tags">
+                    {item.dietary.map(tag => (
+                      <span key={tag} className="dietary-tag">{tag}</span>
+                    ))}
+                  </div>
+                )}
+                {item.rating > 0 && (
+                  <div className="rating">
+                    <i className="fas fa-star"></i> {item.rating.toFixed(1)} 
+                    <span>({item.reviewCount} reviews)</span>
+                  </div>
+                )}
                 <div className="menu-footer">
                   <p className="price">₹{item.price}</p>
                   <button 

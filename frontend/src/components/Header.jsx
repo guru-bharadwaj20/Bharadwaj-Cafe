@@ -65,12 +65,6 @@ const Header = ({ showMobileMenu, setShowMobileMenu }) => {
           </li>
           {user && (
             <>
-              <li className="nav-item cart-wrapper">
-                <button className="nav-link cart-btn" onClick={() => { navigate('/cart'); handleNavLinkClick(); }}>
-                  <i className="fas fa-shopping-cart"></i>
-                  {getTotalItems() > 0 && <span className="cart-badge">{getTotalItems()}</span>}
-                </button>
-              </li>
               <li className="nav-item user-dropdown-wrapper" ref={dropdownRef}>
               <button className="nav-link user-name-btn" onClick={toggleDropdown}>
                 <i className="fa-solid fa-user"></i> {user.name}
@@ -99,11 +93,19 @@ const Header = ({ showMobileMenu, setShowMobileMenu }) => {
             </>
           )}
         </ul>
-        <button 
-          id="menu-open-button" 
-          className="fas fa-bars"
-          onClick={() => setShowMobileMenu(!showMobileMenu)}
-        ></button>
+        <div className="mobile-icons">
+          {user && (
+            <button className="mobile-cart-btn" onClick={() => navigate('/cart')}>
+              <i className="fas fa-shopping-cart"></i>
+              {getTotalItems() > 0 && <span className="cart-badge">{getTotalItems()}</span>}
+            </button>
+          )}
+          <button 
+            id="menu-open-button" 
+            className="fas fa-bars"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+          ></button>
+        </div>
       </nav>
     </header>
   );
