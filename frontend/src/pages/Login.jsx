@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
+    email: location.state?.email || '',
     password: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(location.state?.message || '');
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const handleChange = (e) => {
     setFormData({
@@ -21,12 +32,12 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
     setLoading(true);
 
     try {
       const response = await api.login(formData);
-      localStorage.setItem('userInfo', JSON.stringify(response));
-      localStorage.setItem('token', response.token);
+      login(response);
       navigate('/home');
     } catch (err) {
       setError('Invalid email or password. Please try again.');
@@ -53,6 +64,13 @@ const Login = () => {
               <h1>Login to Your Account</h1>
               <p>Enter your credentials to continue</p>
             </div>
+
+            {successMessage && (
+              <div className="success-message">
+                <i className="fa-solid fa-circle-check"></i>
+                {successMessage}
+              </div>
+            )}
 
             {error && (
               <div className="error-message">

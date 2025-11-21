@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     customerName: {
       type: String,
       required: true,
@@ -52,6 +57,19 @@ const orderSchema = new mongoose.Schema(
       default: '',
     },
     deliveryAddress: {
+      type: String,
+    },
+    paymentMethod: {
+      type: String,
+      enum: ['card', 'upi', 'wallet', 'cod'],
+      default: 'card',
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'completed', 'failed'],
+      default: 'pending',
+    },
+    paymentId: {
       type: String,
     },
   },

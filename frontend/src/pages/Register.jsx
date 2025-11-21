@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
-import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,6 +12,7 @@ const Register = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -65,17 +64,24 @@ const Register = () => {
     setErrors({});
 
     try {
-      const response = await api.register({
+      await api.register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
       
-      // Auto-login after successful registration
-      login(response);
+      // Show success message
+      setSuccess(true);
       
-      // Redirect to home page
-      navigate('/home');
+      // Redirect to login page after 2 seconds
+      setTimeout(() => {
+        navigate('/login', { 
+          state: { 
+            message: 'Registration successful! Please login to continue.',
+            email: formData.email 
+          } 
+        });
+      }, 2000);
     } catch (err) {
       setErrors({ 
         general: err.message || 'Registration failed. Please try again.' 
@@ -108,6 +114,13 @@ const Register = () => {
               <div className="error-message">
                 <i className="fa-solid fa-circle-exclamation"></i>
                 {errors.general}
+              </div>
+            )}
+
+            {success && (
+              <div className="success-message">
+                <i className="fa-solid fa-circle-check"></i>
+                Successfully registered! Redirecting to login page...
               </div>
             )}
 

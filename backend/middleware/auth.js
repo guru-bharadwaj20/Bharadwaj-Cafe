@@ -18,17 +18,23 @@ export const protect = async (req, res, next) => {
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
-  }
-
-  if (!token) {
+  } else {
     res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 
-export const admin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ message: 'Not authorized as admin' });
+export const admin = async (req, res, next) => {
+  try {
+    const User = (await import('../models/User.js')).default;
+    const user = await User.findById(req.userId);
+    
+    if (user && user.role === 'admin') {
+      req.user = user;
+      next();
+    } else {
+      res.status(403).json({ message: 'Not authorized as admin' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error in admin middleware' });
   }
 };

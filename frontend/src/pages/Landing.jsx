@@ -1,8 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  useEffect(() => {
+    if (showMobileMenu) {
+      document.body.classList.add('show-mobile-menu');
+    } else {
+      document.body.classList.remove('show-mobile-menu');
+    }
+
+    return () => {
+      document.body.classList.remove('show-mobile-menu');
+    };
+  }, [showMobileMenu]);
+
+  const handleNavClick = () => {
+    setShowMobileMenu(false);
+  };
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setShowMobileMenu(false);
+    }
+  };
 
   return (
     <div className="landing-page">
@@ -11,11 +36,16 @@ const Landing = () => {
         <nav className="navbar section-content">
           <img src="img/logo.png" alt="Bharadwaj's Cafe" className="logo" />
           <ul className="nav-menu landing-nav">
+            <button 
+              id="menu-close-button" 
+              className="fas fa-times"
+              onClick={() => setShowMobileMenu(false)}
+            ></button>
             <li className="nav-item">
-              <a href="#about-section" className="nav-link">About Us</a>
+              <button onClick={() => scrollToSection('about-section')} className="nav-link">About Us</button>
             </li>
             <li className="nav-item">
-              <a href="#contact-section" className="nav-link">Contact Us</a>
+              <button onClick={() => scrollToSection('contact-section')} className="nav-link">Contact Us</button>
             </li>
             <li className="nav-item">
               <button onClick={() => navigate('/login')} className="nav-link btn-link">Login</button>
@@ -24,6 +54,11 @@ const Landing = () => {
               <button onClick={() => navigate('/register')} className="nav-link btn-link register-btn">Register</button>
             </li>
           </ul>
+          <button 
+            id="menu-open-button" 
+            className="fas fa-bars"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+          ></button>
         </nav>
       </header>
 
