@@ -55,7 +55,10 @@ export const api = {
       },
       body: JSON.stringify(userData),
     });
-    if (!response.ok) throw new Error('Failed to register');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to register');
+    }
     return response.json();
   },
 
@@ -67,7 +70,10 @@ export const api = {
       },
       body: JSON.stringify(credentials),
     });
-    if (!response.ok) throw new Error('Failed to login');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to login');
+    }
     return response.json();
   },
 

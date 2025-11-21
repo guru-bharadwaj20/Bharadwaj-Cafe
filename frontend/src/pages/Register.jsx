@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -63,19 +65,20 @@ const Register = () => {
     setErrors({});
 
     try {
-      await api.register({
+      const response = await api.register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
       
-      // Show success and redirect to login
-      navigate('/login', { 
-        state: { message: 'Registration successful! Please login.' } 
-      });
+      // Auto-login after successful registration
+      login(response);
+      
+      // Redirect to home page
+      navigate('/home');
     } catch (err) {
       setErrors({ 
-        general: err.message || 'Registration failed. Email might already be registered.' 
+        general: err.message || 'Registration failed. Please try again.' 
       });
     } finally {
       setLoading(false);

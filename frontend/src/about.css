@@ -1,33 +1,6 @@
-:root {
-  --white-color: #fff;
-  --dark-color: #252525;
-  --primary-color: #3b141c;
-  --secondary-color: #f3961c;
-  --light-pink-color: #faf4f5;
-  --medium-gray-color: #ccc;
-
-  --font-size-s: 0.9rem;
-  --font-size-n: 1rem;
-  --font-size-m: 1.12rem;
-  --font-size-l: 1.5rem;
-  --font-size-xl: 2rem;
-  --font-size-xxl: 2.3rem;
-
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  --border-radius-s: 8px;
-  --border-radius-m: 30px;
-  --border-radius-circle: 50%;
-
-  --site-max-width: 1300px;
-}
-
 .about-section {
     min-height: 100vh;
-    padding: 120px 0;
+    padding: 100px 0;
     background: var(--light-pink-color);
 }
 
@@ -54,10 +27,11 @@
 }
 
 .about-section .about-details .text {
-    line-height: 30px;
-    margin: 50px 0 30px;
+    line-height: 1.8;
+    margin: 30px 0;
     text-align: center;
     font-size: var(--font-size-m);
+    color: #555;
 }
 
 .about-section .social-link-list {
@@ -75,23 +49,7 @@
 
 .about-section .social-link-list .social-link:hover {
     color: var(--secondary-color);
-}
-
-.section-title {
-    text-align: center;
-    padding: 60px 0 100px;
-    text-transform: uppercase;
-    font-size: var(--font-size-xl);
-}
-
-.section-title::after {
-    content: "";
-    width: 80px;
-    height: 5px;
-    display: block;
-    margin: 10px auto 0;
-    border-radius: var(--border-radius-s);
-    background: var(--secondary-color);
+    transform: scale(1.1);
 }
 
 @media screen and (max-width: 900px) {
@@ -102,19 +60,27 @@
         --font-size-xxl: 1.8rem;
     }
 
+    .about-section {
+        padding: 80px 0;
+    }
+
     .about-section .section-content {
-        gap: 70px;
+        gap: 40px;
         flex-direction: column-reverse;
     }
 
-    .about-section .about-image-wrapper .about-image{
+    .about-section .about-image-wrapper .about-image {
         width: 100%;
         height: 100%;
-        max-width: 250px;
+        max-width: 280px;
         aspect-ratio: 1;
     }
 
     .about-section .about-details {
         max-width: 100%;
+    }
+
+    .about-section .about-details .text {
+        margin: 30px 0 20px;
     }
 }

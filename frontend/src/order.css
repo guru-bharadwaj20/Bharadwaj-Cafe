@@ -1,16 +1,28 @@
-/* Updated order.css */
-
 .order-section {
   background: var(--dark-color);
   color: var(--white-color);
-  padding: 50px 0 100px;
+  padding: 100px 0;
+  min-height: 100vh;
 }
 
-.order-section .heading {
-  font-size: var(--font-size-l);
-  color: var(--primary-color);
+.order-section .section-title {
+  font-size: var(--font-size-xxl);
+  color: var(--white-color);
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
+  padding: 0;
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+}
+
+.order-section .section-title::after {
+  content: "";
+  width: 80px;
+  height: 5px;
+  display: block;
+  margin: 10px auto 0;
+  border-radius: var(--border-radius-s);
+  background: var(--secondary-color);
 }
 
 .order-section .menu-list {
@@ -24,29 +36,40 @@
   flex: 1 1 calc(33.333% - 30px);
   max-width: calc(33.333% - 30px);
   background: #1a1a1a;
-  padding: 20px;
-  border-radius: 10px;
+  padding: 25px;
+  border-radius: 15px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .order-section .menu-item:hover {
-  transform: scale(1.03);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .order-section .menu-image {
   max-width: 80%;
   aspect-ratio: 1;
   object-fit: contain;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+.order-section .menu-item h3 {
+  font-size: var(--font-size-l);
+  color: var(--secondary-color);
+  margin: 10px 0;
+  font-weight: var(--font-weight-semibold);
 }
 
 .order-section .text {
-  font-size: var(--font-size-m);
-  color: #eed4b2;
+  font-size: var(--font-size-n);
+  color: var(--white-color);
+  opacity: 0.9;
 }
 
 /* Responsive Design */
@@ -59,9 +82,22 @@
 }
 
 @media (max-width: 900px) {
+  .order-section {
+    padding: 80px 0;
+  }
+
+  .order-section .section-title {
+    margin-bottom: 40px;
+  }
+
+  .order-section .menu-list {
+    gap: 25px;
+  }
+
   .order-section .menu-item {
     flex: 1 1 calc(50% - 20px);
     max-width: calc(50% - 20px);
+    padding: 20px;
   }
 }
 
