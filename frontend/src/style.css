@@ -129,23 +129,129 @@ header .navbar {
   background: var(--secondary-color);
 }
 
-.navbar .user-info {
-  background: rgba(243, 150, 28, 0.1);
-  border-radius: var(--border-radius-m);
+/* Cart Styles */
+.navbar .cart-wrapper {
+  position: relative;
 }
 
-.navbar .user-name {
-  color: var(--secondary-color) !important;
+.navbar .cart-btn {
+  background: transparent;
+  color: var(--white-color);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: var(--font-size-m);
+  font-family: "Poppins", sans-serif;
+  font-weight: var(--font-weight-medium);
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.navbar .logout-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.navbar .cart-btn:hover {
+  color: var(--secondary-color);
 }
 
-.navbar .logout-btn:hover {
-  background: var(--secondary-color) !important;
-  color: var(--primary-color) !important;
+.navbar .cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #f44336;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* User Dropdown Styles */
+.navbar .user-dropdown-wrapper {
+  position: relative;
+}
+
+.navbar .user-name-btn {
+  background: transparent;
+  color: var(--white-color);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.3s ease;
+}
+
+.navbar .user-name-btn:hover {
+  color: var(--secondary-color);
+}
+
+.navbar .user-name-btn .dropdown-icon {
+  font-size: 0.7rem;
+  transition: transform 0.3s ease;
+}
+
+.navbar .user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--white-color);
+  border-radius: var(--border-radius-s);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.3s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar .user-dropdown .dropdown-item {
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--dark-color);
+  font-family: "Poppins", sans-serif;
+  font-size: var(--font-size-n);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.navbar .user-dropdown .dropdown-item:hover {
+  background: var(--light-pink-color);
+  color: var(--primary-color);
+}
+
+.navbar .user-dropdown .dropdown-item i {
+  font-size: var(--font-size-m);
+  color: var(--secondary-color);
+}
+
+.navbar .user-dropdown .dropdown-item + .dropdown-item {
+  border-top: 1px solid #f0f0f0;
 }
 
 .navbar :where(#menu-close-button, #menu-open-button) {
@@ -341,6 +447,69 @@ header .navbar {
   }
 
   .navbar .nav-menu .nav-link:hover {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+    border-color: var(--secondary-color);
+  }
+
+  /* Mobile Cart Styles */
+  .navbar .cart-wrapper {
+    width: 200px;
+  }
+
+  .navbar .cart-btn {
+    width: 200px;
+    justify-content: center;
+    height: 50px;
+    border: 1.5px solid var(--dark-color);
+    border-radius: 10px;
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .navbar .cart-btn:hover {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+    border-color: var(--secondary-color);
+  }
+
+  /* Mobile User Dropdown Styles */
+  .navbar .user-dropdown-wrapper {
+    width: 200px;
+  }
+
+  .navbar .user-name-btn {
+    width: 200px;
+    justify-content: center;
+    margin-top: 18px;
+    border: 1.5px solid var(--dark-color);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--dark-color);
+    height: 50px;
+  }
+
+  .navbar .user-dropdown {
+    position: static;
+    box-shadow: none;
+    background: transparent;
+    margin-top: 10px;
+  }
+
+  .navbar .user-dropdown .dropdown-item {
+    width: 200px;
+    height: 50px;
+    border: 1.5px solid var(--dark-color);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--dark-color);
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  .navbar .user-dropdown .dropdown-item:hover {
     background: var(--secondary-color);
     color: var(--primary-color);
     border-color: var(--secondary-color);

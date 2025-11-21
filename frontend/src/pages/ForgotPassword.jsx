@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { api } from '../utils/api';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -11,15 +12,21 @@ const ForgotPassword = () => {
     setLoading(true);
     setStatus({ type: '', message: '' });
 
-    // Simulate API call (implement actual forgot password logic later)
-    setTimeout(() => {
+    try {
+      const response = await api.forgotPassword(email);
       setStatus({
         type: 'success',
-        message: 'Password reset link has been sent to your email address!',
+        message: response.message || 'Password reset link has been sent to your email address!',
       });
-      setLoading(false);
       setEmail('');
-    }, 1500);
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error.message || 'Failed to send reset email. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

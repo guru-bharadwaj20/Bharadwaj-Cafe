@@ -2,7 +2,7 @@ import Order from '../models/Order.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
-// @access  Public
+// @access  Private
 export const createOrder = async (req, res) => {
   try {
     const {
@@ -14,6 +14,8 @@ export const createOrder = async (req, res) => {
       orderType,
       specialInstructions,
       deliveryAddress,
+      paymentMethod,
+      paymentId,
     } = req.body;
 
     if (!items || items.length === 0) {
@@ -21,6 +23,7 @@ export const createOrder = async (req, res) => {
     }
 
     const order = await Order.create({
+      user: req.userId,
       customerName,
       customerEmail,
       customerPhone,
@@ -29,6 +32,9 @@ export const createOrder = async (req, res) => {
       orderType,
       specialInstructions,
       deliveryAddress,
+      paymentMethod,
+      paymentId,
+      paymentStatus: paymentId ? 'completed' : 'pending',
     });
 
     // Emit socket event for real-time order notification
@@ -38,6 +44,20 @@ export const createOrder = async (req, res) => {
     res.status(201).json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// @desc    Get user's orders
+// @route   GET /api/orders/myorders
+// @access  Private
+export const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.userId })
+      .sort({ createdAt: -1 })
+      .populate('items.menuItem');
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
