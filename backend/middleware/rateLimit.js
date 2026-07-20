@@ -2,6 +2,12 @@ import rateLimit from 'express-rate-limit';
 
 const message = (text) => ({ message: text });
 
+// Test suites deliberately hammer the failure paths (wrong passwords, expired
+// tokens), which would otherwise exhaust the limit and produce 429s that have
+// nothing to do with what is under test. Limits are exercised by their own
+// dedicated tests, which opt back in.
+const skipInTests = () => process.env.NODE_ENV === 'test' && !process.env.ENFORCE_RATE_LIMITS;
+
 /**
  * Credential endpoints (login, register). Tight enough to make online
  * password guessing impractical without punishing real users.
@@ -11,6 +17,7 @@ export const authLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTests,
   skipSuccessfulRequests: true, // only failed attempts count toward the limit
   message: message('Too many attempts. Please try again in 15 minutes.'),
 });
@@ -24,6 +31,7 @@ export const emailLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTests,
   message: message('Too many requests. Please try again in an hour.'),
 });
 
@@ -35,5 +43,6 @@ export const apiLimiter = rateLimit({
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipInTests,
   message: message('Too many requests. Please slow down.'),
 });

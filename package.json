@@ -1,0 +1,25 @@
+{
+  "name": "bharadwaj-cafe",
+  "version": "1.0.0",
+  "description": "A full-stack coffee shop platform with a React (Vite) frontend and an Express/MongoDB backend. It supports real-time features (orders & chat), user accounts, loyalty points, wishlist management, reviews, blogs, and basic admin functions for menu and order oversight.",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guru-bharadwaj20/Bharadwaj-Cafe.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/guru-bharadwaj20/Bharadwaj-Cafe/issues"
+  },
+  "homepage": "https://github.com/guru-bharadwaj20/Bharadwaj-Cafe#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  },
+  "private": true
+}

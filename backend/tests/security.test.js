@@ -4,28 +4,17 @@
  * Each test is written so that it FAILS against the pre-fix code. They are
  * the executable version of the vulnerability report.
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
 
-process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-secret-that-is-at-least-32-characters-long';
-process.env.REQUIRE_EMAIL_VERIFICATION = 'false';
-
-// No real SMTP in tests. Without this the mailer throws, and forgot-password
-// correctly rolls the reset token back — which would mask what we're testing.
-vi.mock('../utils/email.js', () => ({
-  sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
-  sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
-  sendOrderConfirmationEmail: vi.fn().mockResolvedValue(undefined),
-}));
-
-const { createApp } = await import('../app.js');
-const { default: User } = await import('../models/User.js');
-const { default: MenuItem } = await import('../models/MenuItem.js');
-const { default: Order } = await import('../models/Order.js');
-const { default: Chat } = await import('../models/Chat.js');
-const { authenticateSocket } = await import('../middleware/auth.js');
+// Environment and the SMTP mock are configured centrally in tests/setup.js.
+import { createApp } from '../app.js';
+import User from '../models/User.js';
+import MenuItem from '../models/MenuItem.js';
+import Order from '../models/Order.js';
+import Chat from '../models/Chat.js';
+import { authenticateSocket } from '../middleware/auth.js';
 
 const app = createApp();
 

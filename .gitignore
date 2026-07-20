@@ -35,6 +35,10 @@ Desktop.ini
 # Testing
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
 
 # Temporary files
 *.tmp
