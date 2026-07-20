@@ -13,6 +13,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
   const [successMessage, setSuccessMessage] = useState(location.state?.message || '');
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
+    setNeedsVerification(false);
     setLoading(true);
 
     try {
@@ -40,7 +42,28 @@ const Login = () => {
       login(response);
       navigate('/home');
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      if (err.code === 'EMAIL_NOT_VERIFIED') {
+        // Distinct from bad credentials: the password was right, the account
+        // just has not been confirmed yet.
+        setNeedsVerification(true);
+        setError(err.message);
+      } else {
+        setError('Invalid email or password. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setLoading(true);
+    try {
+      const response = await api.resendVerification(formData.email);
+      setNeedsVerification(false);
+      setError('');
+      setSuccessMessage(response.message);
+    } catch (err) {
+      setError(err.message || 'Could not resend the verification email.');
     } finally {
       setLoading(false);
     }
@@ -76,6 +99,16 @@ const Login = () => {
               <div className="error-message">
                 <i className="fa-solid fa-circle-exclamation"></i>
                 {error}
+                {needsVerification && (
+                  <button
+                    type="button"
+                    className="resend-link"
+                    onClick={handleResendVerification}
+                    disabled={loading}
+                  >
+                    Resend verification email
+                  </button>
+                )}
               </div>
             )}
 

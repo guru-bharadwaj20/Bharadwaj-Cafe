@@ -1,25 +1,63 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [showCheckout, setShowCheckout] = useState(false);
+  const [placing, setPlacing] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [orderType, setOrderType] = useState('takeaway');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [specialInstructions, setSpecialInstructions] = useState('');
 
   const handleProceedToPay = () => {
     if (cartItems.length === 0) {
       alert('Your cart is empty!');
       return;
     }
+    setOrderError('');
     setShowCheckout(true);
   };
 
-  const handlePlaceOrder = () => {
-    alert('Order placed successfully! Payment functionality coming soon.');
-    clearCart();
-    setShowCheckout(false);
-    navigate('/order');
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+    setOrderError('');
+    setPlacing(true);
+
+    try {
+      // Only ids and quantities go to the server. It looks up the current
+      // price of each item and calculates the total itself, so the amounts
+      // shown below are a preview, not the source of truth.
+      const order = await api.createOrder(
+        {
+          items: cartItems.map((item) => ({
+            menuItem: item._id,
+            quantity: item.quantity,
+          })),
+          customerPhone,
+          orderType,
+          deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
+          specialInstructions,
+        },
+        user?.token
+      );
+
+      clearCart();
+      setShowCheckout(false);
+      navigate('/order-history', {
+        state: { message: `Order #${order._id.slice(-8).toUpperCase()} placed successfully!` },
+      });
+    } catch (err) {
+      setOrderError(err.message || 'Could not place your order. Please try again.');
+    } finally {
+      setPlacing(false);
+    }
   };
 
   if (showCheckout) {
@@ -36,38 +74,98 @@ const Cart = () => {
                   <span>₹{item.price * item.quantity}</span>
                 </div>
               ))}
+              <div className="summary-row">
+                <span>Tax (5%):</span>
+                <span>₹{Math.round(getTotalPrice() * 0.05)}</span>
+              </div>
               <div className="summary-total">
                 <strong>Total:</strong>
-                <strong>₹{getTotalPrice()}</strong>
+                <strong>₹{Math.round(getTotalPrice() * 1.05)}</strong>
               </div>
+              <p className="summary-note">
+                Final amount is confirmed by the cafe when your order is placed.
+              </p>
             </div>
             <div className="payment-form">
-              <h3>Payment Details</h3>
-              <form onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }}>
+              <h3>Order Details</h3>
+
+              {orderError && (
+                <div className="error-message">
+                  <i className="fa-solid fa-circle-exclamation"></i> {orderError}
+                </div>
+              )}
+
+              <form onSubmit={handlePlaceOrder}>
                 <div className="form-group">
-                  <label>Card Number</label>
-                  <input type="text" placeholder="1234 5678 9012 3456" required />
+                  <label htmlFor="customerPhone">Contact Number</label>
+                  <input
+                    id="customerPhone"
+                    type="tel"
+                    placeholder="Phone number for order updates"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    required
+                  />
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Expiry Date</label>
-                    <input type="text" placeholder="MM/YY" required />
-                  </div>
-                  <div className="form-group">
-                    <label>CVV</label>
-                    <input type="text" placeholder="123" required />
-                  </div>
-                </div>
+
                 <div className="form-group">
-                  <label>Cardholder Name</label>
-                  <input type="text" placeholder="John Doe" required />
+                  <label htmlFor="orderType">Order Type</label>
+                  <select
+                    id="orderType"
+                    value={orderType}
+                    onChange={(e) => setOrderType(e.target.value)}
+                  >
+                    <option value="takeaway">Takeaway</option>
+                    <option value="dine-in">Dine-in</option>
+                    <option value="delivery">Delivery</option>
+                  </select>
                 </div>
+
+                {orderType === 'delivery' && (
+                  <div className="form-group">
+                    <label htmlFor="deliveryAddress">Delivery Address</label>
+                    <textarea
+                      id="deliveryAddress"
+                      rows="3"
+                      placeholder="Flat / street / landmark"
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="form-group">
+                  <label htmlFor="specialInstructions">Special Instructions (optional)</label>
+                  <textarea
+                    id="specialInstructions"
+                    rows="2"
+                    placeholder="Less sugar, extra hot, etc."
+                    value={specialInstructions}
+                    onChange={(e) => setSpecialInstructions(e.target.value)}
+                  />
+                </div>
+
+                {/* Card details are deliberately not collected here. Taking
+                    them without a payment provider would mean handling raw
+                    card data on our own server. Online payment is handled by
+                    the upcoming gateway integration. */}
+                <p className="payment-note">
+                  <i className="fa-solid fa-circle-info"></i> Pay on collection or delivery.
+                  Online payment is coming soon.
+                </p>
+
                 <div className="checkout-buttons">
-                  <button type="button" className="btn-secondary" onClick={() => setShowCheckout(false)}>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setShowCheckout(false)}
+                    disabled={placing}
+                  >
                     Back to Cart
                   </button>
-                  <button type="submit" className="btn-primary">
-                    Place Order
+                  <button type="submit" className="btn-primary" disabled={placing}>
+                    {placing ? 'Placing Order...' : 'Place Order'}
                   </button>
                 </div>
               </form>

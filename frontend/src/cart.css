@@ -305,3 +305,42 @@
     flex-direction: column;
   }
 }
+
+/* Checkout clarifications */
+.summary-note,
+.payment-note {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #cfc3bd;
+}
+
+.payment-note {
+  padding: 10px 12px;
+  background: rgba(243, 150, 28, 0.1);
+  border-left: 3px solid #f3961c;
+  border-radius: 4px;
+}
+
+.payment-form select,
+.payment-form textarea {
+  width: 100%;
+  padding: 12px;
+  font: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.payment-form select:focus,
+.payment-form textarea:focus {
+  outline: none;
+  border-color: #f3961c;
+}
+
+.payment-form select option {
+  color: #3b141c;
+  background: #fff;
+}

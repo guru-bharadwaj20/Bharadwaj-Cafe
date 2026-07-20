@@ -38,6 +38,16 @@ const orderSchema = new mongoose.Schema(
         price: Number,
       },
     ],
+    // Every monetary field below is computed on the server from current menu
+    // prices. Values supplied by the client are ignored.
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
+    tax: {
+      type: Number,
+      default: 0,
+    },
     totalAmount: {
       type: Number,
       required: true,
@@ -75,6 +85,11 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Supports the two hot read paths: a customer's own history, and the
+// admin order queue filtered by status.
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ status: 1, createdAt: -1 });
 
 const Order = mongoose.model('Order', orderSchema);
 

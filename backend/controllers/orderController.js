@@ -1,5 +1,22 @@
 import Order from '../models/Order.js';
 import { updateLoyalty } from './loyaltyController.js';
+import { priceOrder, PricingError } from '../config/pricing.js';
+import { emitToAdmins, emitToUser } from '../utils/realtime.js';
+import { sendOrderConfirmationEmail } from '../utils/email.js';
+
+const ORDER_TYPES = ['dine-in', 'takeaway', 'delivery'];
+const PAYMENT_METHODS = ['card', 'upi', 'wallet', 'cod'];
+const ORDER_STATUSES = [
+  'pending',
+  'confirmed',
+  'preparing',
+  'ready',
+  'delivered',
+  'cancelled',
+];
+
+const isOwnerOrAdmin = (order, user) =>
+  user.role === 'admin' || (order.user && order.user.equals(user._id));
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -8,42 +25,70 @@ export const createOrder = async (req, res) => {
   try {
     const {
       customerName,
-      customerEmail,
       customerPhone,
       items,
-      totalAmount,
       orderType,
       specialInstructions,
       deliveryAddress,
       paymentMethod,
-      paymentId,
     } = req.body;
 
-    if (!items || items.length === 0) {
-      return res.status(400).json({ message: 'No order items' });
+    // Prices, subtotal, tax and total are all recomputed here. Anything the
+    // client sent about money is discarded.
+    const priced = await priceOrder(items);
+
+    if (orderType && !ORDER_TYPES.includes(orderType)) {
+      return res.status(400).json({ message: 'Invalid order type' });
+    }
+
+    if (paymentMethod && !PAYMENT_METHODS.includes(paymentMethod)) {
+      return res.status(400).json({ message: 'Invalid payment method' });
+    }
+
+    if (orderType === 'delivery' && !deliveryAddress) {
+      return res.status(400).json({ message: 'A delivery address is required for delivery orders' });
+    }
+
+    if (!customerPhone) {
+      return res.status(400).json({ message: 'A contact phone number is required' });
     }
 
     const order = await Order.create({
-      user: req.userId,
-      customerName,
-      customerEmail,
+      user: req.user._id,
+      // Identity comes from the authenticated session, not the request body,
+      // so an order cannot be filed under someone else's account or email.
+      customerName: customerName || req.user.name,
+      customerEmail: req.user.email,
       customerPhone,
-      items,
-      totalAmount,
-      orderType,
-      specialInstructions,
+      items: priced.items,
+      subtotal: priced.subtotal,
+      tax: priced.tax,
+      totalAmount: priced.totalAmount,
+      orderType: orderType || 'takeaway',
+      specialInstructions: specialInstructions || '',
       deliveryAddress,
-      paymentMethod,
-      paymentId,
-      paymentStatus: paymentId ? 'completed' : 'pending',
+      paymentMethod: paymentMethod || 'card',
+      // Payment state is never set from user input. It only advances when a
+      // payment provider confirms it (see the planned webhook integration);
+      // until then every order starts unpaid.
+      paymentStatus: 'pending',
     });
 
-    // Emit socket event for real-time order notification
-    const io = req.app.get('io');
-    io.emit('newOrder', order);
+    // Order contents are personal data: notify only the customer and staff,
+    // never every connected socket.
+    emitToAdmins(req.app.get('io'), 'newOrder', order);
+    emitToUser(req.app.get('io'), order.user, 'orderCreated', order);
+
+    sendOrderConfirmationEmail(order.customerEmail, order).catch((error) =>
+      console.error('Failed to send order confirmation email:', error)
+    );
 
     res.status(201).json(order);
   } catch (error) {
+    if (error instanceof PricingError) {
+      return res.status(400).json({ message: error.message });
+    }
+    console.error('Create order error:', error);
     res.status(400).json({ message: error.message });
   }
 };
@@ -53,7 +98,7 @@ export const createOrder = async (req, res) => {
 // @access  Private
 export const getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.userId })
+    const orders = await Order.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .populate('items.menuItem');
     res.json(orders);
@@ -78,16 +123,21 @@ export const getOrders = async (req, res) => {
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
-// @access  Public
+// @access  Private (owner or admin)
 export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate('items.menuItem');
-    
-    if (order) {
-      res.json(order);
-    } else {
-      res.status(404).json({ message: 'Order not found' });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
+
+    // Knowing an order id is not authorisation to read it.
+    if (!isOwnerOrAdmin(order, req.user)) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -98,42 +148,47 @@ export const getOrderById = async (req, res) => {
 // @access  Private/Admin
 export const updateOrderStatus = async (req, res) => {
   try {
+    const { status } = req.body;
+
+    if (!status || !ORDER_STATUSES.includes(status)) {
+      return res.status(400).json({ message: 'Invalid order status' });
+    }
+
     const order = await Order.findById(req.params.id);
 
-    if (order) {
-      const oldStatus = order.status;
-      order.status = req.body.status || order.status;
-      const updatedOrder = await order.save();
-
-      // Award loyalty points when order is delivered
-      if (oldStatus !== 'delivered' && updatedOrder.status === 'delivered' && updatedOrder.user) {
-        const pointsEarned = await updateLoyalty(updatedOrder.user, updatedOrder.totalAmount);
-        console.log(`Awarded ${pointsEarned} loyalty points for order ${updatedOrder._id}`);
-      }
-
-      // Emit socket event for real-time status update
-      const io = req.app.get('io');
-      io.emit('orderStatusUpdated', {
-        orderId: updatedOrder._id,
-        status: updatedOrder.status,
-        userId: updatedOrder.user
-      });
-
-      res.json(updatedOrder);
-    } else {
-      res.status(404).json({ message: 'Order not found' });
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
+
+    const oldStatus = order.status;
+    order.status = status;
+    const updatedOrder = await order.save();
+
+    // Award loyalty points when order is delivered
+    if (oldStatus !== 'delivered' && updatedOrder.status === 'delivered' && updatedOrder.user) {
+      const pointsEarned = await updateLoyalty(updatedOrder.user, updatedOrder.totalAmount);
+      console.log(`Awarded ${pointsEarned} loyalty points for order ${updatedOrder._id}`);
+    }
+
+    const payload = {
+      orderId: updatedOrder._id,
+      status: updatedOrder.status,
+    };
+    emitToUser(req.app.get('io'), updatedOrder.user, 'orderStatusUpdated', payload);
+    emitToAdmins(req.app.get('io'), 'orderStatusUpdated', payload);
+
+    res.json(updatedOrder);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-// @desc    Get orders by email
+// @desc    Look up orders for any customer email
 // @route   GET /api/orders/customer/:email
-// @access  Public
+// @access  Private/Admin
 export const getOrdersByEmail = async (req, res) => {
   try {
-    const orders = await Order.find({ customerEmail: req.params.email })
+    const orders = await Order.find({ customerEmail: req.params.email.toLowerCase() })
       .populate('items.menuItem')
       .sort({ createdAt: -1 });
     res.json(orders);

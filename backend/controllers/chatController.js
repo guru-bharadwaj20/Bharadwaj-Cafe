@@ -1,4 +1,7 @@
 import Chat from '../models/Chat.js';
+import { emitToAdmins, emitToUser } from '../utils/realtime.js';
+
+const MAX_MESSAGE_LENGTH = 2000;
 
 // @desc    Get or create user chat
 // @route   GET /api/chat
@@ -27,7 +30,14 @@ export const getUserChat = async (req, res) => {
 // @access  Private
 export const sendMessage = async (req, res) => {
   try {
-    const { message } = req.body;
+    const message = typeof req.body.message === 'string' ? req.body.message.trim() : '';
+
+    if (!message) {
+      return res.status(400).json({ message: 'Message cannot be empty' });
+    }
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return res.status(400).json({ message: 'Message is too long' });
+    }
 
     let chat = await Chat.findOne({ user: req.user._id });
 
@@ -45,6 +55,14 @@ export const sendMessage = async (req, res) => {
 
     chat.lastMessage = Date.now();
     await chat.save();
+
+    // Notify staff only. This used to be broadcast to every connected client.
+    emitToAdmins(req.app.get('io'), 'newMessage', {
+      chatId: chat._id,
+      userId: req.user._id,
+      name: req.user.name,
+      message,
+    });
 
     res.json(chat);
   } catch (error) {
@@ -72,7 +90,15 @@ export const getAllChats = async (req, res) => {
 // @access  Private/Admin
 export const sendAdminMessage = async (req, res) => {
   try {
-    const { message } = req.body;
+    const message = typeof req.body.message === 'string' ? req.body.message.trim() : '';
+
+    if (!message) {
+      return res.status(400).json({ message: 'Message cannot be empty' });
+    }
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return res.status(400).json({ message: 'Message is too long' });
+    }
+
     const chat = await Chat.findById(req.params.chatId);
 
     if (!chat) {
@@ -86,6 +112,12 @@ export const sendAdminMessage = async (req, res) => {
 
     chat.lastMessage = Date.now();
     await chat.save();
+
+    // Delivered to the one customer this chat belongs to.
+    emitToUser(req.app.get('io'), chat.user, 'adminMessage', {
+      chatId: chat._id,
+      message,
+    });
 
     res.json(chat);
   } catch (error) {
@@ -121,6 +153,13 @@ export const markAsRead = async (req, res) => {
     const chat = await Chat.findById(req.params.chatId);
 
     if (!chat) {
+      return res.status(404).json({ message: 'Chat not found' });
+    }
+
+    // Any authenticated user could previously pass any chat id here, which
+    // both mutated and returned a stranger's entire conversation.
+    const isOwner = chat.user.equals(req.user._id);
+    if (!isOwner && req.user.role !== 'admin') {
       return res.status(404).json({ message: 'Chat not found' });
     }
 

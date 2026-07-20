@@ -5,11 +5,13 @@ import {
   deleteUser,
   updateUserRole,
   getAllOrders,
-  updateOrderStatus,
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
 } from '../controllers/adminController.js';
+// Single source of truth for status transitions: validates the status,
+// awards loyalty points and emits the real-time update.
+import { updateOrderStatus } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/auth.js';
 
 const router = express.Router();

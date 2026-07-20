@@ -18,26 +18,41 @@ export const api = {
   },
 
   // Order APIs
-  createOrder: async (orderData) => {
+  // The server prices the order from the live menu, so only item ids and
+  // quantities are sent — never prices or totals.
+  createOrder: async (orderData, token) => {
     const response = await fetch(`${API_URL}/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(orderData),
     });
-    if (!response.ok) throw new Error('Failed to create order');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to create order');
+    }
     return response.json();
   },
 
-  getOrderById: async (orderId) => {
-    const response = await fetch(`${API_URL}/orders/${orderId}`);
+  getOrderById: async (orderId, token) => {
+    const response = await fetch(`${API_URL}/orders/${orderId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (!response.ok) throw new Error('Failed to fetch order');
     return response.json();
   },
 
-  getOrdersByEmail: async (email) => {
-    const response = await fetch(`${API_URL}/orders/customer/${email}`);
+  // Admin only: looks up any customer's orders by email address.
+  getOrdersByEmail: async (email, token) => {
+    const response = await fetch(`${API_URL}/orders/customer/${encodeURIComponent(email)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (!response.ok) throw new Error('Failed to fetch orders');
     return response.json();
   },
@@ -80,8 +95,27 @@ export const api = {
       body: JSON.stringify(credentials),
     });
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to login');
+      const errorData = await response.json().catch(() => ({}));
+      const error = new Error(errorData.message || 'Failed to login');
+      // Lets the UI tell "wrong password" apart from "unverified email".
+      error.code = errorData.code;
+      error.status = response.status;
+      throw error;
+    }
+    return response.json();
+  },
+
+  resendVerification: async (email) => {
+    const response = await fetch(`${API_URL}/auth/resend-verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to resend verification email');
     }
     return response.json();
   },
