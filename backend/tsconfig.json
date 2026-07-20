@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    /* The project is native ESM ("type": "module"), so NodeNext is the
+       resolution mode that matches how Node actually loads these files.
+       It requires explicit .js extensions on relative imports, even in .ts. */
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+
+    "outDir": "./dist",
+    "rootDir": "./",
+    "sourceMap": true,
+    "declaration": false,
+
+    /* Strict from day one. Migrating a codebase with strict off means doing
+       the work twice — the errors it surfaces are the reason to migrate. */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+
+    "types": ["node"]
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist", "coverage", "tests/**/*"]
+}
