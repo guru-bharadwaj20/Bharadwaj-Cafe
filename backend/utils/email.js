@@ -1,5 +1,21 @@
 import nodemailer from 'nodemailer';
 
+/**
+ * When SMTP credentials are absent — local development, CI, E2E runs — every
+ * send would otherwise open a doomed connection and throw. Detect it once and
+ * degrade to a logged no-op instead of failing the surrounding request.
+ */
+const isConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
+let warned = false;
+const warnOnce = (to, subject) => {
+  if (!warned) {
+    console.warn('[email] EMAIL_USER/EMAIL_PASS not set — emails are being skipped.');
+    warned = true;
+  }
+  console.info(`[email] skipped "${subject}" to ${to}`);
+};
+
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: process.env.EMAIL_PORT || 587,
@@ -11,6 +27,11 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendVerificationEmail = async (email, token) => {
+  if (!isConfigured) {
+    warnOnce(email, 'Email Verification');
+    return;
+  }
+
   const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${token}`;
 
   const mailOptions = {
@@ -65,6 +86,11 @@ export const sendVerificationEmail = async (email, token) => {
 };
 
 export const sendPasswordResetEmail = async (email, token) => {
+  if (!isConfigured) {
+    warnOnce(email, 'Password Reset Request');
+    return;
+  }
+
   const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
 
   const mailOptions = {
@@ -126,6 +152,11 @@ export const sendPasswordResetEmail = async (email, token) => {
 };
 
 export const sendOrderConfirmationEmail = async (email, order) => {
+  if (!isConfigured) {
+    warnOnce(email, 'Order Confirmation');
+    return;
+  }
+
   const mailOptions = {
     from: `"Bharadwaj's Cafe" <${process.env.EMAIL_USER}>`,
     to: email,
