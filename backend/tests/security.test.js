@@ -83,9 +83,7 @@ describe('Fix #1 — the pre-save hook only runs when the password changes', () 
       .expect(200);
 
     // Pre-fix, this save re-hashed the existing hash and locked the user out.
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: user.email, password });
+    const res = await request(app).post('/api/auth/login').send({ email: user.email, password });
 
     expect(res.status).toBe(200);
     expect(res.body.token).toBeTruthy();
@@ -94,14 +92,9 @@ describe('Fix #1 — the pre-save hook only runs when the password changes', () 
   it('keeps the password valid after a forgot-password request', async () => {
     const { user, password } = await makeUser();
 
-    await request(app)
-      .post('/api/auth/forgot-password')
-      .send({ email: user.email })
-      .expect(200);
+    await request(app).post('/api/auth/forgot-password').send({ email: user.email }).expect(200);
 
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: user.email, password });
+    const res = await request(app).post('/api/auth/login').send({ email: user.email, password });
 
     expect(res.status).toBe(200);
   });
@@ -120,10 +113,7 @@ describe('Fix #1 — the pre-save hook only runs when the password changes', () 
       .send({ email: user.email, password: 'a-brand-new-password' })
       .expect(200);
 
-    await request(app)
-      .post('/api/auth/login')
-      .send({ email: user.email, password })
-      .expect(401);
+    await request(app).post('/api/auth/login').send({ email: user.email, password }).expect(401);
   });
 });
 
@@ -237,7 +227,7 @@ describe('Fix #3 — order reads require auth and ownership', () => {
     await request(app).get(`/api/orders/${order._id}`).expect(401);
   });
 
-  it('hides another user\'s order even from a logged-in user', async () => {
+  it("hides another user's order even from a logged-in user", async () => {
     const { token: strangerToken } = await makeUser();
 
     await request(app)
@@ -313,7 +303,7 @@ describe('Fix #4 — sockets are authenticated and identity-pinned', () => {
 });
 
 describe('Fix #5 — remaining hardening', () => {
-  it('will not let a stranger read or mutate another user\'s chat', async () => {
+  it("will not let a stranger read or mutate another user's chat", async () => {
     const { token: ownerToken } = await makeUser();
     const { token: strangerToken } = await makeUser();
 
@@ -397,10 +387,7 @@ describe('Fix #5 — remaining hardening', () => {
   it('requires admin role for admin endpoints', async () => {
     const { token } = await makeUser();
 
-    await request(app)
-      .get('/api/admin/stats')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(403);
+    await request(app).get('/api/admin/stats').set('Authorization', `Bearer ${token}`).expect(403);
 
     const { token: adminToken } = await makeUser({ role: 'admin' });
     await request(app)
@@ -413,10 +400,7 @@ describe('Fix #5 — remaining hardening', () => {
     const { user, token } = await makeUser();
     await User.findByIdAndDelete(user._id);
 
-    await request(app)
-      .get('/api/auth/profile')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(401);
+    await request(app).get('/api/auth/profile').set('Authorization', `Bearer ${token}`).expect(401);
   });
 
   it('validates order status transitions', async () => {

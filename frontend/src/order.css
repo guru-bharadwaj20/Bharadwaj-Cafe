@@ -16,7 +16,7 @@
 }
 
 .order-section .section-title::after {
-  content: "";
+  content: '';
   width: 80px;
   height: 5px;
   display: block;

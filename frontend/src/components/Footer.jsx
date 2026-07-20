@@ -1,11 +1,10 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   };
 
@@ -24,10 +23,18 @@ const Footer = () => {
             <div className="footer-column">
               <h3>Get to Know Us</h3>
               <ul>
-                <li><Link to="/about">About Us</Link></li>
-                <li><Link to="/contact">Contact Us</Link></li>
-                <li><a href="#">Careers</a></li>
-                <li><a href="#">Our Story</a></li>
+                <li>
+                  <Link to="/about">About Us</Link>
+                </li>
+                <li>
+                  <Link to="/contact">Contact Us</Link>
+                </li>
+                <li>
+                  <a href="#">Careers</a>
+                </li>
+                <li>
+                  <a href="#">Our Story</a>
+                </li>
               </ul>
             </div>
 
@@ -35,10 +42,18 @@ const Footer = () => {
             <div className="footer-column">
               <h3>Our Menu</h3>
               <ul>
-                <li><Link to="/order">Coffee</Link></li>
-                <li><a href="#">Snacks</a></li>
-                <li><a href="#">Beverages</a></li>
-                <li><a href="#">Specials</a></li>
+                <li>
+                  <Link to="/order">Coffee</Link>
+                </li>
+                <li>
+                  <a href="#">Snacks</a>
+                </li>
+                <li>
+                  <a href="#">Beverages</a>
+                </li>
+                <li>
+                  <a href="#">Specials</a>
+                </li>
               </ul>
             </div>
 
@@ -46,10 +61,18 @@ const Footer = () => {
             <div className="footer-column">
               <h3>Customer Service</h3>
               <ul>
-                <li><Link to="/profile">Your Account</Link></li>
-                <li><Link to="/cart">Your Cart</Link></li>
-                <li><a href="#">Help Center</a></li>
-                <li><a href="#">Track Order</a></li>
+                <li>
+                  <Link to="/profile">Your Account</Link>
+                </li>
+                <li>
+                  <Link to="/cart">Your Cart</Link>
+                </li>
+                <li>
+                  <a href="#">Help Center</a>
+                </li>
+                <li>
+                  <a href="#">Track Order</a>
+                </li>
               </ul>
             </div>
 
@@ -57,10 +80,26 @@ const Footer = () => {
             <div className="footer-column">
               <h3>Connect With Us</h3>
               <ul>
-                <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a></li>
-                <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-                <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-                <li><a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+                <li>
+                  <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                    Facebook
+                  </a>
+                </li>
+                <li>
+                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+                    LinkedIn
+                  </a>
+                </li>
+                <li>
+                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                    Twitter
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -85,7 +124,10 @@ const Footer = () => {
               <p>© 2025 Bharadwaj's Cafe. All rights reserved.</p>
             </div>
             <div className="made-with-love">
-              <p>Made with <i className="fas fa-heart"></i> by <span className="creator">Guru Bharadwaj</span></p>
+              <p>
+                Made with <i className="fas fa-heart"></i> by{' '}
+                <span className="creator">Guru Bharadwaj</span>
+              </p>
             </div>
           </div>
         </div>

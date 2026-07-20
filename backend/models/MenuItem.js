@@ -28,30 +28,38 @@ const menuItemSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    dietary: [{
-      type: String,
-      enum: ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free']
-    }],
-    customizations: [{
-      name: String,
-      options: [{
+    dietary: [
+      {
+        type: String,
+        enum: ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'],
+      },
+    ],
+    customizations: [
+      {
         name: String,
-        price: Number
-      }]
-    }],
+        options: [
+          {
+            name: String,
+            price: Number,
+          },
+        ],
+      },
+    ],
     rating: {
       type: Number,
       default: 0,
       min: 0,
-      max: 5
+      max: 5,
     },
     reviewCount: {
       type: Number,
-      default: 0
+      default: 0,
     },
-    tags: [{
-      type: String
-    }]
+    tags: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true }
 );

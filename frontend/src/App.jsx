@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -60,172 +60,172 @@ function App() {
       <CartProvider>
         <Router>
           <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/verify-email/:token" element={<VerifyEmail />} />
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <Home />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <AboutPage />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/order"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <OrderPage />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/contact"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <ContactPage />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/merchandise"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <MerchandisePage />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <Cart />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <Profile />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/order-history"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <OrderHistory />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <AdminDashboard />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/wishlist"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <WishlistPage />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/addresses"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <AddressManagement />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/loyalty"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <LoyaltyPage />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/blog"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <BlogList />
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/blog/:slug"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                  <BlogDetail />
-                </>
-              </ProtectedRoute>
-            }
-          />
+            {/* Protected Routes */}
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <Home />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <AboutPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <OrderPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <ContactPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/merchandise"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <MerchandisePage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <Cart />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <Profile />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order-history"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <OrderHistory />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <AdminDashboard />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wishlist"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <WishlistPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/addresses"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <AddressManagement />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/loyalty"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <LoyaltyPage />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/blog"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <BlogList />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/blog/:slug"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <BlogDetail />
+                  </>
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Redirect any unknown routes to landing */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Redirect any unknown routes to landing */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <ChatWidget />
         </Router>

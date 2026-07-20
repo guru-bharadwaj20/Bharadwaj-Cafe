@@ -8,13 +8,12 @@ const MAX_MESSAGE_LENGTH = 2000;
 // @access  Private
 export const getUserChat = async (req, res) => {
   try {
-    let chat = await Chat.findOne({ user: req.user._id })
-      .populate('user', 'name email');
+    let chat = await Chat.findOne({ user: req.user._id }).populate('user', 'name email');
 
     if (!chat) {
       chat = await Chat.create({
         user: req.user._id,
-        messages: []
+        messages: [],
       });
       chat = await chat.populate('user', 'name email');
     }
@@ -44,13 +43,13 @@ export const sendMessage = async (req, res) => {
     if (!chat) {
       chat = await Chat.create({
         user: req.user._id,
-        messages: []
+        messages: [],
       });
     }
 
     chat.messages.push({
       sender: 'user',
-      message
+      message,
     });
 
     chat.lastMessage = Date.now();
@@ -75,9 +74,7 @@ export const sendMessage = async (req, res) => {
 // @access  Private/Admin
 export const getAllChats = async (req, res) => {
   try {
-    const chats = await Chat.find()
-      .populate('user', 'name email')
-      .sort('-lastMessage');
+    const chats = await Chat.find().populate('user', 'name email').sort('-lastMessage');
 
     res.json(chats);
   } catch (error) {
@@ -107,7 +104,7 @@ export const sendAdminMessage = async (req, res) => {
 
     chat.messages.push({
       sender: 'admin',
-      message
+      message,
     });
 
     chat.lastMessage = Date.now();
@@ -163,7 +160,7 @@ export const markAsRead = async (req, res) => {
       return res.status(404).json({ message: 'Chat not found' });
     }
 
-    chat.messages.forEach(msg => {
+    chat.messages.forEach((msg) => {
       if (msg.sender !== 'user') {
         msg.read = true;
       }

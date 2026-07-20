@@ -37,7 +37,7 @@ export const sendVerificationEmail = async (email, token) => {
   const mailOptions = {
     from: `"Bharadwaj's Cafe" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: 'Email Verification - Bharadwaj\'s Cafe',
+    subject: "Email Verification - Bharadwaj's Cafe",
     html: `
       <!DOCTYPE html>
       <html>
@@ -96,7 +96,7 @@ export const sendPasswordResetEmail = async (email, token) => {
   const mailOptions = {
     from: `"Bharadwaj's Cafe" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: 'Password Reset Request - Bharadwaj\'s Cafe',
+    subject: "Password Reset Request - Bharadwaj's Cafe",
     html: `
       <!DOCTYPE html>
       <html>
@@ -189,12 +189,16 @@ export const sendOrderConfirmationEmail = async (email, order) => {
               <p><strong>Status:</strong> ${order.status}</p>
               <p><strong>Order Type:</strong> ${order.orderType}</p>
               <hr>
-              ${order.items.map(item => `
+              ${order.items
+                .map(
+                  (item) => `
                 <div class="item">
                   <strong>${item.name}</strong> x ${item.quantity}
                   <span style="float: right;">₹${item.price * item.quantity}</span>
                 </div>
-              `).join('')}
+              `
+                )
+                .join('')}
               <div class="total">
                 Total: ₹${order.totalAmount}
               </div>

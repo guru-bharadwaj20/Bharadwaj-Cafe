@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -8,13 +8,12 @@ const Order = () => {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const [addedItems, setAddedItems] = useState({});
-  const [filters, setFilters] = useState({});
 
   const handleAddToCart = (item) => {
     addToCart(item);
-    setAddedItems(prev => ({ ...prev, [item._id]: true }));
+    setAddedItems((prev) => ({ ...prev, [item._id]: true }));
     setTimeout(() => {
-      setAddedItems(prev => ({ ...prev, [item._id]: false }));
+      setAddedItems((prev) => ({ ...prev, [item._id]: false }));
     }, 1500);
   };
 
@@ -24,43 +23,43 @@ const Order = () => {
       name: 'Cappuccino',
       description: 'Espresso with steamed milk foam and a touch of cocoa',
       price: 150,
-      image: 'img/cappuccino.png'
+      image: 'img/cappuccino.png',
     },
     {
       _id: '2',
       name: 'Caffe Latte',
       description: 'Smooth espresso with steamed milk and light foam',
       price: 160,
-      image: 'img/latte.png'
+      image: 'img/latte.png',
     },
     {
       _id: '3',
       name: 'Mocha',
       description: 'Rich chocolate and espresso blend with whipped cream',
       price: 170,
-      image: 'img/mocha.png'
+      image: 'img/mocha.png',
     },
     {
       _id: '4',
       name: 'Americano',
       description: 'Espresso diluted with hot water for a smooth taste',
       price: 130,
-      image: 'img/americano.png'
+      image: 'img/americano.png',
     },
     {
       _id: '5',
       name: 'Flat White',
       description: 'Velvety microfoam with a double shot of espresso',
       price: 155,
-      image: 'img/flat.png'
+      image: 'img/flat.png',
     },
     {
       _id: '6',
       name: 'Filter Coffee',
       description: 'Traditional South Indian filter coffee with milk and sugar',
       price: 100,
-      image: 'img/filter.png'
-    }
+      image: 'img/filter.png',
+    },
   ];
 
   const [menuItems, setMenuItems] = useState(defaultMenuItems);
@@ -71,7 +70,7 @@ const Order = () => {
     try {
       setLoading(true);
       const data = await api.getMenu(filterParams);
-      
+
       // If database has items, use them; otherwise use default
       if (data && data.length > 0) {
         setMenuItems(data);
@@ -93,8 +92,6 @@ const Order = () => {
   }, []);
 
   const handleFilterChange = (newFilters) => {
-    console.log('Filters changed:', newFilters);
-    setFilters(newFilters);
     fetchMenu(newFilters);
   };
 
@@ -141,7 +138,7 @@ const Order = () => {
         <ul className="menu-list">
           {menuItems.map((item) => (
             <li className="menu-item" key={item._id}>
-              <button 
+              <button
                 className="btn-wishlist"
                 onClick={() => handleAddToWishlist(item._id)}
                 title="Add to Wishlist"
@@ -154,27 +151,33 @@ const Order = () => {
                 <p className="text">{item.description}</p>
                 {item.dietary && item.dietary.length > 0 && (
                   <div className="dietary-tags">
-                    {item.dietary.map(tag => (
-                      <span key={tag} className="dietary-tag">{tag}</span>
+                    {item.dietary.map((tag) => (
+                      <span key={tag} className="dietary-tag">
+                        {tag}
+                      </span>
                     ))}
                   </div>
                 )}
                 {item.rating > 0 && (
                   <div className="rating">
-                    <i className="fas fa-star"></i> {item.rating.toFixed(1)} 
+                    <i className="fas fa-star"></i> {item.rating.toFixed(1)}
                     <span>({item.reviewCount} reviews)</span>
                   </div>
                 )}
                 <div className="menu-footer">
                   <p className="price">₹{item.price}</p>
-                  <button 
+                  <button
                     className={`add-to-cart-btn ${addedItems[item._id] ? 'added' : ''}`}
                     onClick={() => handleAddToCart(item)}
                   >
                     {addedItems[item._id] ? (
-                      <><i className="fas fa-check"></i> Added</>
+                      <>
+                        <i className="fas fa-check"></i> Added
+                      </>
                     ) : (
-                      <><i className="fas fa-cart-plus"></i> Add to Cart</>
+                      <>
+                        <i className="fas fa-cart-plus"></i> Add to Cart
+                      </>
                     )}
                   </button>
                 </div>

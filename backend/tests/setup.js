@@ -20,7 +20,15 @@ vi.mock('../utils/email.js', () => ({
 let mongoServer;
 
 beforeAll(async () => {
-  // The first run extracts the mongod binary, which can take well over the
+  // CI supplies a MongoDB service container, which avoids downloading a
+  // ~780MB mongod binary on every run. Locally we fall back to an in-memory
+  // instance so `npm test` needs no setup at all.
+  if (process.env.MONGO_URI_TEST) {
+    await mongoose.connect(process.env.MONGO_URI_TEST);
+    return;
+  }
+
+  // The first local run extracts the mongod binary, which takes well over the
   // library's 10s default on a cold cache.
   mongoServer = await MongoMemoryServer.create({
     instance: { launchTimeout: 120000 },

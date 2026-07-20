@@ -1,6 +1,33 @@
 # Bharadwaj's Cafe
 
+[![CI](https://github.com/guru-bharadwaj20/Bharadwaj-Cafe/actions/workflows/ci.yml/badge.svg)](https://github.com/guru-bharadwaj20/Bharadwaj-Cafe/actions/workflows/ci.yml)
+![Node](https://img.shields.io/badge/node-22.x-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/react-18-61DAFB?logo=react&logoColor=black)
+![Tests](https://img.shields.io/badge/tests-139%20passing-brightgreen)
+![License](https://img.shields.io/badge/license-ISC-blue)
+
 A full-stack coffee shop platform with a React (Vite) frontend and an Express/MongoDB backend. It supports real-time features (orders & chat), user accounts, loyalty points, wishlist management, reviews, blogs, and basic admin functions for menu and order oversight.
+
+## Quality Checks
+
+Every push and pull request to `main` runs the full pipeline:
+
+| Job | What it does |
+| --- | --- |
+| **Lint & format** | ESLint + Prettier across backend and frontend |
+| **Backend tests** | 106 integration tests against a MongoDB service container, with coverage |
+| **Frontend tests & build** | 29 component/context tests, then a production build |
+| **End-to-end** | 4 Playwright journeys against the real API and the production bundle |
+| **Dependency audit** | `npm audit` on both packages (advisory) |
+
+Run them locally:
+
+```bash
+npm run lint --prefix backend && npm run lint --prefix frontend
+npm test --prefix backend      # 106 tests
+npm test --prefix frontend     #  29 tests
+npm run test:e2e               #   4 journeys (starts its own API + DB)
+```
 
 ## Project Structure
 

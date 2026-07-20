@@ -1,9 +1,5 @@
 import express from 'express';
-import {
-  getLoyaltyInfo,
-  redeemPoints,
-  getRewards
-} from '../controllers/loyaltyController.js';
+import { getLoyaltyInfo, redeemPoints, getRewards } from '../controllers/loyaltyController.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();

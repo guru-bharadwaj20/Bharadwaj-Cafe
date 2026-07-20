@@ -183,7 +183,7 @@ describe('Reviews', () => {
       .expect(400);
   });
 
-  it('refuses to let one user edit or delete another\'s review', async () => {
+  it("refuses to let one user edit or delete another's review", async () => {
     const item = await createMenuItem();
     const { token: owner } = await createUser(app);
     const { token: stranger } = await createUser(app);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
 
@@ -21,7 +21,7 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       setStatus({ type: 'error', message: 'Passwords do not match!' });
       return;
@@ -41,7 +41,7 @@ const ResetPassword = () => {
         type: 'success',
         message: response.message || 'Password reset successful!',
       });
-      
+
       setTimeout(() => {
         navigate('/login');
       }, 2000);
@@ -68,7 +68,9 @@ const ResetPassword = () => {
 
             {status.message && (
               <div className={`${status.type === 'success' ? 'success-message' : 'error-message'}`}>
-                <i className={`fa-solid ${status.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`}></i>
+                <i
+                  className={`fa-solid ${status.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`}
+                ></i>
                 {status.message}
               </div>
             )}

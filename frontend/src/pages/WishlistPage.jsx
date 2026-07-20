@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ const WishlistPage = () => {
     try {
       const data = await api.removeFromWishlist(itemId, user?.token);
       setWishlist(data);
-    } catch (error) {
+    } catch {
       alert('Failed to remove item');
     }
   };
@@ -45,7 +45,7 @@ const WishlistPage = () => {
     try {
       await api.clearWishlist(user?.token);
       fetchWishlist();
-    } catch (error) {
+    } catch {
       alert('Failed to clear wishlist');
     }
   };
@@ -87,35 +87,29 @@ const WishlistPage = () => {
           </div>
 
           <div className="wishlist-grid">
-            {wishlist.items.map(item => (
+            {wishlist.items.map((item) => (
               <div key={item._id} className="wishlist-card">
-                <button 
-                  className="btn-remove"
-                  onClick={() => handleRemove(item.menuItem._id)}
-                >
+                <button className="btn-remove" onClick={() => handleRemove(item.menuItem._id)}>
                   <i className="fas fa-times"></i>
                 </button>
-                
+
                 <img src={item.menuItem.image} alt={item.menuItem.name} />
-                
+
                 <div className="wishlist-card-content">
                   <h3>{item.menuItem.name}</h3>
                   <p>{item.menuItem.description}</p>
-                  
+
                   {item.menuItem.rating > 0 && (
                     <div className="rating">
                       <i className="fas fa-star"></i>
-                      {item.menuItem.rating.toFixed(1)} 
+                      {item.menuItem.rating.toFixed(1)}
                       <span>({item.menuItem.reviewCount} reviews)</span>
                     </div>
                   )}
-                  
+
                   <div className="wishlist-card-footer">
                     <span className="price">₹{item.menuItem.price}</span>
-                    <button 
-                      className="btn-add-cart"
-                      onClick={() => handleAddToCart(item.menuItem)}
-                    >
+                    <button className="btn-add-cart" onClick={() => handleAddToCart(item.menuItem)}>
                       <i className="fas fa-shopping-cart"></i> Add to Cart
                     </button>
                   </div>

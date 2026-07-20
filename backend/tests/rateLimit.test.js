@@ -22,9 +22,7 @@ afterAll(() => {
 describe('Credential rate limiting', () => {
   it('blocks sustained failed login attempts', async () => {
     const attempt = () =>
-      request(app)
-        .post('/api/auth/login')
-        .send({ email: 'nobody@example.com', password: 'wrong' });
+      request(app).post('/api/auth/login').send({ email: 'nobody@example.com', password: 'wrong' });
 
     const statuses = [];
     for (let i = 0; i < 14; i += 1) {

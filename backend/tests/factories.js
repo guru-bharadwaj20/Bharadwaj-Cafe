@@ -28,9 +28,7 @@ export const createUser = async (app, overrides = {}) => {
     password,
   });
 
-  const res = await request(app)
-    .post('/api/auth/login')
-    .send({ email: user.email, password });
+  const res = await request(app).post('/api/auth/login').send({ email: user.email, password });
 
   if (!res.body.token) {
     throw new Error(`Login failed in factory: ${JSON.stringify(res.body)}`);
@@ -59,9 +57,7 @@ export const placeOrder = async (app, token, items, overrides = {}) => {
     .set('Authorization', `Bearer ${token}`)
     .send({
       items: items.map((entry) =>
-        entry.menuItem
-          ? entry
-          : { menuItem: entry._id, quantity: entry.quantity || 1 }
+        entry.menuItem ? entry : { menuItem: entry._id, quantity: entry.quantity || 1 }
       ),
       customerPhone: '9999999999',
       ...overrides,

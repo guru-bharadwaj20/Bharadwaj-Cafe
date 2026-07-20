@@ -4,7 +4,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 :root {
@@ -67,7 +67,7 @@ img {
 }
 
 .section-title::after {
-  content: "";
+  content: '';
   width: 80px;
   height: 5px;
   display: block;
@@ -141,7 +141,7 @@ header .navbar {
   cursor: pointer;
   padding: 0;
   font-size: var(--font-size-m);
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: var(--font-weight-medium);
   transition: all 0.3s ease;
   position: relative;
@@ -184,7 +184,7 @@ header .navbar {
   align-items: center;
   gap: 6px;
   padding: 0;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: var(--font-size-m);
   font-weight: var(--font-weight-medium);
   transition: all 0.3s ease;
@@ -230,7 +230,7 @@ header .navbar {
   border: none;
   text-align: left;
   color: var(--dark-color);
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: var(--font-size-n);
   cursor: pointer;
   display: flex;
@@ -306,7 +306,7 @@ header .navbar {
 .hero-section .hero-details .title {
   font-size: var(--font-size-xxl);
   color: var(--secondary-color);
-  font-family: "Miniver", cursive;
+  font-family: 'Miniver', cursive;
   padding-left: 1rem;
 }
 
@@ -382,7 +382,7 @@ header .navbar {
   }
 
   body.show-mobile-menu header::before {
-    content: "";
+    content: '';
     position: fixed;
     left: 0;
     top: 0;
@@ -557,9 +557,9 @@ header .navbar {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    margin-right: 0; 
+    margin-right: 0;
   }
-  
+
   .hero-section .hero-image-wrapper img {
     width: 100%;
     height: auto;
@@ -571,7 +571,8 @@ header .navbar {
     max-width: 100%;
   }
 
-  .hero-section .hero-details ,.buttons {
+  .hero-section .hero-details,
+  .buttons {
     justify-content: center;
-  } 
+  }
 }

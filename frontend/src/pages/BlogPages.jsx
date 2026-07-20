@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
@@ -25,7 +25,11 @@ export const BlogList = () => {
   };
 
   if (loading) {
-    return <div className="loading-container"><div className="spinner"></div></div>;
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+      </div>
+    );
   }
 
   return (
@@ -52,7 +56,7 @@ export const BlogList = () => {
       </div>
 
       <div className="blog-grid">
-        {blogs.map(blog => (
+        {blogs.map((blog) => (
           <div key={blog._id} className="blog-card" onClick={() => navigate(`/blog/${blog.slug}`)}>
             <img src={blog.coverImage} alt={blog.title} />
             <div className="blog-card-content">
@@ -60,13 +64,17 @@ export const BlogList = () => {
               <h3>{blog.title}</h3>
               <p>{blog.excerpt}</p>
               <div className="blog-meta">
-                <span><i className="fas fa-user"></i> {blog.author?.name}</span>
-                <span><i className="fas fa-eye"></i> {blog.views} views</span>
-                <span><i className="fas fa-heart"></i> {blog.likes?.length || 0}</span>
+                <span>
+                  <i className="fas fa-user"></i> {blog.author?.name}
+                </span>
+                <span>
+                  <i className="fas fa-eye"></i> {blog.views} views
+                </span>
+                <span>
+                  <i className="fas fa-heart"></i> {blog.likes?.length || 0}
+                </span>
               </div>
-              <span className="blog-date">
-                {new Date(blog.createdAt).toLocaleDateString()}
-              </span>
+              <span className="blog-date">{new Date(blog.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
         ))}
@@ -111,11 +119,19 @@ export const BlogDetail = () => {
   };
 
   if (loading) {
-    return <div className="loading-container"><div className="spinner"></div></div>;
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+      </div>
+    );
   }
 
   if (!blog) {
-    return <div className="blog-detail-page"><h2>Blog not found</h2></div>;
+    return (
+      <div className="blog-detail-page">
+        <h2>Blog not found</h2>
+      </div>
+    );
   }
 
   return (
@@ -127,11 +143,17 @@ export const BlogDetail = () => {
       <div className="blog-detail">
         <span className="blog-category">{blog.category}</span>
         <h1>{blog.title}</h1>
-        
+
         <div className="blog-meta">
-          <span><i className="fas fa-user"></i> By {blog.author?.name}</span>
-          <span><i className="fas fa-calendar"></i> {new Date(blog.createdAt).toLocaleDateString()}</span>
-          <span><i className="fas fa-eye"></i> {blog.views} views</span>
+          <span>
+            <i className="fas fa-user"></i> By {blog.author?.name}
+          </span>
+          <span>
+            <i className="fas fa-calendar"></i> {new Date(blog.createdAt).toLocaleDateString()}
+          </span>
+          <span>
+            <i className="fas fa-eye"></i> {blog.views} views
+          </span>
         </div>
 
         <img src={blog.coverImage} alt={blog.title} className="blog-cover" />
@@ -139,8 +161,10 @@ export const BlogDetail = () => {
         <div className="blog-content" dangerouslySetInnerHTML={{ __html: blog.content }}></div>
 
         <div className="blog-tags">
-          {blog.tags?.map(tag => (
-            <span key={tag} className="tag">{tag}</span>
+          {blog.tags?.map((tag) => (
+            <span key={tag} className="tag">
+              {tag}
+            </span>
           ))}
         </div>
 

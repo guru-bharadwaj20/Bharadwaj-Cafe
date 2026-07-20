@@ -123,10 +123,7 @@ describe('Profile management', () => {
   });
 
   it('rejects a malformed authorization header', async () => {
-    await request(app)
-      .get('/api/auth/profile')
-      .set('Authorization', 'NotBearer abc')
-      .expect(401);
+    await request(app).get('/api/auth/profile').set('Authorization', 'NotBearer abc').expect(401);
   });
 
   it('updates the display name', async () => {

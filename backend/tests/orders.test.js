@@ -123,7 +123,7 @@ describe('POST /api/orders', () => {
 });
 
 describe('GET /api/orders/myorders', () => {
-  it('returns only the caller\'s own orders, newest first', async () => {
+  it("returns only the caller's own orders, newest first", async () => {
     const { token: mine } = await createUser(app);
     const { token: theirs } = await createUser(app);
     const item = await createMenuItem();

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../utils/api';
 
@@ -42,7 +42,9 @@ const ForgotPassword = () => {
 
             {status.message && (
               <div className={`${status.type === 'success' ? 'success-message' : 'error-message'}`}>
-                <i className={`fa-solid ${status.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`}></i>
+                <i
+                  className={`fa-solid ${status.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`}
+                ></i>
                 {status.message}
               </div>
             )}
@@ -74,7 +76,12 @@ const ForgotPassword = () => {
             </div>
 
             <div className="auth-redirect">
-              <p>Remember your password? <Link to="/login" className="redirect-link">Login here</Link></p>
+              <p>
+                Remember your password?{' '}
+                <Link to="/login" className="redirect-link">
+                  Login here
+                </Link>
+              </p>
             </div>
 
             <div className="back-home">

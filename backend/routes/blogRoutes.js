@@ -5,22 +5,17 @@ import {
   createBlog,
   updateBlog,
   deleteBlog,
-  likeBlog
+  likeBlog,
 } from '../controllers/blogController.js';
 import { protect, admin } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.route('/')
-  .get(getBlogs)
-  .post(protect, admin, createBlog);
+router.route('/').get(getBlogs).post(protect, admin, createBlog);
 
-router.route('/:slug')
-  .get(getBlogBySlug);
+router.route('/:slug').get(getBlogBySlug);
 
-router.route('/:id')
-  .put(protect, admin, updateBlog)
-  .delete(protect, admin, deleteBlog);
+router.route('/:id').put(protect, admin, updateBlog).delete(protect, admin, deleteBlog);
 
 router.put('/:id/like', protect, likeBlog);
 

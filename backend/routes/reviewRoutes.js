@@ -4,7 +4,7 @@ import {
   getMenuItemReviews,
   updateReview,
   deleteReview,
-  markHelpful
+  markHelpful,
 } from '../controllers/reviewController.js';
 import { protect } from '../middleware/auth.js';
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 
@@ -17,7 +17,7 @@ const AddressManagement = () => {
     state: '',
     pincode: '',
     landmark: '',
-    isDefault: false
+    isDefault: false,
   });
 
   useEffect(() => {
@@ -41,11 +41,11 @@ const AddressManagement = () => {
       } else {
         await api.createAddress(formData, user?.token);
       }
-      
+
       resetForm();
       fetchAddresses();
       alert(editingAddress ? 'Address updated!' : 'Address added!');
-    } catch (error) {
+    } catch {
       alert('Failed to save address');
     }
   };
@@ -61,7 +61,7 @@ const AddressManagement = () => {
     try {
       await api.deleteAddress(id, user?.token);
       fetchAddresses();
-    } catch (error) {
+    } catch {
       alert('Failed to delete address');
     }
   };
@@ -70,7 +70,7 @@ const AddressManagement = () => {
     try {
       await api.setDefaultAddress(id, user?.token);
       fetchAddresses();
-    } catch (error) {
+    } catch {
       alert('Failed to set default address');
     }
   };
@@ -86,7 +86,7 @@ const AddressManagement = () => {
       state: '',
       pincode: '',
       landmark: '',
-      isDefault: false
+      isDefault: false,
     });
     setEditingAddress(null);
     setShowForm(false);
@@ -94,9 +94,9 @@ const AddressManagement = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -244,19 +244,23 @@ const AddressManagement = () => {
         {addresses.length === 0 ? (
           <p className="no-addresses">No saved addresses yet.</p>
         ) : (
-          addresses.map(address => (
+          addresses.map((address) => (
             <div key={address._id} className={`address-card ${address.isDefault ? 'default' : ''}`}>
               {address.isDefault && <span className="default-badge">Default</span>}
-              
+
               <div className="address-label">
-                <i className={`fas fa-${address.label === 'Home' ? 'home' : address.label === 'Work' ? 'briefcase' : 'map-marker-alt'}`}></i>
+                <i
+                  className={`fas fa-${address.label === 'Home' ? 'home' : address.label === 'Work' ? 'briefcase' : 'map-marker-alt'}`}
+                ></i>
                 {address.label}
               </div>
 
               <h4>{address.fullName}</h4>
               <p>{address.addressLine1}</p>
               {address.addressLine2 && <p>{address.addressLine2}</p>}
-              <p>{address.city}, {address.state} - {address.pincode}</p>
+              <p>
+                {address.city}, {address.state} - {address.pincode}
+              </p>
               {address.landmark && <p className="landmark">Landmark: {address.landmark}</p>}
               <p className="phone">Phone: {address.phone}</p>
 

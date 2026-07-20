@@ -4,41 +4,44 @@ const messageSchema = new mongoose.Schema({
   sender: {
     type: String,
     required: true,
-    enum: ['user', 'admin']
+    enum: ['user', 'admin'],
   },
   message: {
     type: String,
-    required: true
+    required: true,
   },
   timestamp: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   read: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
-const chatSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+const chatSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    messages: [messageSchema],
+    status: {
+      type: String,
+      enum: ['open', 'closed'],
+      default: 'open',
+    },
+    lastMessage: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  messages: [messageSchema],
-  status: {
-    type: String,
-    enum: ['open', 'closed'],
-    default: 'open'
-  },
-  lastMessage: {
-    type: Date,
-    default: Date.now
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true
-});
+);
 
 const Chat = mongoose.model('Chat', chatSchema);
 

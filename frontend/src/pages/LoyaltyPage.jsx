@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 
@@ -17,7 +17,7 @@ const LoyaltyPage = () => {
     try {
       const [info, rewardsList] = await Promise.all([
         api.getLoyaltyInfo(user?.token),
-        api.getRewards(user?.token)
+        api.getRewards(user?.token),
       ]);
       setLoyaltyInfo(info);
       setRewards(rewardsList);
@@ -31,12 +31,12 @@ const LoyaltyPage = () => {
   const handleRedeem = async (e) => {
     e.preventDefault();
     const points = parseInt(redeemPoints);
-    
+
     if (points < 100) {
       alert('Minimum 100 points required');
       return;
     }
-    
+
     if (points > loyaltyInfo.points) {
       alert('Insufficient points');
       return;
@@ -47,7 +47,7 @@ const LoyaltyPage = () => {
       alert(result.message);
       setRedeemPoints('');
       fetchLoyaltyData();
-    } catch (error) {
+    } catch {
       alert('Failed to redeem points');
     }
   };
@@ -57,7 +57,7 @@ const LoyaltyPage = () => {
       Bronze: '#CD7F32',
       Silver: '#C0C0C0',
       Gold: '#FFD700',
-      Platinum: '#E5E4E2'
+      Platinum: '#E5E4E2',
     };
     return colors[tier] || '#666';
   };
@@ -67,7 +67,7 @@ const LoyaltyPage = () => {
       Bronze: 'fa-medal',
       Silver: 'fa-award',
       Gold: 'fa-crown',
-      Platinum: 'fa-gem'
+      Platinum: 'fa-gem',
     };
     return icons[tier] || 'fa-medal';
   };
@@ -92,16 +92,16 @@ const LoyaltyPage = () => {
 
       <div className="loyalty-dashboard">
         <div className="tier-card" style={{ borderColor: getTierColor(loyaltyInfo.tier) }}>
-          <i className={`fas ${getTierIcon(loyaltyInfo.tier)}`} style={{ color: getTierColor(loyaltyInfo.tier) }}></i>
+          <i
+            className={`fas ${getTierIcon(loyaltyInfo.tier)}`}
+            style={{ color: getTierColor(loyaltyInfo.tier) }}
+          ></i>
           <h2>{loyaltyInfo.tier} Member</h2>
           {loyaltyInfo.nextTier && (
             <div className="tier-progress">
               <p>Progress to {loyaltyInfo.nextTier}</p>
               <div className="progress-bar">
-                <div 
-                  className="progress-fill" 
-                  style={{ width: `${loyaltyInfo.progress}%` }}
-                ></div>
+                <div className="progress-fill" style={{ width: `${loyaltyInfo.progress}%` }}></div>
               </div>
               <span className="progress-text">
                 ₹{loyaltyInfo.pointsToNextTier} more to {loyaltyInfo.nextTier}
@@ -138,7 +138,7 @@ const LoyaltyPage = () => {
       <div className="rewards-section">
         <h2>Rewards Catalog</h2>
         <div className="rewards-grid">
-          {rewards.map(reward => (
+          {rewards.map((reward) => (
             <div key={reward.id} className="reward-card">
               <div className="reward-icon">
                 <i className="fas fa-gift"></i>
@@ -147,10 +147,7 @@ const LoyaltyPage = () => {
               <p>{reward.description}</p>
               <div className="reward-footer">
                 <span className="points-required">{reward.points} Points</span>
-                <button 
-                  className="btn-claim"
-                  disabled={loyaltyInfo.points < reward.points}
-                >
+                <button className="btn-claim" disabled={loyaltyInfo.points < reward.points}>
                   {loyaltyInfo.points >= reward.points ? 'Claim' : 'Not Enough Points'}
                 </button>
               </div>

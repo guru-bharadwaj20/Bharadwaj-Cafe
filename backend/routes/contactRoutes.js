@@ -8,9 +8,7 @@ import { protect, admin } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.route('/')
-  .post(submitContact)
-  .get(protect, admin, getContacts);
+router.route('/').post(submitContact).get(protect, admin, getContacts);
 
 router.put('/:id', protect, admin, updateContactStatus);
 

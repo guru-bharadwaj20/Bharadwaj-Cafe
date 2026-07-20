@@ -6,20 +6,18 @@ import Blog from '../models/Blog.js';
 export const getBlogs = async (req, res) => {
   try {
     const { category, tag, search } = req.query;
-    let query = { published: true };
+    const query = { published: true };
 
     if (category) query.category = category;
     if (tag) query.tags = tag;
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } }
+        { content: { $regex: search, $options: 'i' } },
       ];
     }
 
-    const blogs = await Blog.find(query)
-      .populate('author', 'name')
-      .sort('-createdAt');
+    const blogs = await Blog.find(query).populate('author', 'name').sort('-createdAt');
 
     res.json(blogs);
   } catch (error) {
@@ -32,8 +30,7 @@ export const getBlogs = async (req, res) => {
 // @access  Public
 export const getBlogBySlug = async (req, res) => {
   try {
-    const blog = await Blog.findOne({ slug: req.params.slug })
-      .populate('author', 'name');
+    const blog = await Blog.findOne({ slug: req.params.slug }).populate('author', 'name');
 
     if (!blog) {
       return res.status(404).json({ message: 'Blog not found' });
@@ -56,7 +53,7 @@ export const createBlog = async (req, res) => {
   try {
     const blog = await Blog.create({
       ...req.body,
-      author: req.user._id
+      author: req.user._id,
     });
 
     res.status(201).json(blog);
@@ -117,9 +114,7 @@ export const likeBlog = async (req, res) => {
     const alreadyLiked = blog.likes.includes(req.user._id);
 
     if (alreadyLiked) {
-      blog.likes = blog.likes.filter(
-        id => id.toString() !== req.user._id.toString()
-      );
+      blog.likes = blog.likes.filter((id) => id.toString() !== req.user._id.toString());
     } else {
       blog.likes.push(req.user._id);
     }

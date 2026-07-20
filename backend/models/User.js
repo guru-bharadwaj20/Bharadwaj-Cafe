@@ -84,12 +84,11 @@ userSchema.pre('save', async function (next) {
 
 // Method to compare password
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return bcrypt.compare(enteredPassword, this.password);
 };
 
 // Hash a raw token the same way we store it, so lookups can compare hashes.
-export const hashToken = (rawToken) =>
-  crypto.createHash('sha256').update(rawToken).digest('hex');
+export const hashToken = (rawToken) => crypto.createHash('sha256').update(rawToken).digest('hex');
 
 // Issues a single-use token: the raw half goes in the email, the hashed half
 // goes in the database.
