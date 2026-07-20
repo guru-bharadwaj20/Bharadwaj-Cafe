@@ -325,3 +325,22 @@
     font-size: var(--font-size-l);
   }
 }
+
+/* Inline action inside the login error banner (resend verification email) */
+.resend-link {
+  display: block;
+  margin-top: 10px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #f3961c;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.resend-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -1,32 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
-import io from 'socket.io-client';
+import { socket, connectSocket, disconnectSocket } from '../utils/socket';
 
 const ChatWidget = () => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [chat, setChat] = useState(null);
   const [message, setMessage] = useState('');
-  const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    if (user) {
-      const newSocket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
-      setSocket(newSocket);
+    if (!user?.token) return undefined;
 
-      newSocket.emit('joinRoom', user._id);
+    // The server places this socket in the current user's room based on the
+    // token, so replies arriving here are already known to be for us.
+    connectSocket(user.token);
 
-      newSocket.on('adminMessage', (data) => {
-        if (data.userId === user._id) {
-          fetchChat();
-        }
-      });
+    const handleAdminMessage = () => fetchChat();
+    socket.on('adminMessage', handleAdminMessage);
 
-      return () => newSocket.close();
-    }
-  }, [user]);
+    return () => {
+      socket.off('adminMessage', handleAdminMessage);
+      disconnectSocket();
+    };
+  }, [user?.token]);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -56,13 +54,12 @@ const ChatWidget = () => {
     if (!message.trim()) return;
 
     try {
+      // Persisting the message is what notifies staff; the server emits to
+      // the admin room from the request handler. Emitting from the client
+      // would let anyone forge a message from any user.
       const data = await api.sendChatMessage({ message }, user?.token);
       setChat(data);
       setMessage('');
-      
-      if (socket) {
-        socket.emit('sendMessage', { userId: user._id, message });
-      }
     } catch (error) {
       console.error('Error sending message:', error);
     }

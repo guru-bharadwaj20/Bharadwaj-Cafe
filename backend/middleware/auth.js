@@ -1,49 +1,91 @@
 import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 export const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 };
 
+/**
+ * Verifies a bearer token and loads the user onto the request.
+ * Every downstream handler can assume `req.user` is a real, current user.
+ */
 export const protect = async (req, res, next) => {
-  let token;
+  const header = req.headers.authorization;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    try {
-      token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.userId = decoded.id;
-      
-      // Fetch user and attach to request
-      const User = (await import('../models/User.js')).default;
-      req.user = await User.findById(decoded.id).select('-password');
-      
-      if (!req.user) {
-        return res.status(401).json({ message: 'User not found' });
-      }
-      
-      next();
-    } catch (error) {
-      res.status(401).json({ message: 'Not authorized, token failed' });
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
+
+  try {
+    const token = header.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (!user) {
+      return res.status(401).json({ message: 'Not authorized, user no longer exists' });
     }
-  } else {
-    res.status(401).json({ message: 'Not authorized, no token' });
+
+    req.user = user;
+    req.userId = user._id; // kept for handlers that still read req.userId
+    return next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Not authorized, token failed' });
   }
 };
 
-export const admin = async (req, res, next) => {
+/**
+ * Must run after `protect`. Reuses the user already loaded rather than
+ * issuing a second database query for the same document.
+ */
+export const admin = (req, res, next) => {
+  if (req.user?.role === 'admin') {
+    return next();
+  }
+  return res.status(403).json({ message: 'Not authorized as admin' });
+};
+
+/**
+ * Blocks actions that require a confirmed email address. Opt out in local
+ * development by setting REQUIRE_EMAIL_VERIFICATION=false.
+ */
+export const requireVerified = (req, res, next) => {
+  if (process.env.REQUIRE_EMAIL_VERIFICATION === 'false') {
+    return next();
+  }
+  if (!req.user?.isVerified) {
+    return res.status(403).json({
+      message: 'Please verify your email address before continuing.',
+      code: 'EMAIL_NOT_VERIFIED',
+    });
+  }
+  return next();
+};
+
+/**
+ * Socket.io handshake authentication. Rejects unauthenticated sockets and
+ * pins the identity to the token, so a client cannot claim another user's id.
+ */
+export const authenticateSocket = async (socket, next) => {
   try {
-    const User = (await import('../models/User.js')).default;
-    const user = await User.findById(req.userId);
-    
-    if (user && user.role === 'admin') {
-      req.user = user;
-      next();
-    } else {
-      res.status(403).json({ message: 'Not authorized as admin' });
+    const token = socket.handshake.auth?.token;
+
+    if (!token) {
+      return next(new Error('Authentication required'));
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('_id name role');
+
+    if (!user) {
+      return next(new Error('Authentication failed'));
+    }
+
+    socket.userId = user._id.toString();
+    socket.userRole = user.role;
+    return next();
   } catch (error) {
-    res.status(500).json({ message: 'Server error in admin middleware' });
+    return next(new Error('Authentication failed'));
   }
 };

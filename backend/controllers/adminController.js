@@ -118,24 +118,9 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
-// @desc    Update order status
-// @route   PUT /api/admin/orders/:id/status
-// @access  Private/Admin
-export const updateOrderStatus = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-
-    if (order) {
-      order.status = req.body.status || order.status;
-      const updatedOrder = await order.save();
-      res.json(updatedOrder);
-    } else {
-      res.status(404).json({ message: 'Order not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// Order status updates live in orderController.updateOrderStatus, which is
+// mounted on this router. Keeping a second copy here meant the admin path
+// skipped status validation, loyalty points and real-time notifications.
 
 // @desc    Create menu item
 // @route   POST /api/admin/menu

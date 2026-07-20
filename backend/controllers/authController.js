@@ -1,7 +1,8 @@
-import User from '../models/User.js';
-import crypto from 'crypto';
+import User, { hashToken } from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/email.js';
+
+const verificationRequired = () => process.env.REQUIRE_EMAIL_VERIFICATION !== 'false';
 
 // @desc    Register new user
 // @route   POST /api/auth/register
@@ -25,41 +26,33 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Generate verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    // Build the document first so the verification token is persisted by the
+    // same save() that creates the user.
+    const user = new User({ name, email, password });
+    const rawVerificationToken = user.createVerificationToken();
+    await user.save();
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-      verificationToken,
-    });
-
-    if (user) {
-      // Send verification email
-      try {
-        await sendVerificationEmail(email, verificationToken);
-      } catch (emailError) {
-        console.error('Failed to send verification email:', emailError);
-      }
-
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-        token: generateToken(user._id),
-        message: 'Registration successful! Please check your email to verify your account.',
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid user data' });
+    try {
+      await sendVerificationEmail(email, rawVerificationToken);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
     }
+
+    // Deliberately no auth token here: handing one out at registration would
+    // let an unverified account straight past the verification gate.
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+      message: 'Registration successful! Please check your email to verify your account.',
+    });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(400).json({ 
+    res.status(400).json({
       message: error.message || 'Failed to register user',
-      error: error.name 
+      error: error.name,
     });
   }
 };
@@ -78,17 +71,27 @@ export const loginUser = async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+    // Single generic failure message for both branches, so the response does
+    // not reveal whether an account exists.
+    if (!user || !(await user.matchPassword(password))) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
+
+    if (verificationRequired() && !user.isVerified) {
+      return res.status(403).json({
+        message: 'Please verify your email address before logging in.',
+        code: 'EMAIL_NOT_VERIFIED',
+      });
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+      token: generateToken(user._id),
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(400).json({ message: error.message || 'Login failed' });
@@ -119,30 +122,41 @@ export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
-    if (user) {
-      user.name = req.body.name || user.name;
-      
-      // Check if email is being changed and if it's already taken
-      if (req.body.email && req.body.email !== user.email) {
-        const emailExists = await User.findOne({ email: req.body.email });
-        if (emailExists) {
-          return res.status(400).json({ message: 'Email already in use' });
-        }
-        user.email = req.body.email;
-      }
-
-      const updatedUser = await user.save();
-
-      res.json({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-        token: generateToken(updatedUser._id),
-      });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+
+    user.name = req.body.name || user.name;
+
+    // Check if email is being changed and if it's already taken
+    if (req.body.email && req.body.email !== user.email) {
+      const emailExists = await User.findOne({ email: req.body.email });
+      if (emailExists) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
+      user.email = req.body.email;
+      // A new address is unproven until it is confirmed.
+      user.isVerified = false;
+      const rawVerificationToken = user.createVerificationToken();
+      await user.save();
+
+      try {
+        await sendVerificationEmail(user.email, rawVerificationToken);
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
+      }
+    } else {
+      await user.save();
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+      token: generateToken(user._id),
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -201,7 +215,10 @@ export const deleteAccount = async (req, res) => {
 // @access  Public
 export const verifyEmail = async (req, res) => {
   try {
-    const user = await User.findOne({ verificationToken: req.params.token });
+    const user = await User.findOne({
+      verificationToken: hashToken(req.params.token),
+      verificationTokenExpire: { $gt: Date.now() },
+    }).select('+verificationToken +verificationTokenExpire');
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired verification token' });
@@ -209,6 +226,7 @@ export const verifyEmail = async (req, res) => {
 
     user.isVerified = true;
     user.verificationToken = undefined;
+    user.verificationTokenExpire = undefined;
     await user.save();
 
     res.json({ message: 'Email verified successfully! You can now login.' });
@@ -217,37 +235,83 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
+// @desc    Resend the verification email
+// @route   POST /api/auth/resend-verification
+// @access  Public
+export const resendVerification = async (req, res) => {
+  // Always the same response, so this cannot be used to probe for accounts.
+  const genericResponse = {
+    message: 'If that account exists and is unverified, a new verification link has been sent.',
+  };
+
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide an email address' });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user || user.isVerified) {
+      return res.json(genericResponse);
+    }
+
+    const rawVerificationToken = user.createVerificationToken();
+    await user.save();
+
+    try {
+      await sendVerificationEmail(user.email, rawVerificationToken);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+    }
+
+    res.json(genericResponse);
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.json(genericResponse);
+  }
+};
+
 // @desc    Forgot password
 // @route   POST /api/auth/forgot-password
 // @access  Public
 export const forgotPassword = async (req, res) => {
+  // Identical response whether or not the account exists, so an attacker
+  // cannot enumerate registered email addresses.
+  const genericResponse = {
+    message: 'If an account exists for that email, a password reset link has been sent.',
+  };
+
   try {
     const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide an email address' });
+    }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ message: 'No user found with this email' });
+      return res.json(genericResponse);
     }
 
-    // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+    const rawResetToken = user.createPasswordResetToken();
     await user.save();
 
-    // Send email
     try {
-      await sendPasswordResetEmail(email, resetToken);
-      res.json({ message: 'Password reset link sent to your email' });
+      await sendPasswordResetEmail(email, rawResetToken);
     } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError);
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save();
-      return res.status(500).json({ message: 'Failed to send reset email. Please try again.' });
     }
+
+    res.json(genericResponse);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Forgot password error:', error);
+    res.json(genericResponse);
   }
 };
 
@@ -263,9 +327,9 @@ export const resetPassword = async (req, res) => {
     }
 
     const user = await User.findOne({
-      resetPasswordToken: req.params.token,
+      resetPasswordToken: hashToken(req.params.token),
       resetPasswordExpire: { $gt: Date.now() },
-    });
+    }).select('+resetPasswordToken +resetPasswordExpire');
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired reset token' });
