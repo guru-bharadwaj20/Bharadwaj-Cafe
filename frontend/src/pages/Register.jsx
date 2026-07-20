@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
 
@@ -53,7 +53,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
@@ -69,22 +69,22 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
       });
-      
+
       // Show success message
       setSuccess(true);
-      
+
       // Redirect to login page after 2 seconds
       setTimeout(() => {
-        navigate('/login', { 
-          state: { 
+        navigate('/login', {
+          state: {
             message: 'Registration successful! Please login to continue.',
-            email: formData.email 
-          } 
+            email: formData.email,
+          },
         });
       }, 2000);
     } catch (err) {
-      setErrors({ 
-        general: err.message || 'Registration failed. Please try again.' 
+      setErrors({
+        general: err.message || 'Registration failed. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -190,7 +190,9 @@ const Register = () => {
                   onChange={handleChange}
                   required
                 />
-                {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
+                {errors.confirmPassword && (
+                  <span className="field-error">{errors.confirmPassword}</span>
+                )}
               </div>
 
               <button type="submit" className="auth-btn" disabled={loading}>
@@ -203,7 +205,12 @@ const Register = () => {
             </div>
 
             <div className="auth-redirect">
-              <p>Already have an account? <Link to="/login" className="redirect-link">Login here</Link></p>
+              <p>
+                Already have an account?{' '}
+                <Link to="/login" className="redirect-link">
+                  Login here
+                </Link>
+              </p>
             </div>
 
             <div className="back-home">

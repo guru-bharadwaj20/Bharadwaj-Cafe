@@ -1,5 +1,4 @@
 import User from '../models/User.js';
-import Order from '../models/Order.js';
 
 // @desc    Get user's loyalty info
 // @route   GET /api/loyalty
@@ -7,29 +6,35 @@ import Order from '../models/Order.js';
 export const getLoyaltyInfo = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('loyaltyPoints loyaltyTier totalSpent');
-    
+
     // Calculate tier progress
     const tiers = {
       Bronze: { min: 0, max: 1000 },
       Silver: { min: 1000, max: 5000 },
       Gold: { min: 5000, max: 10000 },
-      Platinum: { min: 10000, max: Infinity }
+      Platinum: { min: 10000, max: Infinity },
     };
 
     const currentTier = tiers[user.loyaltyTier];
-    const progress = currentTier.max === Infinity 
-      ? 100 
-      : ((user.totalSpent - currentTier.min) / (currentTier.max - currentTier.min)) * 100;
+    const progress =
+      currentTier.max === Infinity
+        ? 100
+        : ((user.totalSpent - currentTier.min) / (currentTier.max - currentTier.min)) * 100;
 
     res.json({
       points: user.loyaltyPoints,
       tier: user.loyaltyTier,
       totalSpent: user.totalSpent,
       progress: Math.min(progress, 100),
-      nextTier: user.loyaltyTier === 'Platinum' ? null : 
-        user.loyaltyTier === 'Gold' ? 'Platinum' :
-        user.loyaltyTier === 'Silver' ? 'Gold' : 'Silver',
-      pointsToNextTier: currentTier.max === Infinity ? 0 : currentTier.max - user.totalSpent
+      nextTier:
+        user.loyaltyTier === 'Platinum'
+          ? null
+          : user.loyaltyTier === 'Gold'
+            ? 'Platinum'
+            : user.loyaltyTier === 'Silver'
+              ? 'Gold'
+              : 'Silver',
+      pointsToNextTier: currentTier.max === Infinity ? 0 : currentTier.max - user.totalSpent,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -56,7 +61,7 @@ export const redeemPoints = async (req, res) => {
     res.json({
       discount,
       remainingPoints: user.loyaltyPoints,
-      message: `Redeemed ${points} points for ₹${discount} discount`
+      message: `Redeemed ${points} points for ₹${discount} discount`,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -74,7 +79,7 @@ export const getRewards = async (req, res) => {
       { id: 3, name: 'Free Pastry', points: 150, description: 'Get a free pastry of your choice' },
       { id: 4, name: '20% Off', points: 400, description: '20% off on your next order' },
       { id: 5, name: 'Free Meal Combo', points: 500, description: 'Get a free meal combo' },
-      { id: 6, name: 'Premium Membership', points: 1000, description: '1 month premium benefits' }
+      { id: 6, name: 'Premium Membership', points: 1000, description: '1 month premium benefits' },
     ];
 
     res.json(rewards);
@@ -87,7 +92,7 @@ export const getRewards = async (req, res) => {
 export const updateLoyalty = async (userId, orderTotal) => {
   try {
     const user = await User.findById(userId);
-    
+
     // Add points (1 point per ₹10 spent)
     const pointsEarned = Math.floor(orderTotal / 10);
     user.loyaltyPoints += pointsEarned;

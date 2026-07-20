@@ -49,7 +49,7 @@
   font-size: var(--font-size-xxl);
   color: var(--secondary-color);
   margin-bottom: 15px;
-  font-family: "Miniver", cursive;
+  font-family: 'Miniver', cursive;
 }
 
 .auth-overlay p {

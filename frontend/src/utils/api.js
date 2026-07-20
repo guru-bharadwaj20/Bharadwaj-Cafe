@@ -6,11 +6,12 @@ export const api = {
     const params = new URLSearchParams();
     if (filters.search) params.append('search', filters.search);
     if (filters.category) params.append('category', filters.category);
-    if (filters.dietary && filters.dietary.length > 0) params.append('dietary', filters.dietary.join(','));
+    if (filters.dietary && filters.dietary.length > 0)
+      params.append('dietary', filters.dietary.join(','));
     if (filters.minPrice) params.append('minPrice', filters.minPrice);
     if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
     if (filters.sortBy) params.append('sortBy', filters.sortBy);
-    
+
     const url = params.toString() ? `${API_URL}/menu?${params}` : `${API_URL}/menu`;
     const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to fetch menu');

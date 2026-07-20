@@ -41,7 +41,7 @@ describe('Addresses', () => {
     expect(res.body).toHaveLength(0);
   });
 
-  it('refuses to update or delete another user\'s address', async () => {
+  it("refuses to update or delete another user's address", async () => {
     const { token: owner } = await createUser(app);
     const { token: stranger } = await createUser(app);
 
@@ -138,10 +138,7 @@ describe('Wishlist', () => {
       .send({ menuItemId: item._id })
       .expect(200);
 
-    await request(app)
-      .delete('/api/wishlist')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
+    await request(app).delete('/api/wishlist').set('Authorization', `Bearer ${token}`).expect(200);
 
     const finalState = await request(app)
       .get('/api/wishlist')
@@ -259,10 +256,7 @@ describe('Contact form', () => {
     await request(app).get('/api/contact').set('Authorization', `Bearer ${token}`).expect(403);
 
     const { token: adminToken } = await createAdmin(app);
-    await request(app)
-      .get('/api/contact')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(200);
+    await request(app).get('/api/contact').set('Authorization', `Bearer ${adminToken}`).expect(200);
   });
 });
 

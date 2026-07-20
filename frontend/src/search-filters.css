@@ -51,7 +51,7 @@
 }
 
 .filter-group select,
-.filter-group input[type="number"] {
+.filter-group input[type='number'] {
   width: 100%;
   padding: 8px;
   border: 1px solid #3a3a3a;
@@ -74,7 +74,7 @@
   color: var(--white-color);
 }
 
-.checkbox-group input[type="checkbox"] {
+.checkbox-group input[type='checkbox'] {
   width: 16px;
   height: 16px;
 }

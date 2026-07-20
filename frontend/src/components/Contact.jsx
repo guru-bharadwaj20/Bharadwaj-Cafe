@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { api } from '../utils/api';
 
 const Contact = () => {
@@ -29,7 +29,7 @@ const Contact = () => {
         message: response.message || 'Thank you for contacting us! We will get back to you soon.',
       });
       setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
+    } catch {
       setStatus({
         type: 'error',
         message: 'Failed to submit form. Please try again.',

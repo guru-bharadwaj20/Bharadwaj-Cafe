@@ -6,15 +6,15 @@ import MenuItem from '../models/MenuItem.js';
 export const getMenuItems = async (req, res) => {
   try {
     const { search, category, dietary, minPrice, maxPrice, sortBy } = req.query;
-    
-    let query = { available: true };
+
+    const query = { available: true };
 
     // Search by name or description
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } }
+        { tags: { $regex: search, $options: 'i' } },
       ];
     }
 

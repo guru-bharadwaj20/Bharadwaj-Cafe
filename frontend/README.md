@@ -50,6 +50,7 @@ Bharadwaj_Cafe/
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -57,6 +58,7 @@ npm install
 ### Development
 
 Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -66,6 +68,7 @@ The app will be available at `http://localhost:5173`
 ### Build
 
 Create a production build:
+
 ```bash
 npm run build
 ```
@@ -73,6 +76,7 @@ npm run build
 ### Preview
 
 Preview the production build:
+
 ```bash
 npm run preview
 ```

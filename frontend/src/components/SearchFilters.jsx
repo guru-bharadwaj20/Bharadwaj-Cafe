@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { api } from '../utils/api';
+import { useState, useEffect, useRef } from 'react';
 
 const SearchFilters = ({ onFilterChange }) => {
   const [search, setSearch] = useState('');
@@ -13,12 +12,12 @@ const SearchFilters = ({ onFilterChange }) => {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearch(value);
-    
+
     // Clear existing timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
-    
+
     // Set new timeout for debouncing
     searchTimeoutRef.current = setTimeout(() => {
       applyFilters({ search: value, category, dietary, minPrice, maxPrice, sortBy });
@@ -33,10 +32,10 @@ const SearchFilters = ({ onFilterChange }) => {
   const handleDietaryChange = (e) => {
     const value = e.target.value;
     const newDietary = dietary.includes(value)
-      ? dietary.filter(d => d !== value)
+      ? dietary.filter((d) => d !== value)
       : [...dietary, value];
     setDietary(newDietary);
-    
+
     // Use setTimeout to ensure state is updated
     setTimeout(() => {
       applyFilters({ search, category, dietary: newDietary, minPrice, maxPrice, sortBy });
@@ -46,12 +45,12 @@ const SearchFilters = ({ onFilterChange }) => {
   const handlePriceChange = (min, max) => {
     setMinPrice(min);
     setMaxPrice(max);
-    
+
     // Clear existing timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
-    
+
     // Debounce price changes too
     searchTimeoutRef.current = setTimeout(() => {
       applyFilters({ search, category, dietary, minPrice: min, maxPrice: max, sortBy });
@@ -113,7 +112,7 @@ const SearchFilters = ({ onFilterChange }) => {
         <div className="filter-group">
           <label>Dietary</label>
           <div className="checkbox-group">
-            {['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'].map(option => (
+            {['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'].map((option) => (
               <label key={option}>
                 <input
                   type="checkbox"

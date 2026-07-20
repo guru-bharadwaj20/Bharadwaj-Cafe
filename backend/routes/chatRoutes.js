@@ -5,7 +5,7 @@ import {
   getAllChats,
   sendAdminMessage,
   closeChat,
-  markAsRead
+  markAsRead,
 } from '../controllers/chatController.js';
 import { protect, admin } from '../middleware/auth.js';
 

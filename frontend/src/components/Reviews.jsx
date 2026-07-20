@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 
@@ -29,12 +29,15 @@ const Reviews = ({ menuItemId }) => {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     try {
-      await api.createReview({
-        menuItem: menuItemId,
-        rating,
-        comment
-      }, user?.token);
-      
+      await api.createReview(
+        {
+          menuItem: menuItemId,
+          rating,
+          comment,
+        },
+        user?.token
+      );
+
       setShowForm(false);
       setRating(5);
       setComment('');
@@ -59,7 +62,7 @@ const Reviews = ({ menuItemId }) => {
     try {
       await api.deleteReview(reviewId, user?.token);
       fetchReviews();
-    } catch (error) {
+    } catch {
       alert('Failed to delete review');
     }
   };
@@ -67,10 +70,10 @@ const Reviews = ({ menuItemId }) => {
   const renderStars = (count, interactive = false) => {
     return (
       <div className="stars">
-        {[1, 2, 3, 4, 5].map(star => (
+        {[1, 2, 3, 4, 5].map((star) => (
           <i
             key={star}
-            className={`fas fa-star ${star <= (interactive ? (hoverRating || rating) : count) ? 'filled' : ''}`}
+            className={`fas fa-star ${star <= (interactive ? hoverRating || rating : count) ? 'filled' : ''}`}
             onClick={() => interactive && setRating(star)}
             onMouseEnter={() => interactive && setHoverRating(star)}
             onMouseLeave={() => interactive && setHoverRating(0)}
@@ -112,7 +115,9 @@ const Reviews = ({ menuItemId }) => {
               />
             </div>
             <div className="form-actions">
-              <button type="submit" className="btn-submit">Submit Review</button>
+              <button type="submit" className="btn-submit">
+                Submit Review
+              </button>
               <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>
                 Cancel
               </button>
@@ -125,7 +130,7 @@ const Reviews = ({ menuItemId }) => {
         {reviews.length === 0 ? (
           <p className="no-reviews">No reviews yet. Be the first to review!</p>
         ) : (
-          reviews.map(review => (
+          reviews.map((review) => (
             <div key={review._id} className="review-card">
               <div className="review-header">
                 <div className="reviewer-info">
@@ -138,16 +143,16 @@ const Reviews = ({ menuItemId }) => {
               </div>
               <p className="review-comment">{review.comment}</p>
               <div className="review-actions">
-                <button 
+                <button
                   className="btn-helpful"
                   onClick={() => handleMarkHelpful(review._id)}
                   disabled={!user}
                 >
-                  <i className="fas fa-thumbs-up"></i> 
+                  <i className="fas fa-thumbs-up"></i>
                   Helpful ({review.helpful?.length || 0})
                 </button>
                 {user && user._id === review.user?._id && (
-                  <button 
+                  <button
                     className="btn-delete-review"
                     onClick={() => handleDeleteReview(review._id)}
                   >

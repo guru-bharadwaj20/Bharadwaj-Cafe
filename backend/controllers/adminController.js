@@ -28,9 +28,9 @@ export const getDashboardStats = async (req, res) => {
       {
         $group: {
           _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     res.json({
@@ -40,7 +40,7 @@ export const getDashboardStats = async (req, res) => {
       pendingContacts,
       totalRevenue,
       recentOrders,
-      ordersByStatus
+      ordersByStatus,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -94,7 +94,7 @@ export const updateUserRole = async (req, res) => {
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
-        role: updatedUser.role
+        role: updatedUser.role,
       });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -109,9 +109,7 @@ export const updateUserRole = async (req, res) => {
 // @access  Private/Admin
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({})
-      .populate('user', 'name email')
-      .sort({ createdAt: -1 });
+    const orders = await Order.find({}).populate('user', 'name email').sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -134,7 +132,7 @@ export const createMenuItem = async (req, res) => {
       description,
       price,
       image,
-      category
+      category,
     });
 
     res.status(201).json(menuItem);
@@ -156,7 +154,8 @@ export const updateMenuItem = async (req, res) => {
       menuItem.price = req.body.price || menuItem.price;
       menuItem.image = req.body.image || menuItem.image;
       menuItem.category = req.body.category || menuItem.category;
-      menuItem.available = req.body.available !== undefined ? req.body.available : menuItem.available;
+      menuItem.available =
+        req.body.available !== undefined ? req.body.available : menuItem.available;
 
       const updatedMenuItem = await menuItem.save();
       res.json(updatedMenuItem);

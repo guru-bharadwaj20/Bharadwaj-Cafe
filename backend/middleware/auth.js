@@ -30,7 +30,7 @@ export const protect = async (req, res, next) => {
     req.user = user;
     req.userId = user._id; // kept for handlers that still read req.userId
     return next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({ message: 'Not authorized, token failed' });
   }
 };
@@ -85,7 +85,7 @@ export const authenticateSocket = async (socket, next) => {
     socket.userId = user._id.toString();
     socket.userRole = user.role;
     return next();
-  } catch (error) {
+  } catch {
     return next(new Error('Authentication failed'));
   }
 };

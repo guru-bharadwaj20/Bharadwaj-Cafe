@@ -11,9 +11,7 @@ import { protect, admin, requireVerified } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.route('/')
-  .post(protect, requireVerified, createOrder)
-  .get(protect, admin, getOrders);
+router.route('/').post(protect, requireVerified, createOrder).get(protect, admin, getOrders);
 
 // Declared before '/:id' so 'myorders' is not swallowed as an order id.
 router.get('/myorders', protect, getMyOrders);

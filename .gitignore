@@ -4,8 +4,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-package-lock.json
-yarn.lock
+
+# Lockfiles are deliberately COMMITTED, not ignored. They pin the exact
+# dependency tree, which is what makes `npm ci` reproducible in CI and what
+# stops a transitive update from silently breaking a build.
 
 # Environment variables
 .env

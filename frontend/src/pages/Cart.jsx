@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
@@ -68,9 +68,11 @@ const Cart = () => {
           <div className="checkout-container">
             <div className="order-summary">
               <h3>Order Summary</h3>
-              {cartItems.map(item => (
+              {cartItems.map((item) => (
                 <div key={item._id} className="summary-item">
-                  <span>{item.name} x {item.quantity}</span>
+                  <span>
+                    {item.name} x {item.quantity}
+                  </span>
                   <span>₹{item.price * item.quantity}</span>
                 </div>
               ))}
@@ -151,8 +153,8 @@ const Cart = () => {
                     card data on our own server. Online payment is handled by
                     the upcoming gateway integration. */}
                 <p className="payment-note">
-                  <i className="fa-solid fa-circle-info"></i> Pay on collection or delivery.
-                  Online payment is coming soon.
+                  <i className="fa-solid fa-circle-info"></i> Pay on collection or delivery. Online
+                  payment is coming soon.
                 </p>
 
                 <div className="checkout-buttons">
@@ -191,7 +193,7 @@ const Cart = () => {
         ) : (
           <>
             <div className="cart-items">
-              {cartItems.map(item => (
+              {cartItems.map((item) => (
                 <div key={item._id} className="cart-item">
                   <img src={item.image} alt={item.name} />
                   <div className="cart-item-details">

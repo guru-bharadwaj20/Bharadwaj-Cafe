@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
@@ -44,7 +44,9 @@ const AdminDashboard = () => {
   return (
     <div className="admin-dashboard">
       <div className="admin-header">
-        <h1><i className="fas fa-dashboard"></i> Admin Dashboard</h1>
+        <h1>
+          <i className="fas fa-dashboard"></i> Admin Dashboard
+        </h1>
         <p>Welcome back, {user?.name}!</p>
       </div>
 
@@ -134,16 +136,14 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.recentOrders?.map(order => (
+                  {stats.recentOrders?.map((order) => (
                     <tr key={order._id}>
                       <td>#{order._id.slice(-6)}</td>
                       <td>{order.user?.name || order.customerName}</td>
                       <td>{order.items.length}</td>
                       <td>₹{order.totalAmount}</td>
                       <td>
-                        <span className={`status-badge ${order.status}`}>
-                          {order.status}
-                        </span>
+                        <span className={`status-badge ${order.status}`}>{order.status}</span>
                       </td>
                       <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                     </tr>
@@ -196,7 +196,9 @@ const OrdersManagement = ({ token }) => {
 
   return (
     <div className="management-section">
-      <h2><i className="fas fa-shopping-bag"></i> All Orders ({orders.length})</h2>
+      <h2>
+        <i className="fas fa-shopping-bag"></i> All Orders ({orders.length})
+      </h2>
       <div className="orders-table">
         <table>
           <thead>
@@ -213,7 +215,7 @@ const OrdersManagement = ({ token }) => {
             </tr>
           </thead>
           <tbody>
-            {orders.map(order => (
+            {orders.map((order) => (
               <tr key={order._id}>
                 <td>#{order._id.slice(-6)}</td>
                 <td>{order.user?.name || order.customerName}</td>
@@ -286,7 +288,9 @@ const UsersManagement = ({ token }) => {
 
   return (
     <div className="management-section">
-      <h2><i className="fas fa-users"></i> All Users ({users.length})</h2>
+      <h2>
+        <i className="fas fa-users"></i> All Users ({users.length})
+      </h2>
       <div className="orders-table">
         <table>
           <thead>
@@ -300,20 +304,22 @@ const UsersManagement = ({ token }) => {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
+            {users.map((user) => (
               <tr key={user._id}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
-                  <span className={`role-badge ${user.role}`}>
-                    {user.role}
-                  </span>
+                  <span className={`role-badge ${user.role}`}>{user.role}</span>
                 </td>
                 <td>
                   {user.isVerified ? (
-                    <span className="verified"><i className="fas fa-check-circle"></i> Yes</span>
+                    <span className="verified">
+                      <i className="fas fa-check-circle"></i> Yes
+                    </span>
                   ) : (
-                    <span className="not-verified"><i className="fas fa-times-circle"></i> No</span>
+                    <span className="not-verified">
+                      <i className="fas fa-times-circle"></i> No
+                    </span>
                   )}
                 </td>
                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>
@@ -370,13 +376,15 @@ const MenuManagement = ({ token }) => {
   return (
     <div className="management-section">
       <div className="section-header">
-        <h2><i className="fas fa-utensils"></i> Menu Items ({menuItems.length})</h2>
+        <h2>
+          <i className="fas fa-utensils"></i> Menu Items ({menuItems.length})
+        </h2>
         <button className="btn-add">
           <i className="fas fa-plus"></i> Add New Item
         </button>
       </div>
       <div className="menu-grid">
-        {menuItems.map(item => (
+        {menuItems.map((item) => (
           <div key={item._id} className="menu-card">
             <img src={item.image} alt={item.name} />
             <div className="menu-card-content">

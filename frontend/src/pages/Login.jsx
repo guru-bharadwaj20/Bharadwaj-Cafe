@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
@@ -161,7 +161,12 @@ const Login = () => {
             </div>
 
             <div className="auth-redirect">
-              <p>New user? <Link to="/register" className="redirect-link">Register here</Link></p>
+              <p>
+                New user?{' '}
+                <Link to="/register" className="redirect-link">
+                  Register here
+                </Link>
+              </p>
             </div>
 
             <div className="back-home">

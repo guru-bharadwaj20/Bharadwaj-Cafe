@@ -19,7 +19,7 @@ export const createAddress = async (req, res) => {
   try {
     const address = await Address.create({
       ...req.body,
-      user: req.user._id
+      user: req.user._id,
     });
 
     res.status(201).json(address);
@@ -90,10 +90,7 @@ export const setDefaultAddress = async (req, res) => {
     }
 
     // Remove default from all other addresses
-    await Address.updateMany(
-      { user: req.user._id },
-      { isDefault: false }
-    );
+    await Address.updateMany({ user: req.user._id }, { isDefault: false });
 
     address.isDefault = true;
     await address.save();

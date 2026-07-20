@@ -3,13 +3,14 @@ import {
   getWishlist,
   addToWishlist,
   removeFromWishlist,
-  clearWishlist
+  clearWishlist,
 } from '../controllers/wishlistController.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.route('/')
+router
+  .route('/')
   .get(protect, getWishlist)
   .post(protect, addToWishlist)
   .delete(protect, clearWishlist);

@@ -16,6 +16,7 @@ Express.js REST API with MongoDB for Bharadwaj's Cafe website.
 ## API Endpoints
 
 ### Menu Routes
+
 - `GET /api/menu` - Get all menu items (Public)
 - `GET /api/menu/:id` - Get single menu item (Public)
 - `POST /api/menu` - Create menu item (Admin only)
@@ -23,6 +24,7 @@ Express.js REST API with MongoDB for Bharadwaj's Cafe website.
 - `DELETE /api/menu/:id` - Delete menu item (Admin only)
 
 ### Order Routes
+
 - `POST /api/orders` - Create new order (Public)
 - `GET /api/orders` - Get all orders (Admin only)
 - `GET /api/orders/:id` - Get order by ID (Public)
@@ -30,16 +32,19 @@ Express.js REST API with MongoDB for Bharadwaj's Cafe website.
 - `PUT /api/orders/:id/status` - Update order status (Admin only)
 
 ### Contact Routes
+
 - `POST /api/contact` - Submit contact form (Public)
 - `GET /api/contact` - Get all messages (Admin only)
 - `PUT /api/contact/:id` - Update message status (Admin only)
 
 ### Auth Routes
+
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/profile` - Get user profile (Protected)
 
 ### Health Check
+
 - `GET /api/health` - Check server status
 
 ## Setup
@@ -64,11 +69,13 @@ CLIENT_URL=http://localhost:5173
 ### 3. Seed Database
 
 Import menu items:
+
 ```bash
 npm run seed
 ```
 
 Destroy data:
+
 ```bash
 npm run seed:destroy
 ```
@@ -76,11 +83,13 @@ npm run seed:destroy
 ### 4. Run Server
 
 Development mode:
+
 ```bash
 npm run dev
 ```
 
 Production mode:
+
 ```bash
 npm start
 ```
@@ -88,15 +97,18 @@ npm start
 ## Socket.io Events
 
 ### Client -> Server
+
 - `orderPlaced` - Notify when new order is placed
 
 ### Server -> Client
+
 - `newOrder` - Broadcast new orders to admin
 - `orderStatusUpdated` - Notify when order status changes
 
 ## Models
 
 ### MenuItem
+
 ```javascript
 {
   name: String,
@@ -109,6 +121,7 @@ npm start
 ```
 
 ### Order
+
 ```javascript
 {
   customerName: String,
@@ -124,6 +137,7 @@ npm start
 ```
 
 ### Contact
+
 ```javascript
 {
   name: String,
@@ -134,6 +148,7 @@ npm start
 ```
 
 ### User
+
 ```javascript
 {
   name: String,
@@ -154,6 +169,7 @@ Authorization: Bearer <token>
 ## Error Handling
 
 All errors return JSON response:
+
 ```json
 {
   "message": "Error description"

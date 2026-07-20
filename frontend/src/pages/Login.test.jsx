@@ -47,9 +47,11 @@ describe('Login', () => {
 
   it('shows a generic message for bad credentials', async () => {
     const user = userEvent.setup();
-    api.login.mockRejectedValue(Object.assign(new Error('Invalid email or password'), {
-      status: 401,
-    }));
+    api.login.mockRejectedValue(
+      Object.assign(new Error('Invalid email or password'), {
+        status: 401,
+      })
+    );
 
     renderLogin();
     await fillAndSubmit(user);

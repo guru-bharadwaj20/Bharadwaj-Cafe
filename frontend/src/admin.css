@@ -71,8 +71,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .stats-grid {
@@ -109,10 +113,18 @@
   color: white;
 }
 
-.stat-icon.revenue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.stat-icon.orders { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.stat-icon.users { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.stat-icon.menu { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.stat-icon.revenue {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.stat-icon.orders {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+.stat-icon.users {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+.stat-icon.menu {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
 
 .stat-info h3 {
   font-size: var(--font-size-xl);
@@ -125,13 +137,15 @@
   font-size: var(--font-size-n);
 }
 
-.overview-section, .management-section {
+.overview-section,
+.management-section {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-.recent-orders h2, .management-section h2 {
+.recent-orders h2,
+.management-section h2 {
   color: var(--white-color);
   font-size: var(--font-size-xl);
   margin-bottom: 20px;
@@ -181,12 +195,30 @@
   text-transform: uppercase;
 }
 
-.status-badge.pending { background: #ffa500; color: #000; }
-.status-badge.confirmed { background: #2196f3; color: #fff; }
-.status-badge.preparing { background: #9c27b0; color: #fff; }
-.status-badge.ready { background: #ff9800; color: #000; }
-.status-badge.delivered { background: #4caf50; color: #fff; }
-.status-badge.cancelled { background: #f44336; color: #fff; }
+.status-badge.pending {
+  background: #ffa500;
+  color: #000;
+}
+.status-badge.confirmed {
+  background: #2196f3;
+  color: #fff;
+}
+.status-badge.preparing {
+  background: #9c27b0;
+  color: #fff;
+}
+.status-badge.ready {
+  background: #ff9800;
+  color: #000;
+}
+.status-badge.delivered {
+  background: #4caf50;
+  color: #fff;
+}
+.status-badge.cancelled {
+  background: #f44336;
+  color: #fff;
+}
 
 .status-select {
   padding: 8px 12px;
@@ -196,14 +228,34 @@
   cursor: pointer;
 }
 
-.status-select.pending { background: #ffa500; color: #000; }
-.status-select.confirmed { background: #2196f3; color: #fff; }
-.status-select.preparing { background: #9c27b0; color: #fff; }
-.status-select.ready { background: #ff9800; color: #000; }
-.status-select.delivered { background: #4caf50; color: #fff; }
-.status-select.cancelled { background: #f44336; color: #fff; }
+.status-select.pending {
+  background: #ffa500;
+  color: #000;
+}
+.status-select.confirmed {
+  background: #2196f3;
+  color: #fff;
+}
+.status-select.preparing {
+  background: #9c27b0;
+  color: #fff;
+}
+.status-select.ready {
+  background: #ff9800;
+  color: #000;
+}
+.status-select.delivered {
+  background: #4caf50;
+  color: #fff;
+}
+.status-select.cancelled {
+  background: #f44336;
+  color: #fff;
+}
 
-.btn-view, .btn-edit, .btn-delete {
+.btn-view,
+.btn-edit,
+.btn-delete {
   padding: 8px 12px;
   border: none;
   border-radius: 5px;
@@ -211,12 +263,27 @@
   transition: all 0.3s ease;
 }
 
-.btn-view { background: #2196f3; color: white; }
-.btn-view:hover { background: #1976d2; }
-.btn-edit { background: #ff9800; color: white; }
-.btn-edit:hover { background: #f57c00; }
-.btn-delete { background: #f44336; color: white; }
-.btn-delete:hover { background: #d32f2f; }
+.btn-view {
+  background: #2196f3;
+  color: white;
+}
+.btn-view:hover {
+  background: #1976d2;
+}
+.btn-edit {
+  background: #ff9800;
+  color: white;
+}
+.btn-edit:hover {
+  background: #f57c00;
+}
+.btn-delete {
+  background: #f44336;
+  color: white;
+}
+.btn-delete:hover {
+  background: #d32f2f;
+}
 
 .role-badge {
   padding: 5px 12px;
@@ -225,11 +292,21 @@
   font-weight: bold;
 }
 
-.role-badge.admin { background: #f3961c; color: #000; }
-.role-badge.customer { background: #2196f3; color: #fff; }
+.role-badge.admin {
+  background: #f3961c;
+  color: #000;
+}
+.role-badge.customer {
+  background: #2196f3;
+  color: #fff;
+}
 
-.verified { color: #4caf50; }
-.not-verified { color: #f44336; }
+.verified {
+  color: #4caf50;
+}
+.not-verified {
+  color: #f44336;
+}
 
 .section-header {
   display: flex;

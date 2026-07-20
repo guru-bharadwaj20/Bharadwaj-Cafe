@@ -11,7 +11,7 @@ export const createReview = async (req, res) => {
     // Check if user already reviewed this item
     const existingReview = await Review.findOne({
       user: req.user._id,
-      menuItem
+      menuItem,
     });
 
     if (existingReview) {
@@ -23,16 +23,16 @@ export const createReview = async (req, res) => {
       menuItem,
       rating,
       comment,
-      images: images || []
+      images: images || [],
     });
 
     // Update menu item rating
     const reviews = await Review.find({ menuItem });
     const avgRating = reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length;
-    
+
     await MenuItem.findByIdAndUpdate(menuItem, {
       rating: avgRating,
-      reviewCount: reviews.length
+      reviewCount: reviews.length,
     });
 
     const populatedReview = await Review.findById(review._id)
@@ -84,9 +84,9 @@ export const updateReview = async (req, res) => {
     // Update menu item rating
     const reviews = await Review.find({ menuItem: review.menuItem });
     const avgRating = reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length;
-    
+
     await MenuItem.findByIdAndUpdate(review.menuItem, {
-      rating: avgRating
+      rating: avgRating,
     });
 
     res.json(updatedReview);
@@ -115,13 +115,12 @@ export const deleteReview = async (req, res) => {
 
     // Update menu item rating
     const reviews = await Review.find({ menuItem: menuItemId });
-    const avgRating = reviews.length > 0 
-      ? reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length 
-      : 0;
-    
+    const avgRating =
+      reviews.length > 0 ? reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length : 0;
+
     await MenuItem.findByIdAndUpdate(menuItemId, {
       rating: avgRating,
-      reviewCount: reviews.length
+      reviewCount: reviews.length,
     });
 
     res.json({ message: 'Review deleted' });
@@ -144,9 +143,7 @@ export const markHelpful = async (req, res) => {
     const alreadyMarked = review.helpful.includes(req.user._id);
 
     if (alreadyMarked) {
-      review.helpful = review.helpful.filter(
-        id => id.toString() !== req.user._id.toString()
-      );
+      review.helpful = review.helpful.filter((id) => id.toString() !== req.user._id.toString());
     } else {
       review.helpful.push(req.user._id);
     }

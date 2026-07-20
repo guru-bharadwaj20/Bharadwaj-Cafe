@@ -44,10 +44,20 @@ const MENU = [
 ];
 
 const start = async () => {
-  const mongoServer = await MongoMemoryServer.create({
-    instance: { launchTimeout: 120000 },
-  });
-  await mongoose.connect(mongoServer.getUri());
+  // Same trade-off as the unit tests: use CI's MongoDB service when present,
+  // otherwise spin up a disposable in-memory instance.
+  let mongoServer;
+
+  if (process.env.MONGO_URI_TEST) {
+    await mongoose.connect(process.env.MONGO_URI_TEST);
+    // Start from a clean slate so repeated CI runs are deterministic.
+    await mongoose.connection.dropDatabase();
+  } else {
+    mongoServer = await MongoMemoryServer.create({
+      instance: { launchTimeout: 120000 },
+    });
+    await mongoose.connect(mongoServer.getUri());
+  }
 
   const { createApp } = await import('../app.js');
   const { authenticateSocket } = await import('../middleware/auth.js');
@@ -78,7 +88,7 @@ const start = async () => {
   const shutdown = async () => {
     httpServer.close();
     await mongoose.disconnect();
-    await mongoServer.stop();
+    await mongoServer?.stop();
     process.exit(0);
   };
 

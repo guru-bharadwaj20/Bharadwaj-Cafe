@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { socket, connectSocket, disconnectSocket } from '../utils/socket';
@@ -10,12 +10,28 @@ const ChatWidget = () => {
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef(null);
 
+  // A plain binding rather than `user?.token` inline: an optional-chain
+  // expression in a dependency array defeats the compiler's memoisation check.
+  const token = user?.token;
+
+  // Declared before the effects that call it, and memoised on the token, so
+  // the socket handler never closes over a stale fetch.
+  const fetchChat = useCallback(async () => {
+    if (!token) return;
+    try {
+      const data = await api.getUserChat(token);
+      setChat(data);
+    } catch (error) {
+      console.error('Error fetching chat:', error);
+    }
+  }, [token]);
+
   useEffect(() => {
-    if (!user?.token) return undefined;
+    if (!token) return undefined;
 
     // The server places this socket in the current user's room based on the
     // token, so replies arriving here are already known to be for us.
-    connectSocket(user.token);
+    connectSocket(token);
 
     const handleAdminMessage = () => fetchChat();
     socket.on('adminMessage', handleAdminMessage);
@@ -24,30 +40,17 @@ const ChatWidget = () => {
       socket.off('adminMessage', handleAdminMessage);
       disconnectSocket();
     };
-  }, [user?.token]);
+  }, [token, fetchChat]);
 
   useEffect(() => {
-    if (isOpen && user) {
+    if (isOpen) {
       fetchChat();
     }
-  }, [isOpen, user]);
+  }, [isOpen, fetchChat]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [chat]);
-
-  const fetchChat = async () => {
-    try {
-      const data = await api.getUserChat(user?.token);
-      setChat(data);
-    } catch (error) {
-      console.error('Error fetching chat:', error);
-    }
-  };
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [chat]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -69,12 +72,9 @@ const ChatWidget = () => {
 
   return (
     <>
-      <button 
-        className="chat-toggle-btn"
-        onClick={() => setIsOpen(!isOpen)}
-      >
+      <button className="chat-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
         <i className="fas fa-comments"></i>
-        {chat?.messages.some(m => m.sender === 'admin' && !m.read) && (
+        {chat?.messages.some((m) => m.sender === 'admin' && !m.read) && (
           <span className="unread-badge"></span>
         )}
       </button>
@@ -93,7 +93,10 @@ const ChatWidget = () => {
               <div key={index} className={`message ${msg.sender}`}>
                 <div className="message-content">{msg.message}</div>
                 <span className="message-time">
-                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
               </div>
             ))}

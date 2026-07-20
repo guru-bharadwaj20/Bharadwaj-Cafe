@@ -5,8 +5,7 @@ import Wishlist from '../models/Wishlist.js';
 // @access  Private
 export const getWishlist = async (req, res) => {
   try {
-    let wishlist = await Wishlist.findOne({ user: req.user._id })
-      .populate('items.menuItem');
+    let wishlist = await Wishlist.findOne({ user: req.user._id }).populate('items.menuItem');
 
     if (!wishlist) {
       wishlist = await Wishlist.create({ user: req.user._id, items: [] });
@@ -30,12 +29,10 @@ export const addToWishlist = async (req, res) => {
     if (!wishlist) {
       wishlist = await Wishlist.create({
         user: req.user._id,
-        items: [{ menuItem: menuItemId }]
+        items: [{ menuItem: menuItemId }],
       });
     } else {
-      const itemExists = wishlist.items.some(
-        item => item.menuItem.toString() === menuItemId
-      );
+      const itemExists = wishlist.items.some((item) => item.menuItem.toString() === menuItemId);
 
       if (itemExists) {
         return res.status(400).json({ message: 'Item already in wishlist' });
@@ -64,7 +61,7 @@ export const removeFromWishlist = async (req, res) => {
     }
 
     wishlist.items = wishlist.items.filter(
-      item => item.menuItem.toString() !== req.params.itemId
+      (item) => item.menuItem.toString() !== req.params.itemId
     );
 
     await wishlist.save();

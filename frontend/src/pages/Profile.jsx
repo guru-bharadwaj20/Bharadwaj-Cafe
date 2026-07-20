@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
@@ -6,12 +6,12 @@ import { api } from '../utils/api';
 const Profile = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  
+
   const [activeTab, setActiveTab] = useState('details');
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-  
+
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -50,17 +50,17 @@ const Profile = () => {
       }
 
       const response = await api.updateProfile(formData, token);
-      
+
       // Update user info in localStorage
       const updatedUser = {
         ...response,
-        token: response.token || token
+        token: response.token || token,
       };
       localStorage.setItem('userInfo', JSON.stringify(updatedUser));
-      
+
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setIsEditing(false);
-      
+
       // Reload page to reflect changes
       setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
@@ -72,7 +72,7 @@ const Profile = () => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setMessage({ type: 'error', text: 'New passwords do not match' });
       return;
@@ -93,11 +93,14 @@ const Profile = () => {
         return;
       }
 
-      await api.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      }, token);
-      
+      await api.changePassword(
+        {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        },
+        token
+      );
+
       setMessage({ type: 'success', text: 'Password changed successfully!' });
       setPasswordData({
         currentPassword: '',
@@ -179,7 +182,9 @@ const Profile = () => {
 
         {message.text && (
           <div className={`message ${message.type}`}>
-            <i className={`fa-solid fa-circle-${message.type === 'success' ? 'check' : 'exclamation'}`}></i>
+            <i
+              className={`fa-solid fa-circle-${message.type === 'success' ? 'check' : 'exclamation'}`}
+            ></i>
             {message.text}
           </div>
         )}
@@ -212,7 +217,9 @@ const Profile = () => {
                   </div>
                   <div className="detail-item">
                     <label>Member Since</label>
-                    <p>{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</p>
+                    <p>
+                      {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -332,8 +339,8 @@ const Profile = () => {
                 <div>
                   <h3>Warning: This action is permanent!</h3>
                   <p>
-                    Once you delete your account, there is no going back. All your data,
-                    including order history and saved preferences, will be permanently deleted.
+                    Once you delete your account, there is no going back. All your data, including
+                    order history and saved preferences, will be permanently deleted.
                   </p>
                 </div>
               </div>
@@ -341,18 +348,22 @@ const Profile = () => {
               <div className="delete-info">
                 <h4>What will be deleted:</h4>
                 <ul>
-                  <li><i className="fa-solid fa-check"></i> Your profile information</li>
-                  <li><i className="fa-solid fa-check"></i> Order history</li>
-                  <li><i className="fa-solid fa-check"></i> Saved preferences</li>
-                  <li><i className="fa-solid fa-check"></i> All personal data</li>
+                  <li>
+                    <i className="fa-solid fa-check"></i> Your profile information
+                  </li>
+                  <li>
+                    <i className="fa-solid fa-check"></i> Order history
+                  </li>
+                  <li>
+                    <i className="fa-solid fa-check"></i> Saved preferences
+                  </li>
+                  <li>
+                    <i className="fa-solid fa-check"></i> All personal data
+                  </li>
                 </ul>
               </div>
 
-              <button
-                className="delete-btn"
-                onClick={handleDeleteAccount}
-                disabled={loading}
-              >
+              <button className="delete-btn" onClick={handleDeleteAccount} disabled={loading}>
                 <i className="fa-solid fa-trash"></i>
                 {loading ? 'Deleting...' : 'Delete My Account'}
               </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
 
@@ -18,7 +18,7 @@ const VerifyEmail = () => {
         type: 'success',
         message: response.message || 'Email verified successfully!',
       });
-      
+
       setTimeout(() => {
         navigate('/login');
       }, 3000);
@@ -63,8 +63,12 @@ const VerifyEmail = () => {
                   <h2>Verification Failed</h2>
                   <p>{status.message}</p>
                   <div className="action-buttons">
-                    <Link to="/register" className="btn-primary">Register Again</Link>
-                    <Link to="/login" className="btn-secondary">Go to Login</Link>
+                    <Link to="/register" className="btn-primary">
+                      Register Again
+                    </Link>
+                    <Link to="/login" className="btn-secondary">
+                      Go to Login
+                    </Link>
                   </div>
                 </div>
               )}

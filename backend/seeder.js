@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import MenuItem from './models/MenuItem.js';
 import connectDB from './config/db.js';
@@ -16,8 +15,22 @@ const menuItems = [
     dietary: ['Vegetarian'],
     tags: ['coffee', 'espresso', 'milk'],
     customizations: [
-      { name: 'Size', options: [{ name: 'Small', price: 0 }, { name: 'Medium', price: 20 }, { name: 'Large', price: 40 }] },
-      { name: 'Milk', options: [{ name: 'Regular', price: 0 }, { name: 'Almond', price: 30 }, { name: 'Oat', price: 30 }] }
+      {
+        name: 'Size',
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 20 },
+          { name: 'Large', price: 40 },
+        ],
+      },
+      {
+        name: 'Milk',
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Almond', price: 30 },
+          { name: 'Oat', price: 30 },
+        ],
+      },
     ],
     rating: 4.5,
     reviewCount: 0,
@@ -32,7 +45,14 @@ const menuItems = [
     dietary: ['Vegan', 'Dairy-Free'],
     tags: ['coffee', 'espresso', 'black'],
     customizations: [
-      { name: 'Size', options: [{ name: 'Small', price: 0 }, { name: 'Medium', price: 20 }, { name: 'Large', price: 40 }] }
+      {
+        name: 'Size',
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 20 },
+          { name: 'Large', price: 40 },
+        ],
+      },
     ],
     rating: 4.2,
     reviewCount: 0,
@@ -47,7 +67,15 @@ const menuItems = [
     dietary: ['Vegetarian'],
     tags: ['coffee', 'traditional', 'south indian'],
     customizations: [
-      { name: 'Sugar Level', options: [{ name: 'No Sugar', price: 0 }, { name: 'Less Sugar', price: 0 }, { name: 'Normal', price: 0 }, { name: 'Extra Sweet', price: 0 }] }
+      {
+        name: 'Sugar Level',
+        options: [
+          { name: 'No Sugar', price: 0 },
+          { name: 'Less Sugar', price: 0 },
+          { name: 'Normal', price: 0 },
+          { name: 'Extra Sweet', price: 0 },
+        ],
+      },
     ],
     rating: 4.7,
     reviewCount: 0,
@@ -62,8 +90,21 @@ const menuItems = [
     dietary: ['Vegetarian'],
     tags: ['coffee', 'espresso', 'foam'],
     customizations: [
-      { name: 'Size', options: [{ name: 'Small', price: 0 }, { name: 'Medium', price: 20 }, { name: 'Large', price: 40 }] },
-      { name: 'Extra', options: [{ name: 'Extra Shot', price: 30 }, { name: 'Whipped Cream', price: 20 }] }
+      {
+        name: 'Size',
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 20 },
+          { name: 'Large', price: 40 },
+        ],
+      },
+      {
+        name: 'Extra',
+        options: [
+          { name: 'Extra Shot', price: 30 },
+          { name: 'Whipped Cream', price: 20 },
+        ],
+      },
     ],
     rating: 4.6,
     reviewCount: 0,
@@ -78,8 +119,22 @@ const menuItems = [
     dietary: ['Vegetarian'],
     tags: ['coffee', 'chocolate', 'sweet'],
     customizations: [
-      { name: 'Size', options: [{ name: 'Small', price: 0 }, { name: 'Medium', price: 20 }, { name: 'Large', price: 40 }] },
-      { name: 'Chocolate', options: [{ name: 'Milk Chocolate', price: 0 }, { name: 'Dark Chocolate', price: 10 }, { name: 'White Chocolate', price: 10 }] }
+      {
+        name: 'Size',
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 20 },
+          { name: 'Large', price: 40 },
+        ],
+      },
+      {
+        name: 'Chocolate',
+        options: [
+          { name: 'Milk Chocolate', price: 0 },
+          { name: 'Dark Chocolate', price: 10 },
+          { name: 'White Chocolate', price: 10 },
+        ],
+      },
     ],
     rating: 4.8,
     reviewCount: 0,
@@ -94,8 +149,21 @@ const menuItems = [
     dietary: ['Vegetarian'],
     tags: ['coffee', 'espresso', 'smooth'],
     customizations: [
-      { name: 'Size', options: [{ name: 'Small', price: 0 }, { name: 'Medium', price: 20 }] },
-      { name: 'Milk', options: [{ name: 'Regular', price: 0 }, { name: 'Almond', price: 30 }, { name: 'Oat', price: 30 }] }
+      {
+        name: 'Size',
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 20 },
+        ],
+      },
+      {
+        name: 'Milk',
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Almond', price: 30 },
+          { name: 'Oat', price: 30 },
+        ],
+      },
     ],
     rating: 4.4,
     reviewCount: 0,

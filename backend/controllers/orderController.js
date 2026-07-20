@@ -6,14 +6,7 @@ import { sendOrderConfirmationEmail } from '../utils/email.js';
 
 const ORDER_TYPES = ['dine-in', 'takeaway', 'delivery'];
 const PAYMENT_METHODS = ['card', 'upi', 'wallet', 'cod'];
-const ORDER_STATUSES = [
-  'pending',
-  'confirmed',
-  'preparing',
-  'ready',
-  'delivered',
-  'cancelled',
-];
+const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'];
 
 const isOwnerOrAdmin = (order, user) =>
   user.role === 'admin' || (order.user && order.user.equals(user._id));
@@ -46,7 +39,9 @@ export const createOrder = async (req, res) => {
     }
 
     if (orderType === 'delivery' && !deliveryAddress) {
-      return res.status(400).json({ message: 'A delivery address is required for delivery orders' });
+      return res
+        .status(400)
+        .json({ message: 'A delivery address is required for delivery orders' });
     }
 
     if (!customerPhone) {
@@ -112,9 +107,7 @@ export const getMyOrders = async (req, res) => {
 // @access  Private/Admin
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({})
-      .populate('items.menuItem')
-      .sort({ createdAt: -1 });
+    const orders = await Order.find({}).populate('items.menuItem').sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
