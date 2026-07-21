@@ -42,7 +42,7 @@ describe('GET /api/menu', () => {
     const res = await request(app).get('/api/menu').expect(200);
 
     expect(res.body).toHaveLength(3);
-    expect(res.body.map((i) => i.name)).not.toContain('Hidden Item');
+    expect((res.body as { name: string }[]).map((i) => i.name)).not.toContain('Hidden Item');
   });
 
   it('filters by category', async () => {

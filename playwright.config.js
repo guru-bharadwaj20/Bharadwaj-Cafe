@@ -23,7 +23,8 @@ export default defineConfig({
   webServer: [
     {
       // Real API + Socket.io against a throwaway in-memory database.
-      command: 'node tests/e2eServer.js',
+      // tsx runs the TypeScript source directly, so E2E needs no build step.
+      command: 'npx tsx tests/e2eServer.ts',
       cwd: './backend',
       port: API_PORT,
       reuseExistingServer: !process.env.CI,

@@ -5,8 +5,9 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
+import type { Express } from 'express';
 
-let app;
+let app: Express;
 
 beforeAll(async () => {
   process.env.ENFORCE_RATE_LIMITS = 'true';
@@ -24,7 +25,7 @@ describe('Credential rate limiting', () => {
     const attempt = () =>
       request(app).post('/api/auth/login').send({ email: 'nobody@example.com', password: 'wrong' });
 
-    const statuses = [];
+    const statuses: number[] = [];
     for (let i = 0; i < 14; i += 1) {
       const res = await attempt();
       statuses.push(res.status);
@@ -42,7 +43,7 @@ describe('Outbound-email rate limiting', () => {
     const attempt = () =>
       request(app).post('/api/auth/forgot-password').send({ email: 'someone@example.com' });
 
-    const statuses = [];
+    const statuses: number[] = [];
     for (let i = 0; i < 8; i += 1) {
       const res = await attempt();
       statuses.push(res.status);

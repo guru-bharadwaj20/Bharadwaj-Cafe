@@ -20,6 +20,8 @@ pnpm-debug.log*
 # Build outputs
 dist/
 build/
+backend/dist/
+*.tsbuildinfo
 *.log
 
 # IDE and Editor files

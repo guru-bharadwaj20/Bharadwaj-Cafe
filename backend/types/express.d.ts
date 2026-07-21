@@ -8,7 +8,6 @@ import type { HydratedUser } from '../models/User.js';
  * have no user, and the compiler should force those to say so.
  */
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: HydratedUser;

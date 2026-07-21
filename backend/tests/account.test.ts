@@ -3,7 +3,7 @@ import request from 'supertest';
 import { createApp } from '../app.js';
 import User from '../models/User.js';
 import Address from '../models/Address.js';
-import { createUser, createAdmin, createMenuItem, placeOrder } from './factories.js';
+import { createUser, createAdmin, createMenuItem, placeOrder, expectFound } from './factories.js';
 
 const app = createApp();
 
@@ -80,7 +80,7 @@ describe('Addresses', () => {
 
     const defaults = await Address.find({ user: user._id, isDefault: true });
     expect(defaults).toHaveLength(1);
-    expect(defaults[0]._id.toString()).toBe(second.body._id);
+    expect(expectFound(defaults[0])._id.toString()).toBe(second.body._id);
 
     // Explicitly switching back also leaves a single default.
     await request(app)
@@ -90,7 +90,7 @@ describe('Addresses', () => {
 
     const afterSwitch = await Address.find({ user: user._id, isDefault: true });
     expect(afterSwitch).toHaveLength(1);
-    expect(afterSwitch[0]._id.toString()).toBe(first.body._id);
+    expect(expectFound(afterSwitch[0])._id.toString()).toBe(first.body._id);
   });
 });
 
@@ -199,7 +199,7 @@ describe('Loyalty', () => {
       .expect(200);
 
     // 6000 + 5% tax = 6300 -> Gold (>= 5000), 630 points
-    const updated = await User.findById(user._id);
+    const updated = expectFound(await User.findById(user._id));
     expect(updated.totalSpent).toBe(6300);
     expect(updated.loyaltyTier).toBe('Gold');
     expect(updated.loyaltyPoints).toBe(630);

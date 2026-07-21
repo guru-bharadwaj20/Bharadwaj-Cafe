@@ -18,7 +18,7 @@ process.env.JWT_SECRET = 'e2e-secret-that-is-at-least-32-characters-long';
 process.env.REQUIRE_EMAIL_VERIFICATION = 'false';
 process.env.CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:4173';
 
-const PORT = Number(process.env.E2E_PORT || 5050);
+const PORT = Number(process.env.E2E_PORT ?? 5050);
 
 export const E2E_ADMIN = {
   name: 'E2E Admin',
@@ -43,10 +43,10 @@ const MENU = [
   },
 ];
 
-const start = async () => {
+const start = async (): Promise<void> => {
   // Same trade-off as the unit tests: use CI's MongoDB service when present,
   // otherwise spin up a disposable in-memory instance.
-  let mongoServer;
+  let mongoServer: MongoMemoryServer | undefined;
 
   if (process.env.MONGO_URI_TEST) {
     await mongoose.connect(process.env.MONGO_URI_TEST);
@@ -68,16 +68,18 @@ const start = async () => {
   await User.create({ ...E2E_ADMIN, role: 'admin', isVerified: true });
   await MenuItem.insertMany(MENU);
 
-  const corsOptions = { origin: process.env.CLIENT_URL.split(','), credentials: true };
+  const corsOptions = { origin: (process.env.CLIENT_URL as string).split(','), credentials: true };
   const app = createApp({ corsOptions });
   const httpServer = createServer(app);
   const io = new Server(httpServer, { cors: corsOptions });
 
   app.set('io', io);
-  io.use(authenticateSocket);
+  io.use((socket, next) => {
+    void authenticateSocket(socket, next);
+  });
   io.on('connection', (socket) => {
-    socket.join(userRoom(socket.userId));
-    if (socket.userRole === 'admin') socket.join(ADMIN_ROOM);
+    void socket.join(userRoom(socket.userId));
+    if (socket.userRole === 'admin') void socket.join(ADMIN_ROOM);
   });
 
   httpServer.listen(PORT, () => {
@@ -85,18 +87,18 @@ const start = async () => {
     console.log(`E2E backend listening on ${PORT}`);
   });
 
-  const shutdown = async () => {
+  const shutdown = async (): Promise<void> => {
     httpServer.close();
     await mongoose.disconnect();
     await mongoServer?.stop();
     process.exit(0);
   };
 
-  process.on('SIGTERM', shutdown);
-  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', () => void shutdown());
+  process.on('SIGINT', () => void shutdown());
 };
 
-start().catch((error) => {
+void start().catch((error: unknown) => {
   console.error('E2E backend failed to start:', error);
   process.exit(1);
 });

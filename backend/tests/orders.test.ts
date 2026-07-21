@@ -3,14 +3,15 @@ import request from 'supertest';
 import { createApp } from '../app.js';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
-import { createUser, createAdmin, createMenuItem, placeOrder } from './factories.js';
+import type { HydratedMenuItem } from '../models/MenuItem.js';
+import { createUser, createAdmin, createMenuItem, placeOrder, expectFound } from './factories.js';
 
 const app = createApp();
 
 describe('POST /api/orders', () => {
-  let token;
-  let coffee;
-  let pastry;
+  let token: string;
+  let coffee: HydratedMenuItem;
+  let pastry: HydratedMenuItem;
 
   beforeEach(async () => {
     ({ token } = await createUser(app));
@@ -58,8 +59,8 @@ describe('POST /api/orders', () => {
     coffee.price = 999;
     await coffee.save();
 
-    const stored = await Order.findById(res.body._id);
-    expect(stored.items[0].price).toBe(150);
+    const stored = expectFound(await Order.findById(res.body._id));
+    expect(expectFound(stored.items[0]).price).toBe(150);
     expect(stored.totalAmount).toBe(158);
   });
 
@@ -186,9 +187,9 @@ describe('GET /api/orders (admin list)', () => {
 });
 
 describe('Order status transitions', () => {
-  let adminToken;
-  let customerToken;
-  let order;
+  let adminToken: string;
+  let customerToken: string;
+  let order: Record<string, any>;
 
   beforeEach(async () => {
     ({ token: adminToken } = await createAdmin(app));
@@ -239,7 +240,7 @@ describe('Order status transitions', () => {
         .expect(200);
 
     await deliver();
-    const afterFirst = await User.findById(order.user);
+    const afterFirst = expectFound(await User.findById(order.user));
 
     // 1050 total -> 105 points, tier still Silver at 1050 spent
     expect(afterFirst.loyaltyPoints).toBe(105);
@@ -248,7 +249,7 @@ describe('Order status transitions', () => {
 
     // Re-sending 'delivered' must not award a second time.
     await deliver();
-    const afterSecond = await User.findById(order.user);
+    const afterSecond = expectFound(await User.findById(order.user));
     expect(afterSecond.loyaltyPoints).toBe(105);
   });
 
