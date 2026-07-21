@@ -1,12 +1,7 @@
 import mongoose, { type HydratedDocument, type Model, Schema, type Types } from 'mongoose';
 
 export type OrderStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'preparing'
-  | 'ready'
-  | 'delivered'
-  | 'cancelled';
+  'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
 export type OrderType = 'dine-in' | 'takeaway' | 'delivery';
 export type PaymentMethod = 'card' | 'upi' | 'wallet' | 'cod';
 export type PaymentStatus = 'pending' | 'completed' | 'failed';

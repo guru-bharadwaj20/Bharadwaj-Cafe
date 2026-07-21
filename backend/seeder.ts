@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
-import MenuItem from './models/MenuItem.js';
+import MenuItem, { type IMenuItem } from './models/MenuItem.js';
 import connectDB from './config/db.js';
 
 dotenv.config();
 
-const menuItems = [
+const menuItems: Partial<IMenuItem>[] = [
   {
     name: 'Latte',
     description: 'Italian-style espresso drink with steamed milk and a light foam layer',
@@ -170,7 +170,7 @@ const menuItems = [
   },
 ];
 
-const importData = async () => {
+const importData = async (): Promise<void> => {
   try {
     await connectDB();
     await MenuItem.deleteMany();
@@ -178,25 +178,25 @@ const importData = async () => {
     console.log('Data Imported!');
     process.exit();
   } catch (error) {
-    console.error(`Error: ${error}`);
+    console.error('Error:', error instanceof Error ? error.message : error);
     process.exit(1);
   }
 };
 
-const destroyData = async () => {
+const destroyData = async (): Promise<void> => {
   try {
     await connectDB();
     await MenuItem.deleteMany();
     console.log('Data Destroyed!');
     process.exit();
   } catch (error) {
-    console.error(`Error: ${error}`);
+    console.error('Error:', error instanceof Error ? error.message : error);
     process.exit(1);
   }
 };
 
 if (process.argv[2] === '-d') {
-  destroyData();
+  void destroyData();
 } else {
-  importData();
+  void importData();
 }

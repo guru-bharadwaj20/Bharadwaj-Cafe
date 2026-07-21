@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../app.js';
 import User, { hashToken } from '../models/User.js';
-import { createUser, DEFAULT_PASSWORD } from './factories.js';
+import { createUser, DEFAULT_PASSWORD, expectFound } from './factories.js';
 
 const app = createApp();
 
-const register = (overrides = {}) =>
+const register = (overrides: Record<string, unknown> = {}) =>
   request(app)
     .post('/api/auth/register')
     .send({
@@ -24,7 +24,7 @@ describe('POST /api/auth/register', () => {
     expect(res.body.isVerified).toBe(false);
     expect(res.body.password).toBeUndefined();
 
-    const stored = await User.findOne({ email: 'new-user@example.com' });
+    const stored = expectFound(await User.findOne({ email: 'new-user@example.com' }));
     expect(stored).toBeTruthy();
     expect(stored.role).toBe('customer');
   });
@@ -32,7 +32,7 @@ describe('POST /api/auth/register', () => {
   it('stores the password hashed, never in plaintext', async () => {
     await register().expect(201);
 
-    const stored = await User.findOne({ email: 'new-user@example.com' });
+    const stored = expectFound(await User.findOne({ email: 'new-user@example.com' }));
     expect(stored.password).not.toBe('password123');
     expect(stored.password).toMatch(/^\$2[aby]\$/); // bcrypt
   });
@@ -200,8 +200,8 @@ describe('Email verification', () => {
   it('verifies with a valid token and rejects reuse', async () => {
     await register().expect(201);
 
-    const stored = await User.findOne({ email: 'new-user@example.com' }).select(
-      '+verificationToken'
+    const stored = expectFound(
+      await User.findOne({ email: 'new-user@example.com' }).select('+verificationToken')
     );
 
     // Reconstruct the raw token by brute-force is impossible; instead assert
@@ -215,7 +215,7 @@ describe('Email verification', () => {
 
     await request(app).get(`/api/auth/verify/${raw}`).expect(200);
 
-    const verified = await User.findById(stored._id);
+    const verified = expectFound(await User.findById(stored._id));
     expect(verified.isVerified).toBe(true);
 
     // Single use: the token is cleared on success.
@@ -226,7 +226,7 @@ describe('Email verification', () => {
     const { user } = await createUser(app, { isVerified: false });
     const raw = 'b'.repeat(64);
 
-    const doc = await User.findById(user._id).select('+verificationToken');
+    const doc = expectFound(await User.findById(user._id).select('+verificationToken'));
     doc.verificationToken = hashToken(raw);
     doc.verificationTokenExpire = new Date(Date.now() - 1000); // already expired
     await doc.save();
@@ -244,7 +244,7 @@ describe('Password reset', () => {
     const { user } = await createUser(app);
     const raw = 'c'.repeat(64);
 
-    const doc = await User.findById(user._id).select('+resetPasswordToken');
+    const doc = expectFound(await User.findById(user._id).select('+resetPasswordToken'));
     doc.resetPasswordToken = hashToken(raw);
     doc.resetPasswordExpire = new Date(Date.now() + 60000);
     await doc.save();
@@ -269,7 +269,7 @@ describe('Password reset', () => {
     const { user } = await createUser(app);
     const raw = 'd'.repeat(64);
 
-    const doc = await User.findById(user._id).select('+resetPasswordToken');
+    const doc = expectFound(await User.findById(user._id).select('+resetPasswordToken'));
     doc.resetPasswordToken = hashToken(raw);
     doc.resetPasswordExpire = new Date(Date.now() - 1000);
     await doc.save();

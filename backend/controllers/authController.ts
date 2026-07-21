@@ -1,29 +1,40 @@
+import type { RequestHandler } from 'express';
 import User, { hashToken } from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/email.js';
 
-const verificationRequired = () => process.env.REQUIRE_EMAIL_VERIFICATION !== 'false';
+const verificationRequired = (): boolean => process.env.REQUIRE_EMAIL_VERIFICATION !== 'false';
+
+const errorMessage = (error: unknown, fallback: string): string =>
+  error instanceof Error ? error.message : fallback;
 
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
-export const registerUser = async (req, res) => {
+export const registerUser: RequestHandler = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body as {
+      name?: string;
+      email?: string;
+      password?: string;
+    };
 
     // Validate input
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please provide all required fields' });
+      res.status(400).json({ message: 'Please provide all required fields' });
+      return;
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+      res.status(400).json({ message: 'Password must be at least 6 characters' });
+      return;
     }
 
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      res.status(400).json({ message: 'User already exists' });
+      return;
     }
 
     // Build the document first so the verification token is persisted by the
@@ -51,8 +62,8 @@ export const registerUser = async (req, res) => {
   } catch (error) {
     console.error('Registration error:', error);
     res.status(400).json({
-      message: error.message || 'Failed to register user',
-      error: error.name,
+      message: errorMessage(error, 'Failed to register user'),
+      error: error instanceof Error ? error.name : 'Error',
     });
   }
 };
@@ -60,13 +71,14 @@ export const registerUser = async (req, res) => {
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
 // @access  Public
-export const loginUser = async (req, res) => {
+export const loginUser: RequestHandler = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body as { email?: string; password?: string };
 
     // Validate input
     if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
+      res.status(400).json({ message: 'Please provide email and password' });
+      return;
     }
 
     const user = await User.findOne({ email });
@@ -74,14 +86,16 @@ export const loginUser = async (req, res) => {
     // Single generic failure message for both branches, so the response does
     // not reveal whether an account exists.
     if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: 'Invalid email or password' });
+      return;
     }
 
     if (verificationRequired() && !user.isVerified) {
-      return res.status(403).json({
+      res.status(403).json({
         message: 'Please verify your email address before logging in.',
         code: 'EMAIL_NOT_VERIFIED',
       });
+      return;
     }
 
     res.json({
@@ -94,14 +108,14 @@ export const loginUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(400).json({ message: error.message || 'Login failed' });
+    res.status(400).json({ message: errorMessage(error, 'Login failed') });
   }
 };
 
 // @desc    Get user profile
 // @route   GET /api/auth/profile
 // @access  Private
-export const getUserProfile = async (req, res) => {
+export const getUserProfile: RequestHandler = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
 
@@ -111,30 +125,34 @@ export const getUserProfile = async (req, res) => {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: errorMessage(error, 'Failed to load profile') });
   }
 };
 
 // @desc    Update user profile
 // @route   PUT /api/auth/profile
 // @access  Private
-export const updateUserProfile = async (req, res) => {
+export const updateUserProfile: RequestHandler = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'User not found' });
+      return;
     }
 
-    user.name = req.body.name || user.name;
+    const { name, email } = req.body as { name?: string; email?: string };
+
+    user.name = name || user.name;
 
     // Check if email is being changed and if it's already taken
-    if (req.body.email && req.body.email !== user.email) {
-      const emailExists = await User.findOne({ email: req.body.email });
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
       if (emailExists) {
-        return res.status(400).json({ message: 'Email already in use' });
+        res.status(400).json({ message: 'Email already in use' });
+        return;
       }
-      user.email = req.body.email;
+      user.email = email;
       // A new address is unproven until it is confirmed.
       user.isVerified = false;
       const rawVerificationToken = user.createVerificationToken();
@@ -158,23 +176,28 @@ export const updateUserProfile = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: errorMessage(error, 'Failed to update profile') });
   }
 };
 
 // @desc    Change user password
 // @route   PUT /api/auth/password
 // @access  Private
-export const changePassword = async (req, res) => {
+export const changePassword: RequestHandler = async (req, res) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body as {
+      currentPassword?: string;
+      newPassword?: string;
+    };
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: 'Please provide current and new password' });
+      res.status(400).json({ message: 'Please provide current and new password' });
+      return;
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+      res.status(400).json({ message: 'New password must be at least 6 characters' });
+      return;
     }
 
     const user = await User.findById(req.userId);
@@ -188,14 +211,14 @@ export const changePassword = async (req, res) => {
       res.status(401).json({ message: 'Current password is incorrect' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: errorMessage(error, 'Failed to change password') });
   }
 };
 
 // @desc    Delete user account
 // @route   DELETE /api/auth/account
 // @access  Private
-export const deleteAccount = async (req, res) => {
+export const deleteAccount: RequestHandler = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
@@ -206,22 +229,23 @@ export const deleteAccount = async (req, res) => {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: errorMessage(error, 'Failed to delete account') });
   }
 };
 
 // @desc    Verify email
 // @route   GET /api/auth/verify/:token
 // @access  Public
-export const verifyEmail = async (req, res) => {
+export const verifyEmail: RequestHandler = async (req, res) => {
   try {
     const user = await User.findOne({
-      verificationToken: hashToken(req.params.token),
-      verificationTokenExpire: { $gt: Date.now() },
+      verificationToken: hashToken(req.params.token as string),
+      verificationTokenExpire: { $gt: new Date() },
     }).select('+verificationToken +verificationTokenExpire');
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired verification token' });
+      res.status(400).json({ message: 'Invalid or expired verification token' });
+      return;
     }
 
     user.isVerified = true;
@@ -231,30 +255,32 @@ export const verifyEmail = async (req, res) => {
 
     res.json({ message: 'Email verified successfully! You can now login.' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: errorMessage(error, 'Failed to verify email') });
   }
 };
 
 // @desc    Resend the verification email
 // @route   POST /api/auth/resend-verification
 // @access  Public
-export const resendVerification = async (req, res) => {
+export const resendVerification: RequestHandler = async (req, res) => {
   // Always the same response, so this cannot be used to probe for accounts.
   const genericResponse = {
     message: 'If that account exists and is unverified, a new verification link has been sent.',
   };
 
   try {
-    const { email } = req.body;
+    const { email } = req.body as { email?: string };
 
     if (!email) {
-      return res.status(400).json({ message: 'Please provide an email address' });
+      res.status(400).json({ message: 'Please provide an email address' });
+      return;
     }
 
     const user = await User.findOne({ email });
 
     if (!user || user.isVerified) {
-      return res.json(genericResponse);
+      res.json(genericResponse);
+      return;
     }
 
     const rawVerificationToken = user.createVerificationToken();
@@ -276,7 +302,7 @@ export const resendVerification = async (req, res) => {
 // @desc    Forgot password
 // @route   POST /api/auth/forgot-password
 // @access  Public
-export const forgotPassword = async (req, res) => {
+export const forgotPassword: RequestHandler = async (req, res) => {
   // Identical response whether or not the account exists, so an attacker
   // cannot enumerate registered email addresses.
   const genericResponse = {
@@ -284,16 +310,18 @@ export const forgotPassword = async (req, res) => {
   };
 
   try {
-    const { email } = req.body;
+    const { email } = req.body as { email?: string };
 
     if (!email) {
-      return res.status(400).json({ message: 'Please provide an email address' });
+      res.status(400).json({ message: 'Please provide an email address' });
+      return;
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.json(genericResponse);
+      res.json(genericResponse);
+      return;
     }
 
     const rawResetToken = user.createPasswordResetToken();
@@ -318,21 +346,23 @@ export const forgotPassword = async (req, res) => {
 // @desc    Reset password
 // @route   POST /api/auth/reset-password/:token
 // @access  Public
-export const resetPassword = async (req, res) => {
+export const resetPassword: RequestHandler = async (req, res) => {
   try {
-    const { password } = req.body;
+    const { password } = req.body as { password?: string };
 
     if (!password || password.length < 6) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+      res.status(400).json({ message: 'Password must be at least 6 characters' });
+      return;
     }
 
     const user = await User.findOne({
-      resetPasswordToken: hashToken(req.params.token),
-      resetPasswordExpire: { $gt: Date.now() },
+      resetPasswordToken: hashToken(req.params.token as string),
+      resetPasswordExpire: { $gt: new Date() },
     }).select('+resetPasswordToken +resetPasswordExpire');
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired reset token' });
+      res.status(400).json({ message: 'Invalid or expired reset token' });
+      return;
     }
 
     user.password = password;
@@ -342,6 +372,6 @@ export const resetPassword = async (req, res) => {
 
     res.json({ message: 'Password reset successful! You can now login with your new password.' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: errorMessage(error, 'Failed to reset password') });
   }
 };

@@ -1,4 +1,11 @@
 import nodemailer from 'nodemailer';
+import type { Types } from 'mongoose';
+import type { IOrder } from '../models/Order.js';
+
+/** Only the fields the receipt template actually renders. */
+type OrderEmailPayload = Pick<IOrder, 'status' | 'orderType' | 'totalAmount' | 'items'> & {
+  _id: Types.ObjectId | string;
+};
 
 /**
  * When SMTP credentials are absent — local development, CI, E2E runs — every
@@ -8,7 +15,7 @@ import nodemailer from 'nodemailer';
 const isConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
 let warned = false;
-const warnOnce = (to, subject) => {
+const warnOnce = (to: string, subject: string): void => {
   if (!warned) {
     console.warn('[email] EMAIL_USER/EMAIL_PASS not set — emails are being skipped.');
     warned = true;
@@ -18,7 +25,7 @@ const warnOnce = (to, subject) => {
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: process.env.EMAIL_PORT || 587,
+  port: Number(process.env.EMAIL_PORT ?? 587),
   secure: false,
   auth: {
     user: process.env.EMAIL_USER,
@@ -26,7 +33,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendVerificationEmail = async (email, token) => {
+export const sendVerificationEmail = async (email: string, token: string): Promise<void> => {
   if (!isConfigured) {
     warnOnce(email, 'Email Verification');
     return;
@@ -85,7 +92,7 @@ export const sendVerificationEmail = async (email, token) => {
   }
 };
 
-export const sendPasswordResetEmail = async (email, token) => {
+export const sendPasswordResetEmail = async (email: string, token: string): Promise<void> => {
   if (!isConfigured) {
     warnOnce(email, 'Password Reset Request');
     return;
@@ -151,7 +158,10 @@ export const sendPasswordResetEmail = async (email, token) => {
   }
 };
 
-export const sendOrderConfirmationEmail = async (email, order) => {
+export const sendOrderConfirmationEmail = async (
+  email: string,
+  order: OrderEmailPayload
+): Promise<void> => {
   if (!isConfigured) {
     warnOnce(email, 'Order Confirmation');
     return;
@@ -160,7 +170,7 @@ export const sendOrderConfirmationEmail = async (email, order) => {
   const mailOptions = {
     from: `"Bharadwaj's Cafe" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: `Order Confirmation #${order._id} - Bharadwaj's Cafe`,
+    subject: `Order Confirmation #${order._id.toString()} - Bharadwaj's Cafe`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -185,7 +195,7 @@ export const sendOrderConfirmationEmail = async (email, order) => {
             <h2>Thank you for your order!</h2>
             <p>Your order has been successfully placed and is being prepared.</p>
             <div class="order-details">
-              <h3>Order #${order._id}</h3>
+              <h3>Order #${order._id.toString()}</h3>
               <p><strong>Status:</strong> ${order.status}</p>
               <p><strong>Order Type:</strong> ${order.orderType}</p>
               <hr>
@@ -194,7 +204,7 @@ export const sendOrderConfirmationEmail = async (email, order) => {
                   (item) => `
                 <div class="item">
                   <strong>${item.name}</strong> x ${item.quantity}
-                  <span style="float: right;">₹${item.price * item.quantity}</span>
+                  <span style="float: right;">₹${(item.price ?? 0) * item.quantity}</span>
                 </div>
               `
                 )

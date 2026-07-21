@@ -17,7 +17,7 @@ vi.mock('../utils/email.js', () => ({
   sendOrderConfirmationEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
-let mongoServer;
+let mongoServer: MongoMemoryServer | undefined;
 
 beforeAll(async () => {
   // CI supplies a MongoDB service container, which avoids downloading a

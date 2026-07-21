@@ -9,7 +9,7 @@ import { ADMIN_ROOM, userRoom } from './utils/realtime.js';
 dotenv.config();
 
 // Fail at boot rather than at the first request that needs them.
-const REQUIRED_ENV = ['MONGO_URI', 'JWT_SECRET'];
+const REQUIRED_ENV = ['MONGO_URI', 'JWT_SECRET'] as const;
 const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
 
 if (missingEnv.length > 0) {
@@ -18,14 +18,16 @@ if (missingEnv.length > 0) {
   process.exit(1);
 }
 
-if (process.env.JWT_SECRET.length < 32) {
+const jwtSecret = process.env.JWT_SECRET as string;
+
+if (jwtSecret.length < 32) {
   console.error('JWT_SECRET must be at least 32 characters. Generate one with:');
   console.error("  node -e \"console.log(require('crypto').randomBytes(48).toString('hex'))\"");
   process.exit(1);
 }
 
 // Allow a comma-separated list so preview and production origins can coexist.
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const allowedOrigins = (process.env.CLIENT_URL ?? 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
@@ -39,20 +41,22 @@ const app = createApp({ corsOptions });
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: corsOptions });
 
-connectDB();
+void connectDB();
 
 // Make io accessible to route handlers via req.app.get('io').
 app.set('io', io);
 
 // Every socket must present a valid JWT before it can join anything.
-io.use(authenticateSocket);
+io.use((socket, next) => {
+  void authenticateSocket(socket, next);
+});
 
 io.on('connection', (socket) => {
   // Rooms are derived from the verified token, never from client input, so a
   // client cannot subscribe to another user's stream by guessing an id.
-  socket.join(userRoom(socket.userId));
+  void socket.join(userRoom(socket.userId));
   if (socket.userRole === 'admin') {
-    socket.join(ADMIN_ROOM);
+    void socket.join(ADMIN_ROOM);
   }
 
   console.log(`Socket connected: ${socket.id} (user ${socket.userId})`);
@@ -67,7 +71,7 @@ io.on('connection', (socket) => {
 // client. Real-time updates are now emitted server-side, from the REST
 // handlers that persist the change, and addressed to specific rooms.
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT ?? 5000);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

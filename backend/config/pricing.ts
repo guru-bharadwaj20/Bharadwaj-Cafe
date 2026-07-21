@@ -1,7 +1,15 @@
+import { Types } from 'mongoose';
 import MenuItem from '../models/MenuItem.js';
 import type { IOrderItem } from '../models/Order.js';
 
 export const TAX_RATE = 0.05;
+
+/** Narrows an untrusted value to a usable ObjectId string, or null. */
+const asObjectIdString = (value: unknown): string | null => {
+  if (value instanceof Types.ObjectId) return value.toString();
+  if (typeof value === 'string' && Types.ObjectId.isValid(value)) return value;
+  return null;
+};
 
 export class PricingError extends Error {
   constructor(message: string) {
@@ -49,14 +57,17 @@ export const priceOrder = async (requestedItems: unknown): Promise<PricedOrder> 
     const id = line?.menuItem ?? line?._id;
     const quantity = Number(line?.quantity ?? 1);
 
-    if (!id) {
+    // Only a string or an ObjectId is a usable reference. Accepting anything
+    // else would stringify to "[object Object]" and quietly become a lookup
+    // for an id that cannot exist.
+    const key = asObjectIdString(id);
+    if (!key) {
       throw new PricingError('Each order item must reference a menu item');
     }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 50) {
       throw new PricingError('Item quantity must be a whole number between 1 and 50');
     }
 
-    const key = String(id);
     quantityById.set(key, (quantityById.get(key) ?? 0) + quantity);
   }
 

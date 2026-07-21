@@ -38,6 +38,10 @@ jobs:
         working-directory: frontend
         run: npm ci
 
+      - name: Typecheck backend
+        working-directory: backend
+        run: npm run typecheck
+
       - name: Lint backend
         working-directory: backend
         run: npm run lint
@@ -86,6 +90,12 @@ jobs:
         env:
           MONGO_URI_TEST: mongodb://localhost:27017/bharadwaj-cafe-test
         run: npm run test:coverage
+
+      # Proves the TypeScript actually compiles to runnable output, which
+      # `tsc --noEmit` alone does not.
+      - name: Build
+        working-directory: backend
+        run: npm run build
 
       - name: Upload coverage
         if: always()

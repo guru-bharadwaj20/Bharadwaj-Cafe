@@ -10,16 +10,18 @@ import mongoose from 'mongoose';
 
 // Environment and the SMTP mock are configured centrally in tests/setup.js.
 import { createApp } from '../app.js';
-import User from '../models/User.js';
-import MenuItem from '../models/MenuItem.js';
+import { expectFound } from './factories.js';
+import User, { type IUser } from '../models/User.js';
+import MenuItem, { type HydratedMenuItem, type IMenuItem } from '../models/MenuItem.js';
 import Order from '../models/Order.js';
 import Chat from '../models/Chat.js';
+import type { Socket } from 'socket.io';
 import { authenticateSocket } from '../middleware/auth.js';
 
 const app = createApp();
 
 /** Creates a verified user and returns the user plus a live bearer token. */
-const makeUser = async (overrides = {}) => {
+const makeUser = async (overrides: Partial<IUser> = {}) => {
   const suffix = new mongoose.Types.ObjectId().toString();
   const password = 'correct-horse-battery';
   const user = await User.create({
@@ -37,7 +39,7 @@ const makeUser = async (overrides = {}) => {
   return { user, password, token: res.body.token };
 };
 
-const makeMenuItem = (overrides = {}) =>
+const makeMenuItem = (overrides: Partial<IMenuItem> = {}) =>
   MenuItem.create({
     name: 'Cappuccino',
     description: 'Espresso with steamed milk foam',
@@ -56,7 +58,7 @@ describe('Fix #1 — the pre-save hook only runs when the password changes', () 
   it('leaves the password field untouched and clean after an unrelated save', async () => {
     const { user } = await makeUser();
 
-    const doc = await User.findById(user._id);
+    const doc = expectFound(await User.findById(user._id));
     const originalHash = doc.password;
 
     doc.name = 'Renamed User';
@@ -118,8 +120,8 @@ describe('Fix #1 — the pre-save hook only runs when the password changes', () 
 });
 
 describe('Fix #2 — order totals and payment status come from the server', () => {
-  let token;
-  let item;
+  let token: string;
+  let item: HydratedMenuItem;
 
   beforeEach(async () => {
     ({ token } = await makeUser());
@@ -207,8 +209,8 @@ describe('Fix #2 — order totals and payment status come from the server', () =
 });
 
 describe('Fix #3 — order reads require auth and ownership', () => {
-  let order;
-  let ownerToken;
+  let order: Record<string, any>;
+  let ownerToken: string;
 
   beforeEach(async () => {
     const owner = await makeUser();
@@ -264,10 +266,10 @@ describe('Fix #3 — order reads require auth and ownership', () => {
 });
 
 describe('Fix #4 — sockets are authenticated and identity-pinned', () => {
-  const connect = (auth) =>
-    new Promise((resolve) => {
-      const socket = { handshake: { auth }, userId: undefined, userRole: undefined };
-      authenticateSocket(socket, (err) => resolve({ err, socket }));
+  const connect = (auth: Record<string, unknown>) =>
+    new Promise<{ err?: Error; socket: Socket }>((resolve) => {
+      const socket = { handshake: { auth } } as unknown as Socket;
+      void authenticateSocket(socket, (err?: Error) => resolve({ err, socket }));
     });
 
   it('rejects a socket with no token', async () => {
@@ -313,15 +315,15 @@ describe('Fix #5 — remaining hardening', () => {
       .send({ message: 'my private message' })
       .expect(200);
 
-    const chat = await Chat.findOne({});
+    const chat = expectFound(await Chat.findOne({}));
 
     await request(app)
-      .put(`/api/chat/${chat._id}/read`)
+      .put(`/api/chat/${chat._id.toString()}/read`)
       .set('Authorization', `Bearer ${strangerToken}`)
       .expect(404);
 
     await request(app)
-      .put(`/api/chat/${chat._id}/read`)
+      .put(`/api/chat/${chat._id.toString()}/read`)
       .set('Authorization', `Bearer ${ownerToken}`)
       .expect(200);
   });
@@ -347,10 +349,12 @@ describe('Fix #5 — remaining hardening', () => {
 
     await request(app).post('/api/auth/forgot-password').send({ email: user.email }).expect(200);
 
-    const stored = await User.findById(user._id).select('+resetPasswordToken +resetPasswordExpire');
+    const stored = expectFound(
+      await User.findById(user._id).select('+resetPasswordToken +resetPasswordExpire')
+    );
 
     expect(stored.resetPasswordToken).toMatch(/^[a-f0-9]{64}$/); // sha256 hex
-    expect(stored.resetPasswordExpire.getTime()).toBeGreaterThan(Date.now());
+    expect(expectFound(stored.resetPasswordExpire).getTime()).toBeGreaterThan(Date.now());
   });
 
   it('does not hand out an auth token at registration', async () => {
@@ -426,8 +430,8 @@ describe('Fix #5 — remaining hardening', () => {
       .expect(200);
 
     // Delivering an order should award loyalty points via the admin route too.
-    const updated = await Order.findById(order._id);
-    const customer = await User.findById(updated.user);
+    const updated = expectFound(await Order.findById(order._id));
+    const customer = expectFound(await User.findById(updated.user));
     expect(customer.loyaltyPoints).toBeGreaterThan(0);
   });
 });

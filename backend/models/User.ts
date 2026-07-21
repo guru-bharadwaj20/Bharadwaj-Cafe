@@ -87,7 +87,10 @@ const issueToken = (ttlMs: number) => {
   return { raw, hashed: hashToken(raw), expiresAt: new Date(Date.now() + ttlMs) };
 };
 
-userSchema.methods.matchPassword = function (enteredPassword: string): Promise<boolean> {
+userSchema.methods.matchPassword = function (
+  this: { password: string },
+  enteredPassword: string
+): Promise<boolean> {
   return bcrypt.compare(enteredPassword, this.password);
 };
 

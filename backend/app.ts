@@ -1,5 +1,5 @@
-import express from 'express';
-import cors from 'cors';
+import express, { type Express } from 'express';
+import cors, { type CorsOptions } from 'cors';
 import helmet from 'helmet';
 import { apiLimiter } from './middleware/rateLimit.js';
 import menuRoutes from './routes/menuRoutes.js';
@@ -14,11 +14,15 @@ import blogRoutes from './routes/blogRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import loyaltyRoutes from './routes/loyaltyRoutes.js';
 
+export interface CreateAppOptions {
+  corsOptions?: CorsOptions;
+}
+
 /**
  * Builds the Express app. Deliberately free of side effects — no database
  * connection, no listening socket — so tests can mount it directly.
  */
-export const createApp = ({ corsOptions } = {}) => {
+export const createApp = ({ corsOptions }: CreateAppOptions = {}): Express => {
   const app = express();
 
   app.use(helmet());
@@ -45,7 +49,7 @@ export const createApp = ({ corsOptions } = {}) => {
   app.use('/api/chat', chatRoutes);
   app.use('/api/loyalty', loyaltyRoutes);
 
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', (_req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
   });
 
