@@ -19,6 +19,7 @@ COPY tsconfig.json ./
 COPY types ./types
 COPY config ./config
 COPY controllers ./controllers
+COPY jobs ./jobs
 COPY middleware ./middleware
 COPY models ./models
 COPY routes ./routes
