@@ -1,123 +1,48 @@
-# Bharadwaj's Cafe - React Version
+# Frontend — React + Vite
 
-A modern, responsive coffee shop website built with React and Vite. This project is a complete conversion of the original HTML/CSS/JS website to React while preserving all the original styling and functionality.
+Single-page app, installable as a PWA. See the root [README](../README.md)
+for the full picture.
 
-## Features
-
-- 🎨 Exact same styling as the original website
-- 📱 Fully responsive design
-- ⚡ Fast performance with Vite
-- 🎭 Smooth animations and transitions
-- 📋 Mobile-friendly navigation menu
-- ☕ Menu showcase with coffee items
-- 📞 Contact form
-- 🔗 Social media links
-
-## Project Structure
+## Layout
 
 ```
-Bharadwaj_Cafe/
-├── public/
-│   └── img/              # All images (logo, coffee items, etc.)
-├── src/
-│   ├── components/
-│   │   ├── Header.jsx    # Navigation header
-│   │   ├── Hero.jsx      # Hero section
-│   │   ├── About.jsx     # About section
-│   │   ├── Order.jsx     # Menu section
-│   │   ├── Contact.jsx   # Contact section
-│   │   └── Footer.jsx    # Footer section
-│   ├── App.jsx           # Main app component
-│   ├── main.jsx          # Entry point
-│   ├── style.css         # Main styles
-│   ├── about.css         # About section styles
-│   ├── order.css         # Order section styles
-│   ├── contact.css       # Contact section styles
-│   └── footer.css        # Footer section styles
-├── index.html
-├── package.json
-└── vite.config.js
-
+src/
+  components/     shared UI, including charts/ and the chat widget
+  pages/          one per route
+  context/        Auth and Cart providers
+  utils/          api client · socket · razorpay · push
+  test/           setup and the accessibility suite
+  *.css           feature-scoped stylesheets
+  sw.js           service worker (caching + push handling)
 ```
 
-## Getting Started
+## Scripts
 
-### Prerequisites
+| Command | What it does |
+|---|---|
+| `npm run dev` | Vite dev server |
+| `npm run build` | Production build, including the service worker |
+| `npm run preview` | Serve the production build locally |
+| `npm test` | 41 component, context and accessibility tests |
+| `npm run lint` | ESLint with React and hooks rules |
 
-- Node.js (v14 or higher)
-- npm or yarn
+## Conventions
 
-### Installation
+- The client sends item ids and quantities; the server prices everything.
+  Amounts shown before checkout are a preview, not an authority.
+- Capability endpoints (`/api/payments/config`, `/api/push/config`,
+  `/api/uploads/config`) decide what UI renders — a control that cannot work
+  is never shown.
+- Icons are decorative and `aria-hidden`; every icon-only button carries an
+  `aria-label`.
 
-1. Install dependencies:
+## Configuration
 
-```bash
-npm install
-```
+`VITE_API_URL` is the only variable. Vite inlines it at **build** time, so
+changing it needs a rebuild, not a restart.
 
-### Development
+## Known gaps
 
-Run the development server:
-
-```bash
-npm run dev
-```
-
-The app will be available at `http://localhost:5173`
-
-### Build
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-### Preview
-
-Preview the production build:
-
-```bash
-npm run preview
-```
-
-## Technologies Used
-
-- **React** - UI library
-- **Vite** - Build tool and dev server
-- **CSS3** - Styling (all original CSS preserved)
-- **Font Awesome** - Icons
-- **Google Fonts** - Typography (Poppins, Miniver)
-
-## Sections
-
-1. **Home/Hero** - Welcome section with call-to-action buttons
-2. **About Us** - Information about the cafe with social media links
-3. **Our Menu** - Showcase of coffee items (Latte, Americano, Filter Coffee, etc.)
-4. **Contact Us** - Contact information and form
-5. **Footer** - Copyright, social links, and policies
-
-## Features Implemented
-
-✅ Responsive navigation with mobile menu toggle
-✅ Smooth scrolling to sections
-✅ Hover effects on buttons and links
-✅ Mobile-first responsive design
-✅ All original styling preserved
-✅ React state management for mobile menu
-✅ Component-based architecture
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## License
-
-This project is for educational purposes.
-
-## Contact
-
-For any queries, reach out at gururb20@gmail.com
+Still JavaScript rather than TypeScript — see
+[ADR 0005](../docs/adr/0005-typescript-backend-only.md). Coverage outside the
+cart, auth and accessibility paths is thin.
