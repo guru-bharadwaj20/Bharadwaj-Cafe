@@ -133,6 +133,19 @@ export const api = {
     return response.json();
   },
 
+  // Analytics APIs (admin only)
+  getAnalytics: async (resource, params, token) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_URL}/analytics/${resource}?${query}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to load analytics');
+    }
+    return response.json();
+  },
+
   // Contact API
   submitContact: async (contactData) => {
     const response = await fetch(`${API_URL}/contact`, {

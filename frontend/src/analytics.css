@@ -1,0 +1,359 @@
+/*
+ * Analytics dashboard.
+ *
+ * Colour is declared once as custom properties per mode. Dark is a separate
+ * validated palette, not an automatic inversion of the light one:
+ *   light  series-1 #2a78d6  on surface #fcfcfb
+ *   dark   series-1 #3987e5  on surface #1a1a19
+ * Both sets pass the lightness band, chroma floor, CVD separation,
+ * normal-vision floor and 3:1 contrast checks.
+ */
+.viz-root {
+  color-scheme: light;
+  --surface-1: #fcfcfb;
+  --surface-2: #f0efec;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #75746f;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --status-good: #0ca30c;
+  --status-critical: #d03b3b;
+  --grid: rgba(11, 11, 11, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --surface-2: #262625;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #97968d;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --grid: rgba(255, 255, 255, 0.1);
+  }
+}
+
+:root[data-theme='dark'] .viz-root {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --surface-2: #262625;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #97968d;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --grid: rgba(255, 255, 255, 0.1);
+}
+
+.analytics-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.analytics-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.analytics-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+}
+
+.analytics-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.range-button {
+  padding: 8px 16px;
+  font: inherit;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.range-button.active {
+  color: var(--surface-1);
+  background: var(--series-1);
+  border-color: var(--series-1);
+}
+
+.range-button:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
+/* Stat tiles ------------------------------------------------------------ */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.stat-tile-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.stat-tile-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The arrow in the markup carries direction; colour only reinforces it. */
+.stat-tile-delta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.stat-tile-delta.up {
+  color: var(--status-good);
+}
+
+.stat-tile-delta.down {
+  color: var(--status-critical);
+}
+
+/* Charts ---------------------------------------------------------------- */
+
+.chart {
+  margin: 0 0 28px;
+  padding: 20px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.chart-title {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Grid and axes stay recessive so the data reads first. */
+.chart-grid {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  font-size: 11px;
+  fill: var(--text-muted);
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--series-1);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-crosshair {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.chart-marker {
+  fill: var(--series-1);
+  /* A surface ring keeps the marker legible over the area fill. */
+  stroke: var(--surface-2);
+  stroke-width: 2;
+}
+
+.chart-tooltip {
+  margin-top: 10px;
+  min-height: 1.2em;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.chart-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.chart-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* Horizontal bars ------------------------------------------------------- */
+
+.bar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bar-list li {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 2fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.bar-label {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-track {
+  height: 14px;
+  background: var(--grid);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--series-1);
+  /* Rounded data-end only, anchored to the baseline. */
+  border-radius: 0 4px 4px 0;
+}
+
+.bar-value {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Columns --------------------------------------------------------------- */
+
+.column-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px; /* the 2px surface gap between adjacent marks */
+  height: 160px;
+  padding-bottom: 18px;
+}
+
+.column {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.column-fill {
+  width: 100%;
+  min-height: 2px;
+  background: var(--series-1);
+  border-radius: 4px 4px 0 0;
+}
+
+.column-fill.peak {
+  background: var(--series-2);
+}
+
+.column-label {
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Table fallback -------------------------------------------------------- */
+
+.analytics-table-section {
+  margin-top: 24px;
+}
+
+.analytics-table-section button {
+  padding: 8px 14px;
+  font: inherit;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid var(--grid);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.analytics-table {
+  width: 100%;
+  margin-top: 16px;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.analytics-table caption {
+  margin-bottom: 8px;
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.analytics-table th,
+.analytics-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--grid);
+  color: var(--text-secondary);
+}
+
+.analytics-table thead th {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.analytics-status,
+.analytics-error {
+  padding: 24px 0;
+  color: var(--text-secondary);
+}
+
+.analytics-error {
+  color: var(--status-critical);
+}
+
+@media (max-width: 600px) {
+  .bar-list li {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
