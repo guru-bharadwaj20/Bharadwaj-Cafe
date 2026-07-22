@@ -3,6 +3,7 @@ import type { Types } from 'mongoose';
 import Review from '../models/Review.js';
 import MenuItem from '../models/MenuItem.js';
 import type { HydratedUser } from '../models/User.js';
+import { invalidateMenuCache } from '../utils/menuCache.js';
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
@@ -17,6 +18,10 @@ const refreshMenuItemRating = async (menuItemId: Types.ObjectId): Promise<void> 
     rating: avgRating,
     reviewCount: reviews.length,
   });
+
+  // A new review changes the rating shown on the menu, so the cached
+  // listing is now stale.
+  await invalidateMenuCache();
 };
 
 // @desc    Create a new review

@@ -3,6 +3,7 @@ import User, { type UserRole } from '../models/User.js';
 import Order from '../models/Order.js';
 import MenuItem, { type IMenuItem } from '../models/MenuItem.js';
 import Contact from '../models/Contact.js';
+import { invalidateMenuCache } from '../utils/menuCache.js';
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
@@ -143,6 +144,7 @@ export const createMenuItem: RequestHandler = async (req, res) => {
     const { name, description, price, image, category } = req.body as Partial<IMenuItem>;
 
     const menuItem = await MenuItem.create({ name, description, price, image, category });
+    await invalidateMenuCache();
 
     res.status(201).json(menuItem);
   } catch (error) {
@@ -171,6 +173,8 @@ export const updateMenuItem: RequestHandler = async (req, res) => {
     menuItem.available = body.available ?? menuItem.available;
 
     const updatedMenuItem = await menuItem.save();
+    await invalidateMenuCache();
+
     res.json(updatedMenuItem);
   } catch (error) {
     res.status(400).json({ message: errorMessage(error, 'Failed to update menu item') });
@@ -190,6 +194,8 @@ export const deleteMenuItem: RequestHandler = async (req, res) => {
     }
 
     await menuItem.deleteOne();
+    await invalidateMenuCache();
+
     res.json({ message: 'Menu item deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: errorMessage(error, 'Failed to delete menu item') });

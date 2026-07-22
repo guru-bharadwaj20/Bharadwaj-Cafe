@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
 import connectDB from './config/db.js';
+import { createPubSubPair } from './config/redis.js';
 import { createApp } from './app.js';
 import { authenticateSocket } from './middleware/auth.js';
 import { ADMIN_ROOM, userRoom } from './utils/realtime.js';
@@ -40,6 +42,17 @@ const corsOptions = {
 const app = createApp({ corsOptions });
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: corsOptions });
+
+// Without this adapter, an emit only reaches sockets attached to the instance
+// that produced it — so with two replicas, half of a customer's order updates
+// would silently go nowhere. With Redis, every instance sees every emit.
+const pubSub = createPubSubPair();
+if (pubSub) {
+  io.adapter(createAdapter(pubSub.pubClient, pubSub.subClient));
+  console.log('Socket.io: using the Redis adapter (multi-instance ready)');
+} else {
+  console.log('Socket.io: in-memory adapter (single instance only)');
+}
 
 void connectDB();
 
