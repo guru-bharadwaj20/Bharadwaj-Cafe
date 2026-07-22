@@ -9,6 +9,7 @@ import Order, {
 import type { HydratedUser } from '../models/User.js';
 import { updateLoyalty } from './loyaltyController.js';
 import { priceOrder } from '../config/pricing.js';
+import { releaseStock, reserveStock } from '../config/inventory.js';
 import { emitToAdmins, emitToUser } from '../utils/realtime.js';
 import { enqueueDetached } from '../jobs/enqueue.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
@@ -80,6 +81,10 @@ export const createOrder: RequestHandler = asyncHandler(async (req, res) => {
   if (!customerPhone) {
     throw new BadRequestError('A contact phone number is required');
   }
+
+  // Reserved *before* the order is written, so a sold-out item fails the
+  // request rather than creating an order that cannot be fulfilled.
+  await reserveStock(priced.items);
 
   const order = await Order.create({
     user: user._id,
@@ -165,6 +170,13 @@ export const updateOrderStatus: RequestHandler = asyncHandler(async (req, res) =
   }
 
   const oldStatus = order.status;
+
+  // Cancelling returns the stock, but only once — re-cancelling an already
+  // cancelled order must not inflate inventory.
+  if (status === 'cancelled' && oldStatus !== 'cancelled') {
+    await releaseStock(order.items);
+  }
+
   order.status = status;
   const updatedOrder = await order.save();
 
