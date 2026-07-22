@@ -147,12 +147,12 @@ const Profile = () => {
   };
 
   return (
-    <div className="profile-page">
+    <div className="profile-page" id="main-content">
       <div className="profile-container section-content">
         <NotificationToggle />
         <div className="profile-header">
           <div className="profile-avatar">
-            <i className="fa-solid fa-user-circle"></i>
+            <i className="fa-solid fa-user-circle" aria-hidden="true"></i>
           </div>
           <div className="profile-info">
             <h1>{user?.name}</h1>
@@ -166,19 +166,19 @@ const Profile = () => {
             className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`}
             onClick={() => setActiveTab('details')}
           >
-            <i className="fa-solid fa-user"></i> Profile Details
+            <i className="fa-solid fa-user" aria-hidden="true"></i> Profile Details
           </button>
           <button
             className={`tab-btn ${activeTab === 'password' ? 'active' : ''}`}
             onClick={() => setActiveTab('password')}
           >
-            <i className="fa-solid fa-lock"></i> Change Password
+            <i className="fa-solid fa-lock" aria-hidden="true"></i> Change Password
           </button>
           <button
             className={`tab-btn ${activeTab === 'delete' ? 'active' : ''}`}
             onClick={() => setActiveTab('delete')}
           >
-            <i className="fa-solid fa-trash"></i> Delete Account
+            <i className="fa-solid fa-trash" aria-hidden="true"></i> Delete Account
           </button>
         </div>
 
@@ -198,7 +198,7 @@ const Profile = () => {
                 <h2>Profile Information</h2>
                 {!isEditing && (
                   <button className="edit-btn" onClick={() => setIsEditing(true)}>
-                    <i className="fa-solid fa-edit"></i> Edit Profile
+                    <i className="fa-solid fa-edit" aria-hidden="true"></i> Edit Profile
                   </button>
                 )}
               </div>
@@ -228,7 +228,7 @@ const Profile = () => {
                 <form onSubmit={handleUpdateProfile} className="edit-form">
                   <div className="form-group">
                     <label htmlFor="name">
-                      <i className="fa-solid fa-user"></i> Full Name
+                      <i className="fa-solid fa-user" aria-hidden="true"></i> Full Name
                     </label>
                     <input
                       type="text"
@@ -242,7 +242,7 @@ const Profile = () => {
 
                   <div className="form-group">
                     <label htmlFor="email">
-                      <i className="fa-solid fa-envelope"></i> Email Address
+                      <i className="fa-solid fa-envelope" aria-hidden="true"></i> Email Address
                     </label>
                     <input
                       type="email"
@@ -284,7 +284,7 @@ const Profile = () => {
               <form onSubmit={handleChangePassword} className="password-form">
                 <div className="form-group">
                   <label htmlFor="currentPassword">
-                    <i className="fa-solid fa-lock"></i> Current Password
+                    <i className="fa-solid fa-lock" aria-hidden="true"></i> Current Password
                   </label>
                   <input
                     type="password"
@@ -298,7 +298,7 @@ const Profile = () => {
 
                 <div className="form-group">
                   <label htmlFor="newPassword">
-                    <i className="fa-solid fa-key"></i> New Password
+                    <i className="fa-solid fa-key" aria-hidden="true"></i> New Password
                   </label>
                   <input
                     type="password"
@@ -313,7 +313,8 @@ const Profile = () => {
 
                 <div className="form-group">
                   <label htmlFor="confirmPassword">
-                    <i className="fa-solid fa-check-circle"></i> Confirm New Password
+                    <i className="fa-solid fa-check-circle" aria-hidden="true"></i> Confirm New
+                    Password
                   </label>
                   <input
                     type="password"
@@ -337,7 +338,7 @@ const Profile = () => {
             <div className="delete-section">
               <h2>Delete Account</h2>
               <div className="warning-box">
-                <i className="fa-solid fa-triangle-exclamation"></i>
+                <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                 <div>
                   <h3>Warning: This action is permanent!</h3>
                   <p>
@@ -351,22 +352,23 @@ const Profile = () => {
                 <h4>What will be deleted:</h4>
                 <ul>
                   <li>
-                    <i className="fa-solid fa-check"></i> Your profile information
+                    <i className="fa-solid fa-check" aria-hidden="true"></i> Your profile
+                    information
                   </li>
                   <li>
-                    <i className="fa-solid fa-check"></i> Order history
+                    <i className="fa-solid fa-check" aria-hidden="true"></i> Order history
                   </li>
                   <li>
-                    <i className="fa-solid fa-check"></i> Saved preferences
+                    <i className="fa-solid fa-check" aria-hidden="true"></i> Saved preferences
                   </li>
                   <li>
-                    <i className="fa-solid fa-check"></i> All personal data
+                    <i className="fa-solid fa-check" aria-hidden="true"></i> All personal data
                   </li>
                 </ul>
               </div>
 
               <button className="delete-btn" onClick={handleDeleteAccount} disabled={loading}>
-                <i className="fa-solid fa-trash"></i>
+                <i className="fa-solid fa-trash" aria-hidden="true"></i>
                 {loading ? 'Deleting...' : 'Delete My Account'}
               </button>
             </div>

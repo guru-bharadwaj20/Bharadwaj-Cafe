@@ -42,10 +42,10 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard" id="main-content">
       <div className="admin-header">
         <h1>
-          <i className="fas fa-dashboard"></i> Admin Dashboard
+          <i className="fas fa-dashboard" aria-hidden="true"></i> Admin Dashboard
         </h1>
         <p>Welcome back, {user?.name}!</p>
       </div>
@@ -55,25 +55,25 @@ const AdminDashboard = () => {
           className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
         >
-          <i className="fas fa-chart-line"></i> Overview
+          <i className="fas fa-chart-line" aria-hidden="true"></i> Overview
         </button>
         <button
           className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
           onClick={() => setActiveTab('orders')}
         >
-          <i className="fas fa-shopping-bag"></i> Orders
+          <i className="fas fa-shopping-bag" aria-hidden="true"></i> Orders
         </button>
         <button
           className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
           onClick={() => setActiveTab('users')}
         >
-          <i className="fas fa-users"></i> Users
+          <i className="fas fa-users" aria-hidden="true"></i> Users
         </button>
         <button
           className={`tab-btn ${activeTab === 'menu' ? 'active' : ''}`}
           onClick={() => setActiveTab('menu')}
         >
-          <i className="fas fa-utensils"></i> Menu
+          <i className="fas fa-utensils" aria-hidden="true"></i> Menu
         </button>
       </div>
 
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
           <div className="stats-grid">
             <div className="stat-card">
               <div className="stat-icon revenue">
-                <i className="fas fa-dollar-sign"></i>
+                <i className="fas fa-dollar-sign" aria-hidden="true"></i>
               </div>
               <div className="stat-info">
                 <h3>₹{stats.totalRevenue?.toLocaleString()}</h3>
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
 
             <div className="stat-card">
               <div className="stat-icon orders">
-                <i className="fas fa-shopping-cart"></i>
+                <i className="fas fa-shopping-cart" aria-hidden="true"></i>
               </div>
               <div className="stat-info">
                 <h3>{stats.totalOrders}</h3>
@@ -102,7 +102,7 @@ const AdminDashboard = () => {
 
             <div className="stat-card">
               <div className="stat-icon users">
-                <i className="fas fa-user"></i>
+                <i className="fas fa-user" aria-hidden="true"></i>
               </div>
               <div className="stat-info">
                 <h3>{stats.totalUsers}</h3>
@@ -112,7 +112,7 @@ const AdminDashboard = () => {
 
             <div className="stat-card">
               <div className="stat-icon menu">
-                <i className="fas fa-coffee"></i>
+                <i className="fas fa-coffee" aria-hidden="true"></i>
               </div>
               <div className="stat-info">
                 <h3>{stats.totalMenuItems}</h3>
@@ -197,7 +197,7 @@ const OrdersManagement = ({ token }) => {
   return (
     <div className="management-section">
       <h2>
-        <i className="fas fa-shopping-bag"></i> All Orders ({orders.length})
+        <i className="fas fa-shopping-bag" aria-hidden="true"></i> All Orders ({orders.length})
       </h2>
       <div className="orders-table">
         <table>
@@ -240,7 +240,7 @@ const OrdersManagement = ({ token }) => {
                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                 <td>
                   <button className="btn-view" onClick={() => alert(`Order Details: ${order._id}`)}>
-                    <i className="fas fa-eye"></i>
+                    <i className="fas fa-eye" aria-hidden="true"></i>
                   </button>
                 </td>
               </tr>
@@ -289,7 +289,7 @@ const UsersManagement = ({ token }) => {
   return (
     <div className="management-section">
       <h2>
-        <i className="fas fa-users"></i> All Users ({users.length})
+        <i className="fas fa-users" aria-hidden="true"></i> All Users ({users.length})
       </h2>
       <div className="orders-table">
         <table>
@@ -314,11 +314,11 @@ const UsersManagement = ({ token }) => {
                 <td>
                   {user.isVerified ? (
                     <span className="verified">
-                      <i className="fas fa-check-circle"></i> Yes
+                      <i className="fas fa-check-circle" aria-hidden="true"></i> Yes
                     </span>
                   ) : (
                     <span className="not-verified">
-                      <i className="fas fa-times-circle"></i> No
+                      <i className="fas fa-times-circle" aria-hidden="true"></i> No
                     </span>
                   )}
                 </td>
@@ -326,7 +326,7 @@ const UsersManagement = ({ token }) => {
                 <td>
                   {user.role !== 'admin' && (
                     <button className="btn-delete" onClick={() => deleteUser(user._id)}>
-                      <i className="fas fa-trash"></i>
+                      <i className="fas fa-trash" aria-hidden="true"></i>
                     </button>
                   )}
                 </td>
@@ -377,10 +377,10 @@ const MenuManagement = ({ token }) => {
     <div className="management-section">
       <div className="section-header">
         <h2>
-          <i className="fas fa-utensils"></i> Menu Items ({menuItems.length})
+          <i className="fas fa-utensils" aria-hidden="true"></i> Menu Items ({menuItems.length})
         </h2>
         <button className="btn-add">
-          <i className="fas fa-plus"></i> Add New Item
+          <i className="fas fa-plus" aria-hidden="true"></i> Add New Item
         </button>
       </div>
       <div className="menu-grid">
@@ -394,10 +394,10 @@ const MenuManagement = ({ token }) => {
                 <span className="price">₹{item.price}</span>
                 <div className="menu-actions">
                   <button className="btn-edit">
-                    <i className="fas fa-edit"></i>
+                    <i className="fas fa-edit" aria-hidden="true"></i>
                   </button>
                   <button className="btn-delete" onClick={() => deleteMenuItem(item._id)}>
-                    <i className="fas fa-trash"></i>
+                    <i className="fas fa-trash" aria-hidden="true"></i>
                   </button>
                 </div>
               </div>

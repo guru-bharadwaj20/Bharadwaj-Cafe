@@ -91,7 +91,7 @@ const Reviews = ({ menuItemId }) => {
         <h3>Customer Reviews ({reviews.length})</h3>
         {user && !showForm && (
           <button className="btn-write-review" onClick={() => setShowForm(true)}>
-            <i className="fas fa-pen"></i> Write a Review
+            <i className="fas fa-pen" aria-hidden="true"></i> Write a Review
           </button>
         )}
       </div>
@@ -148,7 +148,7 @@ const Reviews = ({ menuItemId }) => {
                   onClick={() => handleMarkHelpful(review._id)}
                   disabled={!user}
                 >
-                  <i className="fas fa-thumbs-up"></i>
+                  <i className="fas fa-thumbs-up" aria-hidden="true"></i>
                   Helpful ({review.helpful?.length || 0})
                 </button>
                 {user && user._id === review.user?._id && (
@@ -156,7 +156,7 @@ const Reviews = ({ menuItemId }) => {
                     className="btn-delete-review"
                     onClick={() => handleDeleteReview(review._id)}
                   >
-                    <i className="fas fa-trash"></i> Delete
+                    <i className="fas fa-trash" aria-hidden="true"></i> Delete
                   </button>
                 )}
               </div>

@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Authenticated and transactional areas: nothing here is useful in a search
+# result, and crawling them wastes crawl budget on pages that redirect.
+Disallow: /admin
+Disallow: /analytics
+Disallow: /cart
+Disallow: /profile
+Disallow: /order-history
+Disallow: /addresses
+Disallow: /wishlist
+Disallow: /loyalty
+Disallow: /reset-password/
+Disallow: /verify-email/
+
+Sitemap: https://www.bharadwajscafe.com/sitemap.xml

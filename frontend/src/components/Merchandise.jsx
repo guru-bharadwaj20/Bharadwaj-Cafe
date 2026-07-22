@@ -132,11 +132,11 @@ const Merchandise = () => {
                   >
                     {addedItems[item._id] ? (
                       <>
-                        <i className="fas fa-check"></i> Added
+                        <i className="fas fa-check" aria-hidden="true"></i> Added
                       </>
                     ) : (
                       <>
-                        <i className="fas fa-cart-plus"></i> Add to Cart
+                        <i className="fas fa-cart-plus" aria-hidden="true"></i> Add to Cart
                       </>
                     )}
                   </button>

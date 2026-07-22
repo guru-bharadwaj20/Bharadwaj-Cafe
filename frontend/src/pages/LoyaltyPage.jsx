@@ -84,7 +84,7 @@ const LoyaltyPage = () => {
   }
 
   return (
-    <div className="loyalty-page">
+    <div className="loyalty-page" id="main-content">
       <div className="loyalty-header">
         <h1>Loyalty Rewards</h1>
         <p>Earn points with every purchase and unlock exclusive rewards</p>
@@ -141,7 +141,7 @@ const LoyaltyPage = () => {
           {rewards.map((reward) => (
             <div key={reward.id} className="reward-card">
               <div className="reward-icon">
-                <i className="fas fa-gift"></i>
+                <i className="fas fa-gift" aria-hidden="true"></i>
               </div>
               <h3>{reward.name}</h3>
               <p>{reward.description}</p>
@@ -160,17 +160,17 @@ const LoyaltyPage = () => {
         <h2>How It Works</h2>
         <div className="steps">
           <div className="step">
-            <i className="fas fa-shopping-bag"></i>
+            <i className="fas fa-shopping-bag" aria-hidden="true"></i>
             <h4>Order & Earn</h4>
             <p>Earn 1 point for every ₹10 spent</p>
           </div>
           <div className="step">
-            <i className="fas fa-chart-line"></i>
+            <i className="fas fa-chart-line" aria-hidden="true"></i>
             <h4>Level Up</h4>
             <p>Unlock higher tiers with more spending</p>
           </div>
           <div className="step">
-            <i className="fas fa-gift"></i>
+            <i className="fas fa-gift" aria-hidden="true"></i>
             <h4>Redeem Rewards</h4>
             <p>Use points for discounts and exclusive rewards</p>
           </div>

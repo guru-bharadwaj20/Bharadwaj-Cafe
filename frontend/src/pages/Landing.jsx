@@ -26,7 +26,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="landing-page">
+    <div className="landing-page" id="main-content">
       {/* Landing Header */}
       <header className="landing-header">
         <nav className="navbar section-content">
@@ -168,22 +168,22 @@ const Landing = () => {
             <h2 className="section-heading">Get In Touch</h2>
             <div className="contact-grid">
               <div className="contact-item">
-                <i className="fa-solid fa-location-dot"></i>
+                <i className="fa-solid fa-location-dot" aria-hidden="true"></i>
                 <h4>Visit Us</h4>
                 <p>581, MG Road, Bangalore - 560001</p>
               </div>
               <div className="contact-item">
-                <i className="fa-solid fa-phone"></i>
+                <i className="fa-solid fa-phone" aria-hidden="true"></i>
                 <h4>Call Us</h4>
                 <p>+91 9876543210</p>
               </div>
               <div className="contact-item">
-                <i className="fa-solid fa-envelope"></i>
+                <i className="fa-solid fa-envelope" aria-hidden="true"></i>
                 <h4>Email Us</h4>
                 <p>gururb20@gmail.com</p>
               </div>
               <div className="contact-item">
-                <i className="fa-solid fa-clock"></i>
+                <i className="fa-solid fa-clock" aria-hidden="true"></i>
                 <h4>Working Hours</h4>
                 <p>Mon - Fri: 09:00 AM - 05:00 PM</p>
               </div>

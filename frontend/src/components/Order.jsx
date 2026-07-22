@@ -143,7 +143,7 @@ const Order = () => {
                 onClick={() => handleAddToWishlist(item._id)}
                 title="Add to Wishlist"
               >
-                <i className="fas fa-heart"></i>
+                <i className="fas fa-heart" aria-hidden="true"></i>
               </button>
               <img src={item.image} alt={item.name} className="menu-image" />
               <div className="menu-details">
@@ -160,7 +160,7 @@ const Order = () => {
                 )}
                 {item.rating > 0 && (
                   <div className="rating">
-                    <i className="fas fa-star"></i> {item.rating.toFixed(1)}
+                    <i className="fas fa-star" aria-hidden="true"></i> {item.rating.toFixed(1)}
                     <span>({item.reviewCount} reviews)</span>
                   </div>
                 )}
@@ -172,11 +172,11 @@ const Order = () => {
                   >
                     {addedItems[item._id] ? (
                       <>
-                        <i className="fas fa-check"></i> Added
+                        <i className="fas fa-check" aria-hidden="true"></i> Added
                       </>
                     ) : (
                       <>
-                        <i className="fas fa-cart-plus"></i> Add to Cart
+                        <i className="fas fa-cart-plus" aria-hidden="true"></i> Add to Cart
                       </>
                     )}
                   </button>

@@ -88,7 +88,7 @@ const SearchFilters = ({ onFilterChange }) => {
   return (
     <div className="search-filters">
       <div className="search-bar">
-        <i className="fas fa-search"></i>
+        <i className="fas fa-search" aria-hidden="true"></i>
         <input
           type="text"
           placeholder="Search menu items..."
