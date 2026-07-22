@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import User, { hashToken } from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
-import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/email.js';
+import { enqueueDetached } from '../jobs/enqueue.js';
 
 const verificationRequired = (): boolean => process.env.REQUIRE_EMAIL_VERIFICATION !== 'false';
 
@@ -43,11 +43,9 @@ export const registerUser: RequestHandler = async (req, res) => {
     const rawVerificationToken = user.createVerificationToken();
     await user.save();
 
-    try {
-      await sendVerificationEmail(email, rawVerificationToken);
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-    }
+    // Queued rather than awaited: a slow or failing SMTP server must not
+    // delay — or fail — a successful registration.
+    enqueueDetached('verification-email', { email, token: rawVerificationToken });
 
     // Deliberately no auth token here: handing one out at registration would
     // let an unverified account straight past the verification gate.
@@ -157,12 +155,7 @@ export const updateUserProfile: RequestHandler = async (req, res) => {
       user.isVerified = false;
       const rawVerificationToken = user.createVerificationToken();
       await user.save();
-
-      try {
-        await sendVerificationEmail(user.email, rawVerificationToken);
-      } catch (emailError) {
-        console.error('Failed to send verification email:', emailError);
-      }
+      enqueueDetached('verification-email', { email: user.email, token: rawVerificationToken });
     } else {
       await user.save();
     }
@@ -286,11 +279,7 @@ export const resendVerification: RequestHandler = async (req, res) => {
     const rawVerificationToken = user.createVerificationToken();
     await user.save();
 
-    try {
-      await sendVerificationEmail(user.email, rawVerificationToken);
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-    }
+    enqueueDetached('verification-email', { email: user.email, token: rawVerificationToken });
 
     res.json(genericResponse);
   } catch (error) {
@@ -327,14 +316,10 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     const rawResetToken = user.createPasswordResetToken();
     await user.save();
 
-    try {
-      await sendPasswordResetEmail(email, rawResetToken);
-    } catch (emailError) {
-      console.error('Failed to send password reset email:', emailError);
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpire = undefined;
-      await user.save();
-    }
+    // Queued with retries. The token stays valid for its full hour either
+    // way, so a transient SMTP failure no longer forces a rollback that
+    // would leave the user unable to reset at all.
+    enqueueDetached('password-reset-email', { email, token: rawResetToken });
 
     res.json(genericResponse);
   } catch (error) {

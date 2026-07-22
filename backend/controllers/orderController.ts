@@ -10,7 +10,7 @@ import type { HydratedUser } from '../models/User.js';
 import { updateLoyalty } from './loyaltyController.js';
 import { priceOrder, PricingError } from '../config/pricing.js';
 import { emitToAdmins, emitToUser } from '../utils/realtime.js';
-import { sendOrderConfirmationEmail } from '../utils/email.js';
+import { enqueueDetached } from '../jobs/enqueue.js';
 
 const ORDER_TYPES: readonly OrderType[] = ['dine-in', 'takeaway', 'delivery'];
 const PAYMENT_METHODS: readonly PaymentMethod[] = ['card', 'upi', 'wallet', 'cod'];
@@ -111,9 +111,10 @@ export const createOrder: RequestHandler = async (req, res) => {
     emitToAdmins(io, 'newOrder', order);
     emitToUser(io, order.user, 'orderCreated', order);
 
-    void sendOrderConfirmationEmail(order.customerEmail, order).catch((error: unknown) =>
-      console.error('Failed to send order confirmation email:', error)
-    );
+    enqueueDetached('order-confirmation-email', {
+      email: order.customerEmail,
+      orderId: order._id.toString(),
+    });
 
     res.status(201).json(order);
   } catch (error) {
@@ -214,6 +215,13 @@ export const updateOrderStatus: RequestHandler = async (req, res) => {
     const io = getIo(req);
     emitToUser(io, updatedOrder.user, 'orderStatusUpdated', payload);
     emitToAdmins(io, 'orderStatusUpdated', payload);
+
+    // Customers who are not watching the page still get told.
+    enqueueDetached('order-status-email', {
+      email: updatedOrder.customerEmail,
+      orderId: updatedOrder._id.toString(),
+      status: updatedOrder.status,
+    });
 
     res.json(updatedOrder);
   } catch (error) {
