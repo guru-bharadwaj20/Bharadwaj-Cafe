@@ -62,7 +62,7 @@ const WishlistPage = () => {
   }
 
   return (
-    <div className="wishlist-page">
+    <div className="wishlist-page" id="main-content">
       <div className="wishlist-header">
         <h1>My Wishlist</h1>
         <p>Save your favorite items for later</p>
@@ -70,11 +70,11 @@ const WishlistPage = () => {
 
       {!wishlist || wishlist.items.length === 0 ? (
         <div className="empty-wishlist">
-          <i className="fas fa-heart"></i>
+          <i className="fas fa-heart" aria-hidden="true"></i>
           <h2>Your wishlist is empty</h2>
           <p>Start adding items you love!</p>
           <button className="btn-browse" onClick={() => navigate('/home')}>
-            <i className="fas fa-utensils"></i> Browse Menu
+            <i className="fas fa-utensils" aria-hidden="true"></i> Browse Menu
           </button>
         </div>
       ) : (
@@ -82,7 +82,7 @@ const WishlistPage = () => {
           <div className="wishlist-actions">
             <span>{wishlist.items.length} items</span>
             <button className="btn-clear" onClick={handleClearWishlist}>
-              <i className="fas fa-trash"></i> Clear All
+              <i className="fas fa-trash" aria-hidden="true"></i> Clear All
             </button>
           </div>
 
@@ -90,7 +90,7 @@ const WishlistPage = () => {
             {wishlist.items.map((item) => (
               <div key={item._id} className="wishlist-card">
                 <button className="btn-remove" onClick={() => handleRemove(item.menuItem._id)}>
-                  <i className="fas fa-times"></i>
+                  <i className="fas fa-times" aria-hidden="true"></i>
                 </button>
 
                 <img src={item.menuItem.image} alt={item.menuItem.name} />
@@ -101,7 +101,7 @@ const WishlistPage = () => {
 
                   {item.menuItem.rating > 0 && (
                     <div className="rating">
-                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star" aria-hidden="true"></i>
                       {item.menuItem.rating.toFixed(1)}
                       <span>({item.menuItem.reviewCount} reviews)</span>
                     </div>
@@ -110,7 +110,7 @@ const WishlistPage = () => {
                   <div className="wishlist-card-footer">
                     <span className="price">₹{item.menuItem.price}</span>
                     <button className="btn-add-cart" onClick={() => handleAddToCart(item.menuItem)}>
-                      <i className="fas fa-shopping-cart"></i> Add to Cart
+                      <i className="fas fa-shopping-cart" aria-hidden="true"></i> Add to Cart
                     </button>
                   </div>
                 </div>

@@ -47,15 +47,15 @@ const OrderHistory = () => {
   }
 
   return (
-    <div className="order-history-page">
+    <div className="order-history-page" id="main-content">
       <div className="order-history-container section-content">
         <h1>
-          <i className="fas fa-history"></i> Order History
+          <i className="fas fa-history" aria-hidden="true"></i> Order History
         </h1>
 
         {orders.length === 0 ? (
           <div className="no-orders">
-            <i className="fas fa-shopping-bag"></i>
+            <i className="fas fa-shopping-bag" aria-hidden="true"></i>
             <h2>No Orders Yet</h2>
             <p>Start exploring our menu and place your first order!</p>
             <a href="/order" className="btn-primary">
@@ -104,14 +104,15 @@ const OrderHistory = () => {
                   <div className="order-details">
                     <div className="detail-row">
                       <span>
-                        <i className="fas fa-shopping-bag"></i> Order Type:
+                        <i className="fas fa-shopping-bag" aria-hidden="true"></i> Order Type:
                       </span>
                       <span className="detail-value">{order.orderType}</span>
                     </div>
                     {order.deliveryAddress && (
                       <div className="detail-row">
                         <span>
-                          <i className="fas fa-location-dot"></i> Delivery Address:
+                          <i className="fas fa-location-dot" aria-hidden="true"></i> Delivery
+                          Address:
                         </span>
                         <span className="detail-value">{order.deliveryAddress}</span>
                       </div>
@@ -119,7 +120,7 @@ const OrderHistory = () => {
                     {order.specialInstructions && (
                       <div className="detail-row">
                         <span>
-                          <i className="fas fa-note-sticky"></i> Instructions:
+                          <i className="fas fa-note-sticky" aria-hidden="true"></i> Instructions:
                         </span>
                         <span className="detail-value">{order.specialInstructions}</span>
                       </div>
@@ -142,7 +143,7 @@ const OrderHistory = () => {
                     className={`tracking-step ${['pending', 'confirmed', 'preparing', 'ready', 'delivered'].indexOf(order.status) >= 0 ? 'completed' : ''}`}
                   >
                     <div className="tracking-icon">
-                      <i className="fas fa-check"></i>
+                      <i className="fas fa-check" aria-hidden="true"></i>
                     </div>
                     <span>Placed</span>
                   </div>
@@ -150,7 +151,7 @@ const OrderHistory = () => {
                     className={`tracking-step ${['confirmed', 'preparing', 'ready', 'delivered'].indexOf(order.status) >= 0 ? 'completed' : ''}`}
                   >
                     <div className="tracking-icon">
-                      <i className="fas fa-check-double"></i>
+                      <i className="fas fa-check-double" aria-hidden="true"></i>
                     </div>
                     <span>Confirmed</span>
                   </div>
@@ -158,7 +159,7 @@ const OrderHistory = () => {
                     className={`tracking-step ${['preparing', 'ready', 'delivered'].indexOf(order.status) >= 0 ? 'completed' : ''}`}
                   >
                     <div className="tracking-icon">
-                      <i className="fas fa-fire"></i>
+                      <i className="fas fa-fire" aria-hidden="true"></i>
                     </div>
                     <span>Preparing</span>
                   </div>
@@ -166,7 +167,7 @@ const OrderHistory = () => {
                     className={`tracking-step ${['ready', 'delivered'].indexOf(order.status) >= 0 ? 'completed' : ''}`}
                   >
                     <div className="tracking-icon">
-                      <i className="fas fa-box"></i>
+                      <i className="fas fa-box" aria-hidden="true"></i>
                     </div>
                     <span>Ready</span>
                   </div>
@@ -174,7 +175,7 @@ const OrderHistory = () => {
                     className={`tracking-step ${order.status === 'delivered' ? 'completed' : ''}`}
                   >
                     <div className="tracking-icon">
-                      <i className="fas fa-truck"></i>
+                      <i className="fas fa-truck" aria-hidden="true"></i>
                     </div>
                     <span>Delivered</span>
                   </div>
@@ -191,7 +192,7 @@ const OrderHistory = () => {
             <div className="modal-header">
               <h2>Order Details</h2>
               <button className="modal-close" onClick={() => setSelectedOrder(null)}>
-                <i className="fas fa-times"></i>
+                <i className="fas fa-times" aria-hidden="true"></i>
               </button>
             </div>
             <div className="modal-body">

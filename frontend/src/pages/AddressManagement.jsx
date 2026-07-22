@@ -101,12 +101,12 @@ const AddressManagement = () => {
   };
 
   return (
-    <div className="address-management">
+    <div className="address-management" id="main-content">
       <div className="address-header">
         <h2>My Addresses</h2>
         {!showForm && (
           <button className="btn-add-address" onClick={() => setShowForm(true)}>
-            <i className="fas fa-plus"></i> Add New Address
+            <i className="fas fa-plus" aria-hidden="true"></i> Add New Address
           </button>
         )}
       </div>
@@ -267,14 +267,14 @@ const AddressManagement = () => {
               <div className="address-actions">
                 {!address.isDefault && (
                   <button onClick={() => handleSetDefault(address._id)}>
-                    <i className="fas fa-check"></i> Set as Default
+                    <i className="fas fa-check" aria-hidden="true"></i> Set as Default
                   </button>
                 )}
                 <button onClick={() => handleEdit(address)}>
-                  <i className="fas fa-edit"></i> Edit
+                  <i className="fas fa-edit" aria-hidden="true"></i> Edit
                 </button>
                 <button onClick={() => handleDelete(address._id)}>
-                  <i className="fas fa-trash"></i> Delete
+                  <i className="fas fa-trash" aria-hidden="true"></i> Delete
                 </button>
               </div>
             </div>

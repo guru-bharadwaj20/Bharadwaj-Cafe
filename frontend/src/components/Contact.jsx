@@ -45,27 +45,27 @@ const Contact = () => {
       <div className="section-content">
         <ul className="contact-info-list">
           <li className="contact-info">
-            <i className="fa-solid fa-location-crosshairs"></i>
+            <i className="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
             <p>581, MG Road, Bangalore - 560001</p>
           </li>
           <li className="contact-info">
-            <i className="fa-regular fa-envelope"></i>
+            <i className="fa-regular fa-envelope" aria-hidden="true"></i>
             <p>gururb20@gmail.com</p>
           </li>
           <li className="contact-info">
-            <i className="fa-solid fa-phone"></i>
+            <i className="fa-solid fa-phone" aria-hidden="true"></i>
             <p>+91 9876543210</p>
           </li>
           <li className="contact-info">
-            <i className="fa-regular fa-clock"></i>
+            <i className="fa-regular fa-clock" aria-hidden="true"></i>
             <p>Monday - Friday: 09:00 AM - 05:00 PM</p>
           </li>
           <li className="contact-info">
-            <i className="fa-regular fa-clock"></i>
+            <i className="fa-regular fa-clock" aria-hidden="true"></i>
             <p>Weekend: Closed</p>
           </li>
           <li className="contact-info">
-            <i className="fa-solid fa-globe"></i>
+            <i className="fa-solid fa-globe" aria-hidden="true"></i>
             <p>www.bharadwajscafe.com</p>
           </li>
         </ul>

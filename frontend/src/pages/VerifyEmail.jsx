@@ -31,7 +31,7 @@ const VerifyEmail = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" id="main-content">
       <div className="auth-container verify-email-container">
         <div className="auth-right center-form">
           <div className="auth-form-container">
@@ -50,7 +50,7 @@ const VerifyEmail = () => {
 
               {status.type === 'success' && (
                 <div className="success-box">
-                  <i className="fa-solid fa-circle-check"></i>
+                  <i className="fa-solid fa-circle-check" aria-hidden="true"></i>
                   <h2>Success!</h2>
                   <p>{status.message}</p>
                   <p className="redirect-info">Redirecting to login page...</p>
@@ -59,7 +59,7 @@ const VerifyEmail = () => {
 
               {status.type === 'error' && (
                 <div className="error-box">
-                  <i className="fa-solid fa-circle-exclamation"></i>
+                  <i className="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                   <h2>Verification Failed</h2>
                   <p>{status.message}</p>
                   <div className="action-buttons">

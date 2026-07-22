@@ -3,17 +3,89 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bharadwaj's Cafe</title>
+
+    <title>Bharadwaj's Cafe — Speciality Coffee, Freshly Roasted</title>
+    <meta
+      name="description"
+      content="Order speciality coffee, tea and pastries from Bharadwaj's Cafe. Track your order in real time and earn loyalty points on every purchase."
+    />
+    <meta name="theme-color" content="#3b141c" />
+    <link rel="canonical" href="https://www.bharadwajscafe.com/" />
+
+    <!-- Open Graph: controls how a shared link renders on social platforms and
+         in messaging apps. Without these, a shared link is a bare URL. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bharadwaj's Cafe" />
+    <meta property="og:title" content="Bharadwaj's Cafe — Speciality Coffee, Freshly Roasted" />
+    <meta
+      property="og:description"
+      content="Order speciality coffee, tea and pastries. Track your order in real time and earn loyalty points."
+    />
+    <meta
+      property="og:image"
+      content="https://www.bharadwajscafe.com/img/coffee-hero-section.png"
+    />
+    <meta property="og:url" content="https://www.bharadwajscafe.com/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bharadwaj's Cafe — Speciality Coffee, Freshly Roasted" />
+    <meta
+      name="twitter:description"
+      content="Order speciality coffee, tea and pastries. Track your order in real time and earn loyalty points."
+    />
+    <meta
+      name="twitter:image"
+      content="https://www.bharadwajscafe.com/img/coffee-hero-section.png"
+    />
+
+    <link rel="icon" type="image/png" href="/img/logo.png" />
+    <link rel="apple-touch-icon" href="/img/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Structured data: lets a search engine show opening hours and location
+         in the result itself rather than just a page title. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "CafeOrCoffeeShop",
+        "name": "Bharadwaj's Cafe",
+        "description": "Speciality coffee, tea and pastries, freshly roasted.",
+        "url": "https://www.bharadwajscafe.com/",
+        "image": "https://www.bharadwajscafe.com/img/coffee-hero-section.png",
+        "servesCuisine": "Coffee",
+        "priceRange": "₹₹",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bengaluru",
+          "addressRegion": "Karnataka",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "22:00"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -3,7 +3,7 @@ import Footer from '../components/Footer';
 
 const AboutPage = () => {
   return (
-    <main>
+    <main id="main-content">
       <About />
       <Footer />
     </main>

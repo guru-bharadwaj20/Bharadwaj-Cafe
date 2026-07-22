@@ -92,7 +92,7 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" id="main-content">
       <div className="auth-container">
         <div className="auth-left">
           <img src="img/coffee-hero-section.png" alt="Coffee" className="auth-image" />
@@ -112,14 +112,14 @@ const Register = () => {
 
             {errors.general && (
               <div className="error-message">
-                <i className="fa-solid fa-circle-exclamation"></i>
+                <i className="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                 {errors.general}
               </div>
             )}
 
             {success && (
               <div className="success-message">
-                <i className="fa-solid fa-circle-check"></i>
+                <i className="fa-solid fa-circle-check" aria-hidden="true"></i>
                 Successfully registered! Redirecting to login page...
               </div>
             )}
@@ -127,7 +127,7 @@ const Register = () => {
             <form onSubmit={handleSubmit} className="auth-form">
               <div className="form-group">
                 <label htmlFor="name">
-                  <i className="fa-solid fa-user"></i>
+                  <i className="fa-solid fa-user" aria-hidden="true"></i>
                   Full Name
                 </label>
                 <input
@@ -144,7 +144,7 @@ const Register = () => {
 
               <div className="form-group">
                 <label htmlFor="email">
-                  <i className="fa-solid fa-envelope"></i>
+                  <i className="fa-solid fa-envelope" aria-hidden="true"></i>
                   Email Address
                 </label>
                 <input
@@ -161,7 +161,7 @@ const Register = () => {
 
               <div className="form-group">
                 <label htmlFor="password">
-                  <i className="fa-solid fa-lock"></i>
+                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
                   New Password
                 </label>
                 <input
@@ -178,7 +178,7 @@ const Register = () => {
 
               <div className="form-group">
                 <label htmlFor="confirmPassword">
-                  <i className="fa-solid fa-lock"></i>
+                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
                   Confirm Password
                 </label>
                 <input
@@ -215,7 +215,7 @@ const Register = () => {
 
             <div className="back-home">
               <Link to="/" className="back-link">
-                <i className="fa-solid fa-arrow-left"></i> Back to Home
+                <i className="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Home
               </Link>
             </div>
           </div>

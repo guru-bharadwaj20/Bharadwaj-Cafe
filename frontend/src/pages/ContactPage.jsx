@@ -3,7 +3,7 @@ import Footer from '../components/Footer';
 
 const ContactPage = () => {
   return (
-    <main>
+    <main id="main-content">
       <Contact />
       <Footer />
     </main>
