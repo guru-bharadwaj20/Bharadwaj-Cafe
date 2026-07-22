@@ -95,6 +95,44 @@ export const api = {
     return response.json();
   },
 
+  // Upload APIs
+  getUploadConfig: async () => {
+    const response = await fetch(`${API_URL}/uploads/config`);
+    if (!response.ok) throw new Error('Failed to load upload configuration');
+    return response.json();
+  },
+
+  // Returns a short-lived signature; the browser then posts the file
+  // directly to the provider, never through our API.
+  getUploadSignature: async (kind, token) => {
+    const response = await fetch(`${API_URL}/uploads/signature`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ kind }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Could not start upload');
+    }
+    return response.json();
+  },
+
+  deleteUpload: async (url, token) => {
+    const response = await fetch(`${API_URL}/uploads`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ url }),
+    });
+    if (!response.ok) throw new Error('Failed to delete image');
+    return response.json();
+  },
+
   // Contact API
   submitContact: async (contactData) => {
     const response = await fetch(`${API_URL}/contact`, {
