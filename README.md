@@ -204,3 +204,30 @@ Website: https://www.bharadwajscafe.com
 
 ---
 Superficial overview added: for deeper domain details, inspect individual controller & model files under `backend/`.
+
+## Running with Docker
+
+The whole stack — API, web, and MongoDB — comes up with one command:
+
+```bash
+docker compose up --build
+```
+
+- Web: http://localhost:8080
+- API: http://localhost:5000/api/health
+- MongoDB: localhost:27017
+
+Compose ships working defaults, so no `.env` is required for a local run.
+Override anything via the environment:
+
+```bash
+JWT_SECRET=$(openssl rand -hex 32) docker compose up --build
+```
+
+Both images are multi-stage: the API compiles TypeScript in one stage and
+ships only production dependencies plus `dist/`; the frontend builds with
+Vite and is served by nginx, so the final image contains no Node runtime.
+Both run as non-root with healthchecks.
+
+Note that `VITE_API_URL` is baked in at **build** time (Vite inlines it), so
+changing it requires a rebuild, not just a restart.

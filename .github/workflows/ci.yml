@@ -193,6 +193,57 @@ jobs:
           path: playwright-report
           retention-days: 7
 
+  docker:
+    name: Docker images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Build only — no push. This exists to catch a broken Dockerfile at PR
+      # time rather than at deploy time.
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false
+          load: true
+          tags: bharadwaj-cafe-api:ci
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+
+      - name: Build web image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          load: true
+          tags: bharadwaj-cafe-web:ci
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+
+      # Proves the compiled image actually boots and serves traffic, which a
+      # successful build alone does not.
+      - name: Smoke-test the API image
+        run: |
+          docker run -d --name api-smoke \
+            -e MONGO_URI=mongodb://127.0.0.1:27017/smoke \
+            -e JWT_SECRET=ci-smoke-secret-that-is-at-least-32-chars \
+            -p 5000:5000 bharadwaj-cafe-api:ci
+          for i in $(seq 1 30); do
+            if curl -fs http://localhost:5000/api/health > /dev/null; then
+              echo "API responded to /api/health"
+              docker rm -f api-smoke
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "API never became healthy. Logs:"
+          docker logs api-smoke
+          docker rm -f api-smoke
+          exit 1
+
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest
