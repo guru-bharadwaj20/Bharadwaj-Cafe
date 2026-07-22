@@ -10,6 +10,18 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
+# mongodb-memory-server and redis-memory-server each run a postinstall hook that
+# fetches a server binary — and redis-memory-server compiles Redis from source,
+# which needs `make`, absent from this image. That failed the install outright:
+#
+#   /bin/sh: make: not found
+#   npm error command failed
+#
+# Both are test-only, and this stage only runs tsc, so the fetch is skipped
+# rather than papered over by installing a C toolchain that ships nothing.
+ENV MONGOMS_DISABLE_POSTINSTALL=1 \
+    REDISMS_DISABLE_POSTINSTALL=1
+
 # Copied separately so the dependency layer is only rebuilt when the manifests
 # change, not on every source edit.
 COPY package.json package-lock.json ./
