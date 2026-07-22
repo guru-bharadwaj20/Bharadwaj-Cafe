@@ -14,6 +14,15 @@ concurrency:
 
 env:
   NODE_VERSION: '22'
+  # mongodb-memory-server and redis-memory-server fetch a server binary from a
+  # postinstall hook, so every `npm ci` that touches the backend pays for them —
+  # including lint and e2e, which never start either server. redis-memory-server
+  # compiles Redis from source, so that hook is also a C toolchain away from
+  # failing the install for reasons unrelated to the job. The suites below use
+  # service containers instead; anything that still wants a binary fetches it
+  # when it runs, not at install time.
+  MONGOMS_DISABLE_POSTINSTALL: '1'
+  REDISMS_DISABLE_POSTINSTALL: '1'
 
 jobs:
   lint:
@@ -72,6 +81,16 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
+      # Same reasoning as mongodb above: redis-memory-server would otherwise
+      # compile Redis from source on every run.
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -89,6 +108,7 @@ jobs:
         working-directory: backend
         env:
           MONGO_URI_TEST: mongodb://localhost:27017/bharadwaj-cafe-test
+          REDIS_URI_TEST: redis://localhost:6379
         run: npm run test:coverage
 
       # Proves the TypeScript actually compiles to runnable output, which
