@@ -163,11 +163,21 @@ jobs:
             backend/package-lock.json
             frontend/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm ci --prefix backend
-          npm ci --prefix frontend
+      # Three separate steps rather than `npm ci --prefix <dir>`: with --prefix,
+      # npm resolves some paths against the current directory rather than the
+      # prefix, so which package.json/lockfile pair it reads has historically
+      # varied by version. working-directory has no such ambiguity, and a
+      # failure names the package that failed.
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
 
       - name: Cache Playwright browsers
         id: playwright-cache

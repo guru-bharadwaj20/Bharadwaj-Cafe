@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/image.png" alt="Bharadwaj's Cafe landing page — 'Where Every Sip Tells a Story'" width="100%" />
-</p>
-
 <h1 align="center">Bharadwaj's Cafe</h1>
 
 <p align="center">
@@ -15,6 +11,10 @@
   <img src="https://img.shields.io/badge/backend-TypeScript%20strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
   <img src="https://img.shields.io/badge/react-18-61DAFB?logo=react&logoColor=black" alt="React 18" />
   <img src="https://img.shields.io/badge/tests-255%20passing-brightgreen" alt="255 tests passing" />
+</p>
+
+<p align="center">
+  <img src="docs/image.png" alt="Bharadwaj's Cafe landing page — 'Where Every Sip Tells a Story'" width="100%" />
 </p>
 
 ---
