@@ -1,6 +1,9 @@
 import type { RequestHandler } from 'express';
 import type { Types } from 'mongoose';
 import User, { type LoyaltyTier } from '../models/User.js';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'loyalty' });
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
@@ -139,7 +142,7 @@ export const updateLoyalty = async (
     await user.save();
     return pointsEarned;
   } catch (error) {
-    console.error('Error updating loyalty:', error);
+    log.error({ err: error }, 'Error updating loyalty');
     return 0;
   }
 };

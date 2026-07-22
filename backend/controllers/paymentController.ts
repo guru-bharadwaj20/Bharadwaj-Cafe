@@ -11,6 +11,9 @@ import {
 } from '../config/payments.js';
 import { emitToAdmins, emitToUser } from '../utils/realtime.js';
 import type { Server } from 'socket.io';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'payments' });
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
@@ -104,7 +107,7 @@ export const createPaymentForOrder: RequestHandler = async (req, res) => {
       res.status(503).json({ message: error.message });
       return;
     }
-    console.error('Create payment error:', error);
+    log.error({ err: error }, 'Create payment error');
     res.status(502).json({ message: errorMessage(error, 'Could not start payment') });
   }
 };
@@ -148,7 +151,7 @@ export const verifyPayment: RequestHandler = async (req, res) => {
       status: order.status,
     });
   } catch (error) {
-    console.error('Verify payment error:', error);
+    log.error({ err: error }, 'Verify payment error');
     res.status(500).json({ message: errorMessage(error, 'Could not verify payment') });
   }
 };
@@ -210,7 +213,7 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
     res.json({ received: true });
   } catch (error) {
     // A 5xx asks for a retry, which is what we want if our own write failed.
-    console.error('Webhook processing error:', error);
+    log.error({ err: error }, 'Webhook processing error');
     res.status(500).json({ message: 'Webhook processing failed' });
   }
 };
