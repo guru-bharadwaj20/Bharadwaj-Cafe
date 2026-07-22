@@ -1,0 +1,54 @@
+# Render blueprint for the API.
+#
+# The frontend deploys to Vercel (see vercel.json); this file covers the
+# Express + Socket.io service, which needs a long-lived process and so cannot
+# run on serverless functions.
+#
+# MongoDB comes from Atlas rather than a Render database, because the free
+# Atlas tier is enough for a portfolio deployment and keeps the data layer
+# independent of the host.
+
+services:
+  - type: web
+    name: bharadwaj-cafe-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+
+      # Generated once by Render and then held constant. Rotating it
+      # invalidates every issued token, so it must not be regenerated on
+      # each deploy.
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+
+      # Set these in the Render dashboard — they are secrets or
+      # environment-specific, so they are deliberately not in source control.
+      - key: MONGO_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_PORT
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+
+      # With SMTP configured this should be true. Leave it false only if you
+      # are running the demo without a mail provider.
+      - key: REQUIRE_EMAIL_VERIFICATION
+        value: true
