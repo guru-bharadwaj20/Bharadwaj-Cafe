@@ -73,6 +73,22 @@ const Header = ({ showMobileMenu, setShowMobileMenu }) => {
               Contact Us
             </NavLink>
           </li>
+          {/* Staff-only navigation. The API enforces the same restriction,
+              so hiding these links is convenience, not the access control. */}
+          {user?.role === 'admin' && (
+            <>
+              <li className="nav-item">
+                <NavLink to="/admin" className="nav-link" onClick={handleNavLinkClick}>
+                  Dashboard
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to="/analytics" className="nav-link" onClick={handleNavLinkClick}>
+                  Analytics
+                </NavLink>
+              </li>
+            </>
+          )}
           {user && (
             <>
               <li className="nav-item user-dropdown-wrapper" ref={dropdownRef}>

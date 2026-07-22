@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import Cart from './pages/Cart';
 import MerchandisePage from './pages/MerchandisePage';
 import AdminDashboard from './pages/AdminDashboard';
+import AnalyticsPage from './pages/AnalyticsPage';
 import OrderHistory from './pages/OrderHistory';
 import WishlistPage from './pages/WishlistPage';
 import AddressManagement from './pages/AddressManagement';
@@ -43,6 +44,7 @@ import './loyalty.css';
 import './reviews.css';
 import './blog.css';
 import './chat.css';
+import './analytics.css';
 
 function App() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -164,6 +166,17 @@ function App() {
                   <>
                     <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
                     <AdminDashboard />
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
+                    <AnalyticsPage />
                   </>
                 </ProtectedRoute>
               }
