@@ -19,16 +19,16 @@ tests/        integration tests against an in-memory MongoDB
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Watch mode via tsx — no build step |
-| `npm run build` | Compile to `dist/` |
-| `npm start` | Run the compiled server (build first) |
-| `npm run worker:dev` | Background job worker, watch mode |
-| `npm test` | 210 integration tests |
-| `npm run typecheck` | `tsc --noEmit`, including tests |
-| `npm run lint` | Type-aware ESLint |
-| `npm run seed` | Populate the menu |
+| Command                | What it does                                      |
+| ---------------------- | ------------------------------------------------- |
+| `npm run dev`          | Watch mode via tsx — no build step                |
+| `npm run build`        | Compile to `dist/`                                |
+| `npm start`            | Run the compiled server (build first)             |
+| `npm run worker:dev`   | Background job worker, watch mode                 |
+| `npm test`             | 210 integration tests                             |
+| `npm run typecheck`    | `tsc --noEmit`, including tests                   |
+| `npm run lint`         | Type-aware ESLint                                 |
+| `npm run seed`         | Populate the menu                                 |
 | `npm run create-admin` | Create the first admin (reads `ADMIN_*` env vars) |
 
 ## Conventions
