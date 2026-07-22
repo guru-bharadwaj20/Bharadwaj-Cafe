@@ -6,10 +6,18 @@ import Cart from './Cart';
 import { CartProvider } from '../context/CartContext';
 import { AuthProvider } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { openCheckout } from '../utils/razorpay';
 
 vi.mock('../utils/api', () => ({
-  api: { createOrder: vi.fn() },
+  api: {
+    createOrder: vi.fn(),
+    createPayment: vi.fn(),
+    verifyPayment: vi.fn(),
+    getPaymentConfig: vi.fn(),
+  },
 }));
+
+vi.mock('../utils/razorpay', () => ({ openCheckout: vi.fn() }));
 
 const navigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -39,7 +47,11 @@ const renderCart = () =>
   );
 
 describe('Cart', () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    // Default: no payment provider configured, so checkout is cash-on-delivery.
+    api.getPaymentConfig.mockResolvedValue({ enabled: false, keyId: null });
+  });
 
   it('shows the empty state', () => {
     renderCart();
@@ -139,5 +151,83 @@ describe('Cart', () => {
 
     await waitFor(() => expect(navigate).toHaveBeenCalled());
     expect(JSON.parse(localStorage.getItem('cart'))).toHaveLength(0);
+  });
+
+  describe('online payment', () => {
+    beforeEach(() => {
+      api.getPaymentConfig.mockResolvedValue({ enabled: true, keyId: 'rzp_test_key' });
+    });
+
+    it('offers the option only when the server says payments are configured', async () => {
+      const user = userEvent.setup();
+      seedUser();
+      seedCart([{ ...coffee, quantity: 1 }]);
+
+      renderCart();
+      await user.click(screen.getByRole('button', { name: /proceed to pay/i }));
+
+      expect(await screen.findByText(/pay online now/i)).toBeInTheDocument();
+    });
+
+    it('creates the order, opens checkout, then verifies the signature', async () => {
+      const user = userEvent.setup();
+      seedUser();
+      seedCart([{ ...coffee, quantity: 1 }]);
+
+      api.createOrder.mockResolvedValue({ _id: 'abcdef0123456789' });
+      api.createPayment.mockResolvedValue({
+        keyId: 'rzp_test_key',
+        providerOrderId: 'order_provider_1',
+        amount: 15750,
+        currency: 'INR',
+      });
+      openCheckout.mockResolvedValue({
+        razorpay_order_id: 'order_provider_1',
+        razorpay_payment_id: 'pay_1',
+        razorpay_signature: 'sig',
+      });
+      api.verifyPayment.mockResolvedValue({ paymentStatus: 'completed' });
+
+      renderCart();
+      await user.click(screen.getByRole('button', { name: /proceed to pay/i }));
+      await user.type(screen.getByLabelText(/contact number/i), '9999999999');
+      await user.click(await screen.findByLabelText(/pay online now/i));
+      await user.click(screen.getByRole('button', { name: /pay now/i }));
+
+      await waitFor(() => expect(api.verifyPayment).toHaveBeenCalledTimes(1));
+
+      // The amount is never sent by the client at any step.
+      expect(api.createPayment).toHaveBeenCalledWith('abcdef0123456789', 'jwt');
+      expect(api.verifyPayment.mock.calls[0][0]).toEqual({
+        providerOrderId: 'order_provider_1',
+        paymentId: 'pay_1',
+        signature: 'sig',
+      });
+      expect(JSON.parse(localStorage.getItem('cart'))).toHaveLength(0);
+    });
+
+    it('keeps the user on the page if they dismiss the payment modal', async () => {
+      const user = userEvent.setup();
+      seedUser();
+      seedCart([{ ...coffee, quantity: 1 }]);
+
+      api.createOrder.mockResolvedValue({ _id: 'abcdef0123456789' });
+      api.createPayment.mockResolvedValue({
+        keyId: 'k',
+        providerOrderId: 'o',
+        amount: 100,
+        currency: 'INR',
+      });
+      openCheckout.mockRejectedValue(new Error('Payment cancelled'));
+
+      renderCart();
+      await user.click(screen.getByRole('button', { name: /proceed to pay/i }));
+      await user.type(screen.getByLabelText(/contact number/i), '9999999999');
+      await user.click(await screen.findByLabelText(/pay online now/i));
+      await user.click(screen.getByRole('button', { name: /pay now/i }));
+
+      expect(await screen.findByText(/payment cancelled/i)).toBeInTheDocument();
+      expect(api.verifyPayment).not.toHaveBeenCalled();
+    });
   });
 });
