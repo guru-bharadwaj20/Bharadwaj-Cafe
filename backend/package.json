@@ -40,7 +40,8 @@
     "pino-http": "^11.0.0",
     "rate-limit-redis": "^6.0.0",
     "razorpay": "^2.9.8",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
@@ -51,6 +52,7 @@
     "@types/node": "^26.1.1",
     "@types/nodemailer": "^8.0.1",
     "@types/supertest": "^7.2.1",
+    "@types/web-push": "^3.6.4",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",

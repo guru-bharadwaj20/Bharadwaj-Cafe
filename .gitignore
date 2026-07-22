@@ -53,6 +53,7 @@ blob-report/
 frontend/dist/
 frontend/build/
 frontend/.vite/
+frontend/dev-dist/
 
 # Backend specific
 backend/uploads/

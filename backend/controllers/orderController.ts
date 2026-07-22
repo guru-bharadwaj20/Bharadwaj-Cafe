@@ -12,6 +12,7 @@ import { priceOrder } from '../config/pricing.js';
 import { releaseStock, reserveStock } from '../config/inventory.js';
 import { emitToAdmins, emitToUser } from '../utils/realtime.js';
 import { enqueueDetached } from '../jobs/enqueue.js';
+import { sendToUser } from '../config/push.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { BadRequestError, NotFoundError } from '../utils/errors.js';
 import { childLogger } from '../utils/logger.js';
@@ -30,6 +31,17 @@ const ORDER_STATUSES: readonly OrderStatus[] = [
 ];
 
 const getIo = (req: Request): Server | undefined => req.app.get('io') as Server | undefined;
+
+/**
+ * Which status changes are worth interrupting someone for.
+ * 'confirmed' and 'preparing' are deliberately absent — a push for every
+ * step trains people to disable notifications entirely.
+ */
+const PUSH_COPY: Partial<Record<OrderStatus, { title: string; body: string }>> = {
+  ready: { title: 'Your order is ready', body: 'is ready for collection.' },
+  delivered: { title: 'Order delivered', body: 'has been delivered. Enjoy!' },
+  cancelled: { title: 'Order cancelled', body: 'was cancelled.' },
+};
 
 const isOwnerOrAdmin = (order: HydratedOrder, user: HydratedUser): boolean =>
   user.role === 'admin' || (order.user != null && order.user.equals(user._id));
@@ -200,6 +212,22 @@ export const updateOrderStatus: RequestHandler = asyncHandler(async (req, res) =
     orderId: updatedOrder._id.toString(),
     status: updatedOrder.status,
   });
+
+  // A push arrives even when the tab is closed — the whole point for
+  // "your order is ready". Detached: a push failure must not fail the
+  // status update an admin just made.
+  const reference = updatedOrder._id.toString().slice(-8).toUpperCase();
+  const push = PUSH_COPY[updatedOrder.status];
+  if (push) {
+    void sendToUser(updatedOrder.user, {
+      title: push.title,
+      body: `Order #${reference} ${push.body}`,
+      url: '/order-history',
+      // Tagged per order, so a later update replaces the previous
+      // notification instead of stacking five of them.
+      tag: `order-${reference}`,
+    }).catch((error: unknown) => log.error({ err: error }, 'order push failed'));
+  }
 
   res.json(updatedOrder);
 });
