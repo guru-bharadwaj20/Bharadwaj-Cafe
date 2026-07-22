@@ -48,13 +48,20 @@ describe('without Redis configured', () => {
 });
 
 describe('with Redis configured', () => {
-  let redisServer: RedisMemoryServer;
+  // CI supplies a real Redis as a service container, so nothing has to compile
+  // Redis from source there. Locally, where there is no such container,
+  // redis-memory-server starts one on demand.
+  let redisServer: RedisMemoryServer | undefined;
 
   beforeAll(async () => {
-    redisServer = new RedisMemoryServer();
-    const host = await redisServer.getHost();
-    const port = await redisServer.getPort();
-    process.env.REDIS_URL = `redis://${host}:${port}`;
+    if (process.env.REDIS_URI_TEST) {
+      process.env.REDIS_URL = process.env.REDIS_URI_TEST;
+    } else {
+      redisServer = new RedisMemoryServer();
+      const host = await redisServer.getHost();
+      const port = await redisServer.getPort();
+      process.env.REDIS_URL = `redis://${host}:${port}`;
+    }
 
     // config/redis.ts caches its client at module scope, so the modules that
     // read it are re-imported after the URL is set.
