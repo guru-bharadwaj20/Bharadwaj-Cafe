@@ -20,6 +20,14 @@ export interface IMenuItem {
   image: string;
   category: MenuCategory;
   available: boolean;
+  /**
+   * Units on hand. `null` means "not stock-tracked" — an espresso shot is
+   * limited by beans and time, not by a countable inventory, and forcing a
+   * number on it would mean pretending to know something we do not.
+   */
+  stock: number | null;
+  /** Below this, the admin dashboard flags the item. */
+  lowStockThreshold: number;
   dietary: DietaryTag[];
   customizations: ICustomization[];
   rating: number;
@@ -43,6 +51,8 @@ const menuItemSchema = new Schema<IMenuItem>(
       default: 'coffee',
     },
     available: { type: Boolean, default: true },
+    stock: { type: Number, default: null, min: 0 },
+    lowStockThreshold: { type: Number, default: 5, min: 0 },
     dietary: [
       {
         type: String,
@@ -61,6 +71,9 @@ const menuItemSchema = new Schema<IMenuItem>(
   },
   { timestamps: true }
 );
+
+// Supports the low-stock query on the admin dashboard.
+menuItemSchema.index({ stock: 1 });
 
 const MenuItem: Model<IMenuItem> = mongoose.model<IMenuItem>('MenuItem', menuItemSchema);
 

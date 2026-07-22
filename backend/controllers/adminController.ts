@@ -4,6 +4,7 @@ import Order from '../models/Order.js';
 import MenuItem, { type IMenuItem } from '../models/MenuItem.js';
 import Contact from '../models/Contact.js';
 import { invalidateMenuCache } from '../utils/menuCache.js';
+import { getLowStockItems } from '../config/inventory.js';
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
@@ -37,6 +38,9 @@ export const getDashboardStats: RequestHandler = async (_req, res) => {
       { $group: { _id: '$status', count: { $sum: 1 } } },
     ]);
 
+    // Surfaced on the dashboard so staff can restock before selling out.
+    const lowStock = await getLowStockItems();
+
     res.json({
       totalUsers,
       totalOrders,
@@ -45,6 +49,7 @@ export const getDashboardStats: RequestHandler = async (_req, res) => {
       totalRevenue: revenue?.total ?? 0,
       recentOrders,
       ordersByStatus,
+      lowStock,
     });
   } catch (error) {
     res.status(500).json({ message: errorMessage(error, 'Failed to load dashboard') });
@@ -141,9 +146,18 @@ export const getAllOrders: RequestHandler = async (_req, res) => {
 // @access  Private/Admin
 export const createMenuItem: RequestHandler = async (req, res) => {
   try {
-    const { name, description, price, image, category } = req.body as Partial<IMenuItem>;
+    const { name, description, price, image, category, stock, lowStockThreshold } =
+      req.body as Partial<IMenuItem>;
 
-    const menuItem = await MenuItem.create({ name, description, price, image, category });
+    const menuItem = await MenuItem.create({
+      name,
+      description,
+      price,
+      image,
+      category,
+      stock,
+      lowStockThreshold,
+    });
     await invalidateMenuCache();
 
     res.status(201).json(menuItem);
@@ -171,6 +185,10 @@ export const updateMenuItem: RequestHandler = async (req, res) => {
     menuItem.image = body.image ?? menuItem.image;
     menuItem.category = body.category ?? menuItem.category;
     menuItem.available = body.available ?? menuItem.available;
+    // `null` is meaningful here (stop tracking), so `undefined` is the only
+    // value that means "leave alone".
+    if (body.stock !== undefined) menuItem.stock = body.stock;
+    menuItem.lowStockThreshold = body.lowStockThreshold ?? menuItem.lowStockThreshold;
 
     const updatedMenuItem = await menuItem.save();
     await invalidateMenuCache();
