@@ -1,188 +1,47 @@
-# Bharadwaj's Cafe - Backend API
+# Backend — Express + TypeScript API
 
-Express.js REST API with MongoDB for Bharadwaj's Cafe website.
+REST API and Socket.io server. TypeScript under `strict`; see the root
+[README](../README.md) for the full picture and [docs/adr](../docs/adr/) for
+why things are built the way they are.
 
-## Features
-
-- 🔐 JWT Authentication
-- 📦 RESTful API endpoints
-- 🗄️ MongoDB database
-- ⚡ Real-time updates with Socket.io
-- 🔒 Secure password hashing with bcrypt
-- 📝 Contact form submissions
-- 🛒 Order management
-- 🍽️ Menu management
-
-## API Endpoints
-
-### Menu Routes
-
-- `GET /api/menu` - Get all menu items (Public)
-- `GET /api/menu/:id` - Get single menu item (Public)
-- `POST /api/menu` - Create menu item (Admin only)
-- `PUT /api/menu/:id` - Update menu item (Admin only)
-- `DELETE /api/menu/:id` - Delete menu item (Admin only)
-
-### Order Routes
-
-- `POST /api/orders` - Create new order (Public)
-- `GET /api/orders` - Get all orders (Admin only)
-- `GET /api/orders/:id` - Get order by ID (Public)
-- `GET /api/orders/customer/:email` - Get orders by email (Public)
-- `PUT /api/orders/:id/status` - Update order status (Admin only)
-
-### Contact Routes
-
-- `POST /api/contact` - Submit contact form (Public)
-- `GET /api/contact` - Get all messages (Admin only)
-- `PUT /api/contact/:id` - Update message status (Admin only)
-
-### Auth Routes
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/profile` - Get user profile (Protected)
-
-### Health Check
-
-- `GET /api/health` - Check server status
-
-## Setup
-
-### 1. Install Dependencies
-
-```bash
-npm install
-```
-
-### 2. Environment Variables
-
-Create a `.env` file in the backend directory:
-
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-CLIENT_URL=http://localhost:5173
-```
-
-### 3. Seed Database
-
-Import menu items:
-
-```bash
-npm run seed
-```
-
-Destroy data:
-
-```bash
-npm run seed:destroy
-```
-
-### 4. Run Server
-
-Development mode:
-
-```bash
-npm run dev
-```
-
-Production mode:
-
-```bash
-npm start
-```
-
-## Socket.io Events
-
-### Client -> Server
-
-- `orderPlaced` - Notify when new order is placed
-
-### Server -> Client
-
-- `newOrder` - Broadcast new orders to admin
-- `orderStatusUpdated` - Notify when order status changes
-
-## Models
-
-### MenuItem
-
-```javascript
-{
-  name: String,
-  description: String,
-  price: Number,
-  image: String,
-  category: String,
-  available: Boolean
-}
-```
-
-### Order
-
-```javascript
-{
-  customerName: String,
-  customerEmail: String,
-  customerPhone: String,
-  items: [{ menuItem, name, quantity, price }],
-  totalAmount: Number,
-  status: String,
-  orderType: String,
-  specialInstructions: String,
-  deliveryAddress: String
-}
-```
-
-### Contact
-
-```javascript
-{
-  name: String,
-  email: String,
-  message: String,
-  status: String
-}
-```
-
-### User
-
-```javascript
-{
-  name: String,
-  email: String,
-  password: String (hashed),
-  role: String
-}
-```
-
-## Authentication
-
-Protected routes require a Bearer token in the Authorization header:
+## Layout
 
 ```
-Authorization: Bearer <token>
+config/       pricing · inventory · payments · uploads · redis · assistant · db
+controllers/  one per domain; throw typed errors, never format responses
+middleware/   auth · rate limiting · error translation
+models/       Mongoose schemas with exported interfaces
+routes/       wiring only
+jobs/         BullMQ queues, handlers and the worker entrypoint
+utils/        logger · errors · cache · realtime · email
+tests/        integration tests against an in-memory MongoDB
 ```
 
-## Error Handling
+## Scripts
 
-All errors return JSON response:
+| Command | What it does |
+|---|---|
+| `npm run dev` | Watch mode via tsx — no build step |
+| `npm run build` | Compile to `dist/` |
+| `npm start` | Run the compiled server (build first) |
+| `npm run worker:dev` | Background job worker, watch mode |
+| `npm test` | 210 integration tests |
+| `npm run typecheck` | `tsc --noEmit`, including tests |
+| `npm run lint` | Type-aware ESLint |
+| `npm run seed` | Populate the menu |
+| `npm run create-admin` | Create the first admin (reads `ADMIN_*` env vars) |
 
-```json
-{
-  "message": "Error description"
-}
-```
+## Conventions
 
-## Tech Stack
+- **No monetary value is ever read from a request body.** See
+  [ADR 0001](../docs/adr/0001-server-side-pricing.md).
+- Controllers `throw` typed errors from `utils/errors.ts`; the error
+  middleware decides the status code and what the client is told.
+- Async handlers are wrapped in `asyncHandler` — Express 4 does not await
+  them, so an unhandled rejection would otherwise hang the request.
+- Every external service is optional and has a `*Enabled()` predicate.
 
-- **Express.js** - Web framework
-- **MongoDB** - Database
-- **Mongoose** - ODM
-- **JWT** - Authentication
-- **bcryptjs** - Password hashing
-- **Socket.io** - Real-time communication
-- **CORS** - Cross-origin requests
-- **dotenv** - Environment variables
+## Configuration
+
+Copy `.env.example` to `.env`. Only `MONGO_URI` and `JWT_SECRET` are required;
+everything else enables an optional capability.
