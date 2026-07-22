@@ -58,6 +58,43 @@ export const api = {
     return response.json();
   },
 
+  // Payment APIs
+  getPaymentConfig: async () => {
+    const response = await fetch(`${API_URL}/payments/config`);
+    if (!response.ok) throw new Error('Failed to load payment configuration');
+    return response.json();
+  },
+
+  // Opens a payment against an order the server has already priced. The
+  // amount is never sent from here.
+  createPayment: async (orderId, token) => {
+    const response = await fetch(`${API_URL}/payments/orders/${orderId}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Could not start payment');
+    }
+    return response.json();
+  },
+
+  verifyPayment: async (payload, token) => {
+    const response = await fetch(`${API_URL}/payments/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Payment verification failed');
+    }
+    return response.json();
+  },
+
   // Contact API
   submitContact: async (contactData) => {
     const response = await fetch(`${API_URL}/contact`, {

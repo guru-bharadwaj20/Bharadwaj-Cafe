@@ -30,6 +30,10 @@ export interface IOrder {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   paymentId?: string;
+  /** Razorpay order id, set when a payment is opened against this order. */
+  providerOrderId?: string;
+  /** Set once, when a verified signature first confirms payment. */
+  paidAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,6 +84,8 @@ const orderSchema = new Schema<IOrder>(
       default: 'pending',
     },
     paymentId: { type: String },
+    providerOrderId: { type: String, index: true },
+    paidAt: { type: Date },
   },
   { timestamps: true }
 );
