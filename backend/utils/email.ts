@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
 import type { Types } from 'mongoose';
 import type { IOrder } from '../models/Order.js';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'email' });
 
 /** Only the fields the receipt template actually renders. */
 type OrderEmailPayload = Pick<IOrder, 'status' | 'orderType' | 'totalAmount' | 'items'> & {
@@ -17,10 +20,10 @@ const isConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 let warned = false;
 const warnOnce = (to: string, subject: string): void => {
   if (!warned) {
-    console.warn('[email] EMAIL_USER/EMAIL_PASS not set — emails are being skipped.');
+    log.warn('[email] EMAIL_USER/EMAIL_PASS not set — emails are being skipped.');
     warned = true;
   }
-  console.info(`[email] skipped "${subject}" to ${to}`);
+  log.info({ to, subject }, 'email skipped (mailer not configured)');
 };
 
 const transporter = nodemailer.createTransport({
@@ -85,9 +88,9 @@ export const sendVerificationEmail = async (email: string, token: string): Promi
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Verification email sent to:', email);
+    log.info({ to: email }, 'Verification email sent');
   } catch (error) {
-    console.error('Email sending error:', error);
+    log.error({ err: error }, 'Email sending error');
     throw new Error('Failed to send verification email');
   }
 };
@@ -151,9 +154,9 @@ export const sendPasswordResetEmail = async (email: string, token: string): Prom
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Password reset email sent to:', email);
+    log.info({ to: email }, 'Password reset email sent');
   } catch (error) {
-    console.error('Email sending error:', error);
+    log.error({ err: error }, 'Email sending error');
     throw new Error('Failed to send password reset email');
   }
 };
@@ -226,9 +229,9 @@ export const sendOrderConfirmationEmail = async (
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Order confirmation email sent to:', email);
+    log.info({ to: email }, 'Order confirmation email sent');
   } catch (error) {
-    console.error('Email sending error:', error);
+    log.error({ err: error }, 'Email sending error');
   }
 };
 
@@ -288,9 +291,9 @@ export const sendOrderStatusEmail = async (
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Order status email sent to:', email);
+    log.info({ to: email }, 'Order status email sent');
   } catch (error) {
-    console.error('Email sending error:', error);
+    log.error({ err: error }, 'Email sending error');
     throw new Error('Failed to send order status email');
   }
 };

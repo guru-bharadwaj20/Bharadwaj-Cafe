@@ -1,5 +1,8 @@
 import { runJob } from './handlers.js';
 import { getQueue, QUEUE_FOR, type JobName, type JobPayloads } from './queues.js';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'jobs' });
 
 /**
  * Hands work to a queue, or runs it inline when no queue is configured.
@@ -24,7 +27,7 @@ export const enqueue = async <K extends JobName>(
   try {
     await runJob(name, payload);
   } catch (error) {
-    console.error(`[jobs] inline "${name}" failed:`, error);
+    log.error({ err: error, job: name }, 'inline job failed');
   }
 };
 
@@ -34,7 +37,7 @@ export const enqueue = async <K extends JobName>(
  */
 export const enqueueDetached = <K extends JobName>(name: K, payload: JobPayloads[K]): void => {
   void enqueue(name, payload).catch((error: unknown) => {
-    console.error(`[jobs] could not enqueue "${name}":`, error);
+    log.error({ err: error, job: name }, 'could not enqueue job');
   });
 };
 

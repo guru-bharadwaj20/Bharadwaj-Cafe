@@ -1,4 +1,7 @@
 import { Redis } from 'ioredis';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'redis' });
 
 /**
  * Redis connection management.
@@ -31,14 +34,14 @@ const build = (label: string): Redis => {
   redis.on('error', (error: Error) => {
     // One line per outage, not per failed command.
     if (!unavailableLogged) {
-      console.error(`[redis:${label}] connection error:`, error.message);
+      log.error({ err: error.message }, `[redis:${label}] connection error:`);
       unavailableLogged = true;
     }
   });
 
   redis.on('ready', () => {
     unavailableLogged = false;
-    console.log(`[redis:${label}] connected`);
+    log.info(`[redis:${label}] connected`);
   });
 
   return redis;
