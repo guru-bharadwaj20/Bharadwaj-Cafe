@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { openCheckout } from '../utils/razorpay';
 import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
@@ -15,6 +16,25 @@ const Cart = () => {
   const [orderType, setOrderType] = useState('takeaway');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
+  const [payOnline, setPayOnline] = useState(false);
+  const [paymentsAvailable, setPaymentsAvailable] = useState(false);
+
+  // The server decides whether online payment is offered at all — it depends
+  // on whether provider keys are configured, which the client cannot know.
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getPaymentConfig()
+      .then((config) => {
+        if (!cancelled) setPaymentsAvailable(Boolean(config.enabled));
+      })
+      .catch(() => {
+        if (!cancelled) setPaymentsAvailable(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleProceedToPay = () => {
     if (cartItems.length === 0) {
@@ -23,6 +43,14 @@ const Cart = () => {
     }
     setOrderError('');
     setShowCheckout(true);
+  };
+
+  const goToHistory = (order, message) => {
+    clearCart();
+    setShowCheckout(false);
+    navigate('/order-history', {
+      state: { message: `Order #${order._id.slice(-8).toUpperCase()} ${message}` },
+    });
   };
 
   const handlePlaceOrder = async (e) => {
@@ -44,17 +72,44 @@ const Cart = () => {
           orderType,
           deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
           specialInstructions,
+          paymentMethod: payOnline && paymentsAvailable ? 'card' : 'cod',
         },
         user?.token
       );
 
-      clearCart();
-      setShowCheckout(false);
-      navigate('/order-history', {
-        state: { message: `Order #${order._id.slice(-8).toUpperCase()} placed successfully!` },
+      if (!payOnline || !paymentsAvailable) {
+        goToHistory(order, 'placed successfully!');
+        return;
+      }
+
+      // The order exists and is priced; now open a payment against it. The
+      // amount comes from the server's response to this call, not from here.
+      const payment = await api.createPayment(order._id, user?.token);
+      const result = await openCheckout({
+        keyId: payment.keyId,
+        providerOrderId: payment.providerOrderId,
+        amount: payment.amount,
+        currency: payment.currency,
+        orderId: order._id,
+        user,
       });
+
+      // The provider's response is only a claim until the server checks its
+      // signature. The webhook is the real backstop if this call never lands.
+      await api.verifyPayment(
+        {
+          providerOrderId: result.razorpay_order_id,
+          paymentId: result.razorpay_payment_id,
+          signature: result.razorpay_signature,
+        },
+        user?.token
+      );
+
+      goToHistory(order, 'paid and confirmed!');
     } catch (err) {
-      setOrderError(err.message || 'Could not place your order. Please try again.');
+      // The order may already exist even if payment failed, so the cart is
+      // deliberately left intact only when order creation itself failed.
+      setOrderError(err.message || 'Could not complete your order. Please try again.');
     } finally {
       setPlacing(false);
     }
@@ -148,14 +203,36 @@ const Cart = () => {
                   />
                 </div>
 
-                {/* Card details are deliberately not collected here. Taking
-                    them without a payment provider would mean handling raw
-                    card data on our own server. Online payment is handled by
-                    the upcoming gateway integration. */}
-                <p className="payment-note">
-                  <i className="fa-solid fa-circle-info"></i> Pay on collection or delivery. Online
-                  payment is coming soon.
-                </p>
+                {/* Card details are never collected by this form. Razorpay's
+                    hosted checkout handles them, so no card data touches our
+                    server or this codebase. */}
+                {paymentsAvailable ? (
+                  <fieldset className="payment-method">
+                    <legend>Payment</legend>
+                    <label className="payment-option">
+                      <input
+                        type="radio"
+                        name="payMode"
+                        checked={!payOnline}
+                        onChange={() => setPayOnline(false)}
+                      />
+                      <span>Pay on collection or delivery</span>
+                    </label>
+                    <label className="payment-option">
+                      <input
+                        type="radio"
+                        name="payMode"
+                        checked={payOnline}
+                        onChange={() => setPayOnline(true)}
+                      />
+                      <span>Pay online now (UPI, card, wallet)</span>
+                    </label>
+                  </fieldset>
+                ) : (
+                  <p className="payment-note">
+                    <i className="fa-solid fa-circle-info"></i> Pay on collection or delivery.
+                  </p>
+                )}
 
                 <div className="checkout-buttons">
                   <button
@@ -167,7 +244,11 @@ const Cart = () => {
                     Back to Cart
                   </button>
                   <button type="submit" className="btn-primary" disabled={placing}>
-                    {placing ? 'Placing Order...' : 'Place Order'}
+                    {placing
+                      ? 'Processing...'
+                      : payOnline && paymentsAvailable
+                        ? 'Pay Now'
+                        : 'Place Order'}
                   </button>
                 </div>
               </form>

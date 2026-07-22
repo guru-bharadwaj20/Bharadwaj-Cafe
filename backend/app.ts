@@ -13,6 +13,8 @@ import wishlistRoutes from './routes/wishlistRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import loyaltyRoutes from './routes/loyaltyRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import { handleWebhook } from './controllers/paymentController.js';
 
 export interface CreateAppOptions {
   corsOptions?: CorsOptions;
@@ -29,6 +31,16 @@ export const createApp = ({ corsOptions }: CreateAppOptions = {}): Express => {
   if (corsOptions) {
     app.use(cors(corsOptions));
   }
+
+  // Mounted before express.json(): the webhook signature is computed over the
+  // exact bytes Razorpay sent, and parsing to an object then re-serialising
+  // would not reproduce them.
+  app.post(
+    '/api/payments/webhook',
+    express.raw({ type: 'application/json', limit: '100kb' }),
+    handleWebhook
+  );
+
   app.use(express.json({ limit: '100kb' }));
   app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
@@ -48,6 +60,7 @@ export const createApp = ({ corsOptions }: CreateAppOptions = {}): Express => {
   app.use('/api/blogs', blogRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/loyalty', loyaltyRoutes);
+  app.use('/api/payments', paymentRoutes);
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
