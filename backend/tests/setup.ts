@@ -15,6 +15,7 @@ vi.mock('../utils/email.js', () => ({
   sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
   sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
   sendOrderConfirmationEmail: vi.fn().mockResolvedValue(undefined),
+  sendOrderStatusEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 let mongoServer: MongoMemoryServer | undefined;
