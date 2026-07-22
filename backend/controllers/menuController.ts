@@ -1,6 +1,8 @@
 import type { RequestHandler } from 'express';
 import type { FilterQuery } from 'mongoose';
 import MenuItem, { type IMenuItem } from '../models/MenuItem.js';
+import { cached } from '../utils/cache.js';
+import { invalidateMenuCache, MENU_CACHE_TTL_SECONDS, menuCacheKey } from '../utils/menuCache.js';
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
@@ -56,7 +58,20 @@ export const getMenuItems: RequestHandler = async (req, res) => {
 
     const sort = (sortBy && SORT_OPTIONS[sortBy]) || '-createdAt';
 
-    const menuItems = await MenuItem.find(query).sort(sort);
+    // The key covers every filter, so two different searches never collide.
+    const key = menuCacheKey(
+      search ?? '',
+      category ?? '',
+      dietary ?? '',
+      minPrice ?? '',
+      maxPrice ?? '',
+      sort
+    );
+
+    const menuItems = await cached(key, MENU_CACHE_TTL_SECONDS, () =>
+      MenuItem.find(query).sort(sort).lean()
+    );
+
     res.json(menuItems);
   } catch (error) {
     res.status(500).json({ message: errorMessage(error, 'Failed to load menu') });
@@ -87,6 +102,7 @@ export const createMenuItem: RequestHandler = async (req, res) => {
     const { name, description, price, image, category } = req.body as Partial<IMenuItem>;
 
     const menuItem = await MenuItem.create({ name, description, price, image, category });
+    await invalidateMenuCache();
 
     res.status(201).json(menuItem);
   } catch (error) {
@@ -115,6 +131,8 @@ export const updateMenuItem: RequestHandler = async (req, res) => {
     menuItem.available = body.available ?? menuItem.available;
 
     const updatedMenuItem = await menuItem.save();
+    await invalidateMenuCache();
+
     res.json(updatedMenuItem);
   } catch (error) {
     res.status(400).json({ message: errorMessage(error, 'Failed to update menu item') });
@@ -134,6 +152,8 @@ export const deleteMenuItem: RequestHandler = async (req, res) => {
     }
 
     await menuItem.deleteOne();
+    await invalidateMenuCache();
+
     res.json({ message: 'Menu item removed' });
   } catch (error) {
     res.status(500).json({ message: errorMessage(error, 'Failed to delete menu item') });
