@@ -56,7 +56,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" id="main-content">
       <div className="auth-container reset-password-container">
         <div className="auth-right center-form">
           <div className="auth-form-container">
@@ -78,7 +78,7 @@ const ResetPassword = () => {
             <form onSubmit={handleSubmit} className="auth-form">
               <div className="form-group">
                 <label htmlFor="password">
-                  <i className="fa-solid fa-lock"></i>
+                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
                   New Password
                 </label>
                 <input
@@ -95,7 +95,7 @@ const ResetPassword = () => {
 
               <div className="form-group">
                 <label htmlFor="confirmPassword">
-                  <i className="fa-solid fa-lock"></i>
+                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
                   Confirm Password
                 </label>
                 <input

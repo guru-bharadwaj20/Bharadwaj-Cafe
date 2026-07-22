@@ -61,6 +61,11 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
+          {/* First focusable element on every page. Visually hidden until
+              focused, so keyboard users can jump straight to the content. */}
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Landing />} />

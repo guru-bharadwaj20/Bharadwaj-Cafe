@@ -148,7 +148,7 @@ const Cart = () => {
 
               {orderError && (
                 <div className="error-message">
-                  <i className="fa-solid fa-circle-exclamation"></i> {orderError}
+                  <i className="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {orderError}
                 </div>
               )}
 
@@ -230,7 +230,8 @@ const Cart = () => {
                   </fieldset>
                 ) : (
                   <p className="payment-note">
-                    <i className="fa-solid fa-circle-info"></i> Pay on collection or delivery.
+                    <i className="fa-solid fa-circle-info" aria-hidden="true"></i> Pay on collection
+                    or delivery.
                   </p>
                 )}
 
@@ -260,12 +261,12 @@ const Cart = () => {
   }
 
   return (
-    <section className="cart-section">
+    <section className="cart-section" id="main-content">
       <div className="section-content">
         <h2 className="section-title">Your Cart</h2>
         {cartItems.length === 0 ? (
           <div className="empty-cart">
-            <i className="fas fa-shopping-cart"></i>
+            <i className="fas fa-shopping-cart" aria-hidden="true"></i>
             <p>Your cart is empty</p>
             <button className="btn-primary" onClick={() => navigate('/order')}>
               Browse Menu
@@ -284,17 +285,30 @@ const Cart = () => {
                   </div>
                   <div className="cart-item-actions">
                     <div className="quantity-controls">
-                      <button onClick={() => updateQuantity(item._id, item.quantity - 1)}>
-                        <i className="fas fa-minus"></i>
+                      <button
+                        onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                        aria-label={`Decrease quantity of ${item.name}`}
+                      >
+                        <i className="fas fa-minus" aria-hidden="true"></i>
                       </button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item._id, item.quantity + 1)}>
-                        <i className="fas fa-plus"></i>
+                      <span aria-live="polite" aria-atomic="true">
+                        <span className="visually-hidden">Quantity: </span>
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                        aria-label={`Increase quantity of ${item.name}`}
+                      >
+                        <i className="fas fa-plus" aria-hidden="true"></i>
                       </button>
                     </div>
                     <p className="item-total">₹{item.price * item.quantity}</p>
-                    <button className="remove-btn" onClick={() => removeFromCart(item._id)}>
-                      <i className="fas fa-trash"></i>
+                    <button
+                      className="remove-btn"
+                      onClick={() => removeFromCart(item._id)}
+                      aria-label={`Remove ${item.name} from cart`}
+                    >
+                      <i className="fas fa-trash" aria-hidden="true"></i>
                     </button>
                   </div>
                 </div>

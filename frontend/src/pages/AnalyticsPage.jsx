@@ -56,7 +56,7 @@ const AnalyticsPage = () => {
   if (!isAdmin) return null;
 
   return (
-    <div className="analytics-page viz-root">
+    <div className="analytics-page viz-root" id="main-content">
       <header className="analytics-header">
         <h1>Analytics</h1>
 

@@ -33,7 +33,7 @@ export const BlogList = () => {
   }
 
   return (
-    <div className="blog-list-page">
+    <div className="blog-list-page" id="main-content">
       <div className="blog-header">
         <h1>Our Blog</h1>
         <p>Stories, recipes, and news from Bharadwaj Cafe</p>
@@ -65,13 +65,13 @@ export const BlogList = () => {
               <p>{blog.excerpt}</p>
               <div className="blog-meta">
                 <span>
-                  <i className="fas fa-user"></i> {blog.author?.name}
+                  <i className="fas fa-user" aria-hidden="true"></i> {blog.author?.name}
                 </span>
                 <span>
-                  <i className="fas fa-eye"></i> {blog.views} views
+                  <i className="fas fa-eye" aria-hidden="true"></i> {blog.views} views
                 </span>
                 <span>
-                  <i className="fas fa-heart"></i> {blog.likes?.length || 0}
+                  <i className="fas fa-heart" aria-hidden="true"></i> {blog.likes?.length || 0}
                 </span>
               </div>
               <span className="blog-date">{new Date(blog.createdAt).toLocaleDateString()}</span>
@@ -137,7 +137,7 @@ export const BlogDetail = () => {
   return (
     <div className="blog-detail-page">
       <button className="btn-back" onClick={() => navigate('/blog')}>
-        <i className="fas fa-arrow-left"></i> Back to Blogs
+        <i className="fas fa-arrow-left" aria-hidden="true"></i> Back to Blogs
       </button>
 
       <div className="blog-detail">
@@ -146,13 +146,14 @@ export const BlogDetail = () => {
 
         <div className="blog-meta">
           <span>
-            <i className="fas fa-user"></i> By {blog.author?.name}
+            <i className="fas fa-user" aria-hidden="true"></i> By {blog.author?.name}
           </span>
           <span>
-            <i className="fas fa-calendar"></i> {new Date(blog.createdAt).toLocaleDateString()}
+            <i className="fas fa-calendar" aria-hidden="true"></i>{' '}
+            {new Date(blog.createdAt).toLocaleDateString()}
           </span>
           <span>
-            <i className="fas fa-eye"></i> {blog.views} views
+            <i className="fas fa-eye" aria-hidden="true"></i> {blog.views} views
           </span>
         </div>
 

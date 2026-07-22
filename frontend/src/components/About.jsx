@@ -16,13 +16,13 @@ const About = () => {
           </p>
           <div className="social-link-list">
             <a href="#" className="social-link">
-              <i className="fa-brands fa-facebook"></i>
+              <i className="fa-brands fa-facebook" aria-hidden="true"></i>
             </a>
             <a href="#" className="social-link">
-              <i className="fa-brands fa-instagram"></i>
+              <i className="fa-brands fa-instagram" aria-hidden="true"></i>
             </a>
             <a href="#" className="social-link">
-              <i className="fa-brands fa-linkedin"></i>
+              <i className="fa-brands fa-linkedin" aria-hidden="true"></i>
             </a>
           </div>
         </div>

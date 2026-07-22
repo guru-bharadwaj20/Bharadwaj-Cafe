@@ -92,8 +92,13 @@ const Header = ({ showMobileMenu, setShowMobileMenu }) => {
           {user && (
             <>
               <li className="nav-item user-dropdown-wrapper" ref={dropdownRef}>
-                <button className="nav-link user-name-btn" onClick={toggleDropdown}>
-                  <i className="fa-solid fa-user"></i> {user.name}
+                <button
+                  className="nav-link user-name-btn"
+                  onClick={toggleDropdown}
+                  aria-expanded={showDropdown}
+                  aria-haspopup="true"
+                >
+                  <i className="fa-solid fa-user" aria-hidden="true"></i> {user.name}
                   <i
                     className={`fa-solid fa-chevron-${showDropdown ? 'up' : 'down'} dropdown-icon`}
                   ></i>
@@ -108,11 +113,11 @@ const Header = ({ showMobileMenu, setShowMobileMenu }) => {
                         setShowMobileMenu(false);
                       }}
                     >
-                      <i className="fa-solid fa-user-circle"></i>
+                      <i className="fa-solid fa-user-circle" aria-hidden="true"></i>
                       My Profile
                     </Link>
                     <button className="dropdown-item" onClick={handleLogout}>
-                      <i className="fa-solid fa-right-from-bracket"></i>
+                      <i className="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
                       Logout
                     </button>
                   </div>
@@ -123,8 +128,12 @@ const Header = ({ showMobileMenu, setShowMobileMenu }) => {
         </ul>
         <div className="mobile-icons">
           {user && (
-            <button className="mobile-cart-btn" onClick={() => navigate('/cart')}>
-              <i className="fas fa-shopping-cart"></i>
+            <button
+              className="mobile-cart-btn"
+              onClick={() => navigate('/cart')}
+              aria-label={`Cart, ${getTotalItems()} item${getTotalItems() === 1 ? '' : 's'}`}
+            >
+              <i className="fas fa-shopping-cart" aria-hidden="true"></i>
               {getTotalItems() > 0 && <span className="cart-badge">{getTotalItems()}</span>}
             </button>
           )}

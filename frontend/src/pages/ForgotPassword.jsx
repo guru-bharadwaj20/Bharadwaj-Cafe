@@ -30,7 +30,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" id="main-content">
       <div className="auth-container forgot-password-container">
         <div className="auth-right center-form">
           <div className="auth-form-container">
@@ -52,7 +52,7 @@ const ForgotPassword = () => {
             <form onSubmit={handleSubmit} className="auth-form">
               <div className="form-group">
                 <label htmlFor="email">
-                  <i className="fa-solid fa-envelope"></i>
+                  <i className="fa-solid fa-envelope" aria-hidden="true"></i>
                   Email Address
                 </label>
                 <input
@@ -86,7 +86,7 @@ const ForgotPassword = () => {
 
             <div className="back-home">
               <Link to="/" className="back-link">
-                <i className="fa-solid fa-arrow-left"></i> Back to Home
+                <i className="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Home
               </Link>
             </div>
           </div>

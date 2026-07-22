@@ -74,8 +74,13 @@ const ChatWidget = () => {
 
   return (
     <>
-      <button className="chat-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
-        <i className="fas fa-comments"></i>
+      <button
+        className="chat-toggle-btn"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close chat' : 'Open chat with us'}
+        aria-expanded={isOpen}
+      >
+        <i className="fas fa-comments" aria-hidden="true"></i>
         {chat?.messages.some((m) => m.sender === 'admin' && !m.read) && (
           <span className="unread-badge"></span>
         )}
@@ -85,12 +90,14 @@ const ChatWidget = () => {
         <div className="chat-widget">
           <div className="chat-header">
             <h4>{chat?.escalated ? 'Chat with our team' : 'Ask us anything'}</h4>
-            <button onClick={() => setIsOpen(false)}>
-              <i className="fas fa-times"></i>
+            <button onClick={() => setIsOpen(false)} aria-label="Close chat">
+              <i className="fas fa-times" aria-hidden="true"></i>
             </button>
           </div>
 
-          <div className="chat-messages">
+          {/* Assertive would interrupt; polite lets a screen reader finish
+              the current sentence before announcing a new reply. */}
+          <div className="chat-messages" role="log" aria-live="polite" aria-label="Conversation">
             {chat?.messages.map((msg, index) => (
               <div key={index} className={`message ${msg.sender}`}>
                 {msg.sender === 'assistant' && <span className="message-badge">Assistant</span>}
@@ -111,11 +118,12 @@ const ChatWidget = () => {
             <input
               type="text"
               placeholder="Type your message..."
+              aria-label="Your message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <button type="submit">
-              <i className="fas fa-paper-plane"></i>
+            <button type="submit" aria-label="Send message">
+              <i className="fas fa-paper-plane" aria-hidden="true"></i>
             </button>
           </form>
         </div>
