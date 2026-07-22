@@ -231,3 +231,66 @@ export const sendOrderConfirmationEmail = async (
     console.error('Email sending error:', error);
   }
 };
+
+const STATUS_COPY: Record<string, { title: string; body: string }> = {
+  confirmed: {
+    title: 'Order Confirmed',
+    body: 'We have received your order and will start on it shortly.',
+  },
+  preparing: { title: 'Your Order Is Being Prepared', body: 'Our baristas are on it right now.' },
+  ready: { title: 'Your Order Is Ready', body: 'Come and collect it while it is hot!' },
+  delivered: { title: 'Order Delivered', body: 'Enjoy! Thank you for choosing us.' },
+  cancelled: {
+    title: 'Order Cancelled',
+    body: 'Your order has been cancelled. Any payment will be refunded.',
+  },
+};
+
+export const sendOrderStatusEmail = async (
+  email: string,
+  order: OrderEmailPayload,
+  status: string
+): Promise<void> => {
+  const copy = STATUS_COPY[status];
+  // Intermediate states the customer does not need an email about.
+  if (!copy) return;
+
+  if (!isConfigured) {
+    warnOnce(email, copy.title);
+    return;
+  }
+
+  const mailOptions = {
+    from: `"Bharadwaj's Cafe" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: `${copy.title} - Order #${order._id.toString().slice(-8).toUpperCase()}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: #6b1f1f; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;">
+            <h1 style="margin: 0;">${copy.title}</h1>
+          </div>
+          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 5px 5px;">
+            <p>${copy.body}</p>
+            <p><strong>Order:</strong> #${order._id.toString().slice(-8).toUpperCase()}</p>
+            <p><strong>Total:</strong> Rs.${order.totalAmount}</p>
+          </div>
+          <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+            <p>&copy; 2025 Bharadwaj's Cafe. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Order status email sent to:', email);
+  } catch (error) {
+    console.error('Email sending error:', error);
+    throw new Error('Failed to send order status email');
+  }
+};

@@ -59,6 +59,29 @@ services:
     ports:
       - '5000:5000'
 
+  worker:
+    # Same image as the API, different entrypoint. Running jobs in their own
+    # process means a burst of email retries competes for its own CPU rather
+    # than the event loop serving customers.
+    build:
+      context: ./backend
+    restart: unless-stopped
+    command: ['node', 'dist/jobs/worker.js']
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongo:27017/bharadwaj-cafe
+      REDIS_URL: redis://redis:6379
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:8080}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+
   web:
     build:
       context: ./frontend
