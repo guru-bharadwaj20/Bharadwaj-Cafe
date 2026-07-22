@@ -7,6 +7,9 @@ import {
   sendVerificationEmail,
 } from '../utils/email.js';
 import type { JobName, JobPayloads } from './queues.js';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'jobs' });
 
 /**
  * What each job actually does.
@@ -90,7 +93,7 @@ export const handlers: Handlers = {
     }
 
     if (corrected > 0) {
-      console.log(`[jobs] loyalty reconciliation corrected ${corrected} tier(s)`);
+      log.info({ corrected }, 'loyalty reconciliation corrected tiers');
     }
   },
 };

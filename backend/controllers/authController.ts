@@ -2,6 +2,9 @@ import type { RequestHandler } from 'express';
 import User, { hashToken } from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
 import { enqueueDetached } from '../jobs/enqueue.js';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'auth' });
 
 const verificationRequired = (): boolean => process.env.REQUIRE_EMAIL_VERIFICATION !== 'false';
 
@@ -58,7 +61,7 @@ export const registerUser: RequestHandler = async (req, res) => {
       message: 'Registration successful! Please check your email to verify your account.',
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    log.error({ err: error }, 'Registration error');
     res.status(400).json({
       message: errorMessage(error, 'Failed to register user'),
       error: error instanceof Error ? error.name : 'Error',
@@ -105,7 +108,7 @@ export const loginUser: RequestHandler = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    console.error('Login error:', error);
+    log.error({ err: error }, 'Login error');
     res.status(400).json({ message: errorMessage(error, 'Login failed') });
   }
 };
@@ -283,7 +286,7 @@ export const resendVerification: RequestHandler = async (req, res) => {
 
     res.json(genericResponse);
   } catch (error) {
-    console.error('Resend verification error:', error);
+    log.error({ err: error }, 'Resend verification error');
     res.json(genericResponse);
   }
 };
@@ -323,7 +326,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
 
     res.json(genericResponse);
   } catch (error) {
-    console.error('Forgot password error:', error);
+    log.error({ err: error }, 'Forgot password error');
     res.json(genericResponse);
   }
 };
