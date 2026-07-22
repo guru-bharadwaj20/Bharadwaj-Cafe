@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
+import NotificationToggle from '../components/NotificationToggle';
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -148,6 +149,7 @@ const Profile = () => {
   return (
     <div className="profile-page">
       <div className="profile-container section-content">
+        <NotificationToggle />
         <div className="profile-header">
           <div className="profile-avatar">
             <i className="fa-solid fa-user-circle"></i>

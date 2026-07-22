@@ -146,6 +146,42 @@ export const api = {
     return response.json();
   },
 
+  // Push notification APIs
+  getPushConfig: async () => {
+    const response = await fetch(`${API_URL}/push/config`);
+    if (!response.ok) throw new Error('Failed to load notification settings');
+    return response.json();
+  },
+
+  subscribeToPush: async (subscription, token) => {
+    const response = await fetch(`${API_URL}/push/subscribe`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(subscription),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Could not enable notifications');
+    }
+    return response.json();
+  },
+
+  unsubscribeFromPush: async (endpoint, token) => {
+    const response = await fetch(`${API_URL}/push/subscribe`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ endpoint }),
+    });
+    if (!response.ok) throw new Error('Could not disable notifications');
+    return response.json();
+  },
+
   // Contact API
   submitContact: async (contactData) => {
     const response = await fetch(`${API_URL}/contact`, {

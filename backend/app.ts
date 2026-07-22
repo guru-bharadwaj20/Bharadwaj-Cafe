@@ -20,6 +20,7 @@ import loyaltyRoutes from './routes/loyaltyRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import pushRoutes from './routes/pushRoutes.js';
 import { handleWebhook } from './controllers/paymentController.js';
 
 export interface CreateAppOptions {
@@ -94,6 +95,7 @@ export const createApp = ({ corsOptions }: CreateAppOptions = {}): Express => {
   app.use('/api/payments', paymentRoutes);
   app.use('/api/uploads', uploadRoutes);
   app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/push', pushRoutes);
 
   // Liveness: is the process up? Used by container restart policies, so it
   // must not depend on anything external — a database blip should not cause

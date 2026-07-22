@@ -486,3 +486,49 @@
     justify-content: center;
   }
 }
+
+/* Notification opt-in */
+.notification-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.notification-toggle p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.notification-toggle button {
+  padding: 8px 18px;
+  font: inherit;
+  color: #3b141c;
+  background: #f3961c;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.notification-toggle button.enabled {
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.notification-toggle button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.notification-error {
+  flex-basis: 100%;
+  color: #f44336;
+  font-size: 0.85rem;
+}
