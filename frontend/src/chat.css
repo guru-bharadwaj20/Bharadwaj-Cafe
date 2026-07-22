@@ -161,3 +161,27 @@
     bottom: 20px;
   }
 }
+
+/* Sender attribution — a customer should always know whether they are
+   talking to the AI assistant or a person. */
+.message-badge {
+  display: inline-block;
+  margin-bottom: 4px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #3b141c;
+  background: #f3961c;
+  border-radius: 10px;
+}
+
+.message-badge.staff {
+  color: #fff;
+  background: #1baf7a;
+}
+
+.message.assistant .message-content {
+  background: rgba(243, 150, 28, 0.12);
+  border-left: 3px solid #f3961c;
+}
