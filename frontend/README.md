@@ -18,13 +18,13 @@ src/
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Vite dev server |
-| `npm run build` | Production build, including the service worker |
-| `npm run preview` | Serve the production build locally |
-| `npm test` | 41 component, context and accessibility tests |
-| `npm run lint` | ESLint with React and hooks rules |
+| Command           | What it does                                   |
+| ----------------- | ---------------------------------------------- |
+| `npm run dev`     | Vite dev server                                |
+| `npm run build`   | Production build, including the service worker |
+| `npm run preview` | Serve the production build locally             |
+| `npm test`        | 41 component, context and accessibility tests  |
+| `npm run lint`    | ESLint with React and hooks rules              |
 
 ## Conventions
 
