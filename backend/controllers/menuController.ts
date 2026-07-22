@@ -99,9 +99,18 @@ export const getMenuItem: RequestHandler = async (req, res) => {
 // @access  Private/Admin
 export const createMenuItem: RequestHandler = async (req, res) => {
   try {
-    const { name, description, price, image, category } = req.body as Partial<IMenuItem>;
+    const { name, description, price, image, category, stock, lowStockThreshold } =
+      req.body as Partial<IMenuItem>;
 
-    const menuItem = await MenuItem.create({ name, description, price, image, category });
+    const menuItem = await MenuItem.create({
+      name,
+      description,
+      price,
+      image,
+      category,
+      stock,
+      lowStockThreshold,
+    });
     await invalidateMenuCache();
 
     res.status(201).json(menuItem);
@@ -129,6 +138,10 @@ export const updateMenuItem: RequestHandler = async (req, res) => {
     menuItem.image = body.image ?? menuItem.image;
     menuItem.category = body.category ?? menuItem.category;
     menuItem.available = body.available ?? menuItem.available;
+    // `null` is meaningful here (stop tracking), so `undefined` is the only
+    // value that means "leave alone".
+    if (body.stock !== undefined) menuItem.stock = body.stock;
+    menuItem.lowStockThreshold = body.lowStockThreshold ?? menuItem.lowStockThreshold;
 
     const updatedMenuItem = await menuItem.save();
     await invalidateMenuCache();
