@@ -33,11 +33,13 @@ const ChatWidget = () => {
     // token, so replies arriving here are already known to be for us.
     connectSocket(token);
 
-    const handleAdminMessage = () => fetchChat();
-    socket.on('adminMessage', handleAdminMessage);
+    const handleReply = () => fetchChat();
+    socket.on('adminMessage', handleReply);
+    socket.on('assistantMessage', handleReply);
 
     return () => {
-      socket.off('adminMessage', handleAdminMessage);
+      socket.off('adminMessage', handleReply);
+      socket.off('assistantMessage', handleReply);
       disconnectSocket();
     };
   }, [token, fetchChat]);
@@ -82,7 +84,7 @@ const ChatWidget = () => {
       {isOpen && (
         <div className="chat-widget">
           <div className="chat-header">
-            <h4>Chat with us</h4>
+            <h4>{chat?.escalated ? 'Chat with our team' : 'Ask us anything'}</h4>
             <button onClick={() => setIsOpen(false)}>
               <i className="fas fa-times"></i>
             </button>
@@ -91,6 +93,8 @@ const ChatWidget = () => {
           <div className="chat-messages">
             {chat?.messages.map((msg, index) => (
               <div key={index} className={`message ${msg.sender}`}>
+                {msg.sender === 'assistant' && <span className="message-badge">Assistant</span>}
+                {msg.sender === 'admin' && <span className="message-badge staff">Staff</span>}
                 <div className="message-content">{msg.message}</div>
                 <span className="message-time">
                   {new Date(msg.timestamp).toLocaleTimeString([], {
