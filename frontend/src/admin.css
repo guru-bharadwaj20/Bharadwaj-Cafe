@@ -407,3 +407,35 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Direct-to-provider image upload */
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.image-upload-preview {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.image-upload-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.image-upload-status {
+  font-size: 0.9rem;
+  color: #f3961c;
+}
+
+.image-upload-error {
+  font-size: 0.9rem;
+  color: #f44336;
+}
