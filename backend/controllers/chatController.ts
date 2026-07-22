@@ -3,6 +3,14 @@ import type { Server } from 'socket.io';
 import Chat from '../models/Chat.js';
 import type { HydratedUser } from '../models/User.js';
 import { emitToAdmins, emitToUser } from '../utils/realtime.js';
+import { askAssistant, assistantEnabled, type AssistantTurn } from '../config/assistant.js';
+import { childLogger } from '../utils/logger.js';
+
+const log = childLogger({ module: 'chat' });
+
+// How much conversation the assistant sees. Enough for context, bounded so a
+// long-running chat cannot grow the prompt without limit.
+const ASSISTANT_HISTORY_TURNS = 12;
 
 const MAX_MESSAGE_LENGTH = 2000;
 
@@ -64,12 +72,57 @@ export const sendMessage: RequestHandler = async (req, res) => {
     await chat.save();
 
     // Notify staff only. This used to be broadcast to every connected client.
-    emitToAdmins(getIo(req), 'newMessage', {
+    const io = getIo(req);
+    emitToAdmins(io, 'newMessage', {
       chatId: chat._id,
       userId: user._id,
       name: user.name,
       message,
     });
+
+    // Answer immediately if the AI assistant is configured and a human has
+    // not already taken over this conversation.
+    if (assistantEnabled() && !chat.escalated) {
+      try {
+        const history: AssistantTurn[] = chat.messages
+          .slice(-ASSISTANT_HISTORY_TURNS)
+          // Staff replies are context for the customer, not for the model —
+          // mapping them onto 'assistant' keeps the turn order valid.
+          .map((entry) => ({
+            role: entry.sender === 'user' ? ('user' as const) : ('assistant' as const),
+            text: entry.message,
+          }));
+
+        const reply = await askAssistant(history, user._id);
+
+        chat.messages.push({
+          sender: 'assistant',
+          message: reply.text,
+          timestamp: new Date(),
+          read: false,
+          toolsUsed: reply.toolsUsed,
+        });
+
+        // Once escalated the assistant stays quiet for the rest of the
+        // conversation, so a customer is never bounced between the two.
+        if (reply.needsHuman) {
+          chat.escalated = true;
+          emitToAdmins(io, 'chatEscalated', { chatId: chat._id, userId: user._id });
+        }
+
+        chat.lastMessage = new Date();
+        await chat.save();
+
+        emitToUser(io, user._id, 'assistantMessage', {
+          chatId: chat._id,
+          message: reply.text,
+        });
+      } catch (error) {
+        // A failing assistant must not fail the customer's message — it is
+        // already saved, and staff can still see and answer it.
+        log.error({ err: error }, 'assistant reply failed');
+      }
+    }
 
     res.json(chat);
   } catch (error) {
@@ -109,6 +162,8 @@ export const sendAdminMessage: RequestHandler = async (req, res) => {
     }
 
     chat.messages.push({ sender: 'admin', message, timestamp: new Date(), read: false });
+    // A human answering means the human owns the conversation from here.
+    chat.escalated = true;
     chat.lastMessage = new Date();
     await chat.save();
 

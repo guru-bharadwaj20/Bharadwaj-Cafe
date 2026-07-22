@@ -22,6 +22,7 @@
     "worker:dev": "tsx watch jobs/worker.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.5",
     "@socket.io/redis-adapter": "^8.3.0",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.80.10",
