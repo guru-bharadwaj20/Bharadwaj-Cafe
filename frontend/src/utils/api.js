@@ -230,6 +230,33 @@ export const api = {
     return response.json();
   },
 
+  // Tells the client whether the server has Google sign-in configured, and
+  // supplies the client id the Google script needs. Keeping this server-side
+  // means Google is configured in exactly one place.
+  getGoogleConfig: async () => {
+    const response = await fetch(`${API_URL}/auth/google/config`);
+    if (!response.ok) throw new Error('Failed to load Google config');
+    return response.json();
+  },
+
+  // Exchanges the ID token Google handed the browser for one of our own.
+  googleLogin: async (credential) => {
+    const response = await fetch(`${API_URL}/auth/google`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ credential }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const error = new Error(errorData.message || 'Google sign-in failed');
+      error.status = response.status;
+      throw error;
+    }
+    return response.json();
+  },
+
   resendVerification: async (email) => {
     const response = await fetch(`${API_URL}/auth/resend-verification`, {
       method: 'POST',

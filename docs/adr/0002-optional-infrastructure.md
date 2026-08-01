@@ -25,6 +25,7 @@ behaviour when absent:
 | `CLOUDINARY_*` | Upload UI is hidden; image URLs are entered by hand |
 | `VAPID_*` | The notification toggle does not render |
 | `GEMINI_API_KEY` | Chat behaves as before; staff answer every message |
+| `GOOGLE_CLIENT_ID` | The Google button never renders; email/password is the only way in |
 | `EMAIL_*` | Mail is a logged no-op rather than a thrown error |
 
 Each is a `*Enabled()` predicate, and the corresponding `/config` endpoint

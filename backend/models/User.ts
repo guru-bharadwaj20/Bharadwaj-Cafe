@@ -8,7 +8,10 @@ export type LoyaltyTier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum';
 export interface IUser {
   name: string;
   email: string;
-  password: string;
+  /** Absent on accounts that only ever signed in through Google. */
+  password?: string;
+  /** Google's stable subject id. Set once an account is linked to Google. */
+  googleId?: string;
   role: UserRole;
   isVerified: boolean;
   verificationToken?: string;
@@ -38,7 +41,21 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
-    password: { type: String, required: true, minlength: 6 },
+
+    // Required only for accounts that sign in with a password. A Google-only
+    // account has none, and must never be able to authenticate with one.
+    password: {
+      type: String,
+      minlength: 6,
+      required: function (this: { googleId?: string }) {
+        return !this.googleId;
+      },
+    },
+
+    // sparse: many accounts have no googleId, and a plain unique index would
+    // treat every one of those nulls as a duplicate.
+    googleId: { type: String, unique: true, sparse: true },
+
     role: { type: String, enum: ['customer', 'admin'], default: 'customer' },
     isVerified: { type: Boolean, default: false },
 
@@ -69,7 +86,8 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
 // (profile edits, loyalty updates, reset tokens) re-runs bcrypt over the
 // existing hash and leaves the in-memory document inconsistent with storage.
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+  // `!this.password` covers Google-only accounts, which have nothing to hash.
+  if (!this.isModified('password') || !this.password) {
     return next();
   }
   const salt = await bcrypt.genSalt(10);
@@ -87,10 +105,15 @@ const issueToken = (ttlMs: number) => {
   return { raw, hashed: hashToken(raw), expiresAt: new Date(Date.now() + ttlMs) };
 };
 
-userSchema.methods.matchPassword = function (
-  this: { password: string },
+userSchema.methods.matchPassword = async function (
+  this: { password?: string },
   enteredPassword: string
 ): Promise<boolean> {
+  // A Google-only account has no hash to compare against. Returning false —
+  // rather than letting bcrypt.compare throw on undefined — means password
+  // login simply fails for it, instead of 500ing and leaking that the
+  // account exists but is passwordless.
+  if (!this.password) return false;
   return bcrypt.compare(enteredPassword, this.password);
 };
 

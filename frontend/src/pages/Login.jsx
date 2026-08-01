@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -159,6 +160,17 @@ const Login = () => {
             <div className="auth-divider">
               <span>OR</span>
             </div>
+
+            <GoogleSignInButton
+              onSuccess={(session) => {
+                login(session);
+                navigate('/home');
+              }}
+              onError={(message) => {
+                setNeedsVerification(false);
+                setError(message);
+              }}
+            />
 
             <div className="auth-redirect">
               <p>
