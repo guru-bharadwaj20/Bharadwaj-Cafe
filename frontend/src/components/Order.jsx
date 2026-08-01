@@ -17,71 +17,24 @@ const Order = () => {
     }, 1500);
   };
 
-  const defaultMenuItems = [
-    {
-      _id: '1',
-      name: 'Cappuccino',
-      description: 'Espresso with steamed milk foam and a touch of cocoa',
-      price: 150,
-      image: 'img/cappuccino.png',
-    },
-    {
-      _id: '2',
-      name: 'Caffe Latte',
-      description: 'Smooth espresso with steamed milk and light foam',
-      price: 160,
-      image: 'img/latte.png',
-    },
-    {
-      _id: '3',
-      name: 'Mocha',
-      description: 'Rich chocolate and espresso blend with whipped cream',
-      price: 170,
-      image: 'img/mocha.png',
-    },
-    {
-      _id: '4',
-      name: 'Americano',
-      description: 'Espresso diluted with hot water for a smooth taste',
-      price: 130,
-      image: 'img/americano.png',
-    },
-    {
-      _id: '5',
-      name: 'Flat White',
-      description: 'Velvety microfoam with a double shot of espresso',
-      price: 155,
-      image: 'img/flat.png',
-    },
-    {
-      _id: '6',
-      name: 'Filter Coffee',
-      description: 'Traditional South Indian filter coffee with milk and sugar',
-      price: 100,
-      image: 'img/filter.png',
-    },
-  ];
-
-  const [menuItems, setMenuItems] = useState(defaultMenuItems);
+  // No hardcoded fallback menu. There used to be one, with ids "1" through
+  // "6", shown whenever the request failed *or* returned nothing. Those ids
+  // exist in no database, so anything added to the cart from it was rejected
+  // at checkout — and an ordinary search matching zero items was enough to
+  // put the whole fake menu on screen.
+  const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchMenu = async (filterParams = {}) => {
     try {
       setLoading(true);
-      const data = await api.getMenu(filterParams);
-
-      // If database has items, use them; otherwise use default
-      if (data && data.length > 0) {
-        setMenuItems(data);
-      } else {
-        setMenuItems(defaultMenuItems);
-      }
+      setMenuItems(await api.getMenu(filterParams));
       setError(null);
     } catch (err) {
+      setMenuItems([]);
+      setError('We could not load the menu just now. Please try again in a moment.');
       console.error('Error fetching menu:', err);
-      // Use default menu items if fetch fails
-      setMenuItems(defaultMenuItems);
     } finally {
       setLoading(false);
     }
@@ -135,6 +88,11 @@ const Order = () => {
       <h2 className="section-title">Our Menu</h2>
       <SearchFilters onFilterChange={handleFilterChange} />
       <div className="section-content">
+        {menuItems.length === 0 ? (
+          <p className="menu-empty">
+            No items match those filters. Try widening your search.
+          </p>
+        ) : (
         <ul className="menu-list">
           {menuItems.map((item) => (
             <li className="menu-item" key={item._id}>
@@ -185,6 +143,7 @@ const Order = () => {
             </li>
           ))}
         </ul>
+        )}
       </div>
     </section>
   );

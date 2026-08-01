@@ -155,3 +155,12 @@
     max-width: 100%;
   }
 }
+
+/* Shown when a search or filter genuinely matches nothing. Previously this
+   case silently rendered a hardcoded fallback menu instead. */
+.order-section .menu-empty {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: var(--font-size-m);
+  color: var(--medium-gray-color);
+}

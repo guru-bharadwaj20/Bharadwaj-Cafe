@@ -141,3 +141,16 @@
     max-width: 100%;
   }
 }
+
+/* Loading, empty and error states for the shop. Centred in the grid area so
+   the page does not collapse to a bare heading while the fetch is in flight. */
+.merchandise-section .merchandise-status {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: var(--font-size-m);
+  color: var(--medium-gray-color);
+}
+
+.merchandise-section .merchandise-error {
+  color: var(--secondary-color);
+}
