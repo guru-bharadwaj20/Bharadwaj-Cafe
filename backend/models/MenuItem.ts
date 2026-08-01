@@ -1,7 +1,29 @@
 import mongoose, { type HydratedDocument, type Model, Schema } from 'mongoose';
 
-export type MenuCategory = 'coffee' | 'tea' | 'snacks' | 'pastries';
+export type DrinkCategory = 'coffee' | 'tea' | 'snacks' | 'pastries';
+export type MerchCategory = 'apparel' | 'drinkware' | 'accessories' | 'stationery' | 'home-decor';
+export type MenuCategory = DrinkCategory | MerchCategory;
 export type DietaryTag = 'Vegetarian' | 'Vegan' | 'Gluten-Free' | 'Dairy-Free' | 'Nut-Free';
+
+/**
+ * Splits the consumable menu from the merchandise shelf.
+ *
+ * Both live in this one collection deliberately: an order is priced by looking
+ * its items up here, so anything sellable must be a MenuItem or it cannot be
+ * bought. Merchandise used to be a hardcoded array in the React bundle with
+ * ids like "merch-1", which meant the server rejected every order containing
+ * one — and, because the cart is shared, that poisoned the whole checkout.
+ */
+export type ItemKind = 'drink' | 'merch';
+
+export const DRINK_CATEGORIES: DrinkCategory[] = ['coffee', 'tea', 'snacks', 'pastries'];
+export const MERCH_CATEGORIES: MerchCategory[] = [
+  'apparel',
+  'drinkware',
+  'accessories',
+  'stationery',
+  'home-decor',
+];
 
 export interface ICustomizationOption {
   name?: string;
@@ -19,6 +41,8 @@ export interface IMenuItem {
   price: number;
   image: string;
   category: MenuCategory;
+  /** Drinks appear on the Order page; merch on the Merchandise page. */
+  kind: ItemKind;
   available: boolean;
   /**
    * Units on hand. `null` means "not stock-tracked" — an espresso shot is
@@ -47,9 +71,12 @@ const menuItemSchema = new Schema<IMenuItem>(
     image: { type: String, required: true },
     category: {
       type: String,
-      enum: ['coffee', 'tea', 'snacks', 'pastries'],
+      enum: [...DRINK_CATEGORIES, ...MERCH_CATEGORIES],
       default: 'coffee',
     },
+    // Defaulted, so every document written before this field existed reads
+    // back as a drink rather than vanishing from the Order page.
+    kind: { type: String, enum: ['drink', 'merch'], default: 'drink' },
     available: { type: Boolean, default: true },
     stock: { type: Number, default: null, min: 0 },
     lowStockThreshold: { type: Number, default: 5, min: 0 },
@@ -74,6 +101,9 @@ const menuItemSchema = new Schema<IMenuItem>(
 
 // Supports the low-stock query on the admin dashboard.
 menuItemSchema.index({ stock: 1 });
+
+// Every listing query filters on kind, and most also filter on availability.
+menuItemSchema.index({ kind: 1, available: 1 });
 
 const MenuItem: Model<IMenuItem> = mongoose.model<IMenuItem>('MenuItem', menuItemSchema);
 

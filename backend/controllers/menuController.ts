@@ -14,6 +14,7 @@ interface MenuQuery {
   minPrice?: string;
   maxPrice?: string;
   sortBy?: string;
+  kind?: string;
 }
 
 const SORT_OPTIONS: Record<string, string> = {
@@ -28,9 +29,14 @@ const SORT_OPTIONS: Record<string, string> = {
 // @access  Public
 export const getMenuItems: RequestHandler = async (req, res) => {
   try {
-    const { search, category, dietary, minPrice, maxPrice, sortBy } = req.query as MenuQuery;
+    const { search, category, dietary, minPrice, maxPrice, sortBy, kind } = req.query as MenuQuery;
 
-    const query: FilterQuery<IMenuItem> = { available: true };
+    // Drinks unless asked otherwise, so merchandise never leaks onto the
+    // Order page just because a caller forgot to filter.
+    const query: FilterQuery<IMenuItem> = {
+      available: true,
+      kind: kind === 'merch' ? 'merch' : 'drink',
+    };
 
     // Search by name or description
     if (search) {
@@ -59,7 +65,10 @@ export const getMenuItems: RequestHandler = async (req, res) => {
     const sort = (sortBy && SORT_OPTIONS[sortBy]) || '-createdAt';
 
     // The key covers every filter, so two different searches never collide.
+    // `kind` is part of it: without that, an unfiltered drinks request and an
+    // unfiltered merch request would share a key and serve each other.
     const key = menuCacheKey(
+      query.kind as string,
       search ?? '',
       category ?? '',
       dietary ?? '',
