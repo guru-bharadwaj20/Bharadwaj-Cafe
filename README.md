@@ -40,6 +40,7 @@ unconfigured ([ADR 0002](docs/adr/0002-optional-infrastructure.md)).
 | API | Express + TypeScript (`strict`), Socket.io |
 | Data | MongoDB + Mongoose; aggregation pipelines for analytics |
 | Cache & jobs | Redis + BullMQ, both optional |
+| Auth | JWT, with optional Google sign-in (verified ID tokens, no sessions) |
 | Payments | Razorpay with signature-verified webhooks |
 | AI | Google Gemini with session-scoped tools |
 | Frontend | React 18 + Vite, installable PWA |

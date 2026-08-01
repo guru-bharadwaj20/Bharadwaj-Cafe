@@ -237,6 +237,15 @@
   font-weight: var(--font-weight-medium);
 }
 
+/* Google renders its own button into this wrapper and owns its appearance —
+   Google's branding terms do not allow restyling it — so this only centres it.
+   The wrapper is hidden entirely until the button is ready, which keeps the
+   layout from jumping while the script loads. */
+.google-signin {
+  justify-content: center;
+  margin: 20px 0;
+}
+
 .auth-redirect {
   text-align: center;
   margin-top: 20px;

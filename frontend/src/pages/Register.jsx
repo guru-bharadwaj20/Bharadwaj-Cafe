@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -203,6 +206,17 @@ const Register = () => {
             <div className="auth-divider">
               <span>OR</span>
             </div>
+
+            {/* Signing up with Google needs no email confirmation step, so it
+                lands straight on /home rather than bouncing through /login. */}
+            <GoogleSignInButton
+              text="signup_with"
+              onSuccess={(session) => {
+                login(session);
+                navigate('/home');
+              }}
+              onError={(message) => setErrors({ general: message })}
+            />
 
             <div className="auth-redirect">
               <p>

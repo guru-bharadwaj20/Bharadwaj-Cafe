@@ -1,8 +1,14 @@
 import type { RequestHandler } from 'express';
-import User, { hashToken } from '../models/User.js';
+import User, { hashToken, type HydratedUser } from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
 import { enqueueDetached } from '../jobs/enqueue.js';
 import { childLogger } from '../utils/logger.js';
+import {
+  googleAuthEnabled,
+  googleClientId,
+  verifyGoogleIdToken,
+} from '../config/googleAuth.js';
+import { AppError } from '../utils/errors.js';
 
 const log = childLogger({ module: 'auth' });
 
@@ -10,6 +16,20 @@ const verificationRequired = (): boolean => process.env.REQUIRE_EMAIL_VERIFICATI
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
+
+/**
+ * The body every successful sign-in returns. Password and Google logins hand
+ * back exactly the same thing, so the client never needs to know which was
+ * used. Note what is absent: the password hash and both token columns.
+ */
+const session = (user: HydratedUser) => ({
+  _id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  isVerified: user.isVerified,
+  token: generateToken(user._id),
+});
 
 // @desc    Register new user
 // @route   POST /api/auth/register
@@ -99,17 +119,84 @@ export const loginUser: RequestHandler = async (req, res) => {
       return;
     }
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      isVerified: user.isVerified,
-      token: generateToken(user._id),
-    });
+    res.json(session(user));
   } catch (error) {
     log.error({ err: error }, 'Login error');
     res.status(400).json({ message: errorMessage(error, 'Login failed') });
+  }
+};
+
+// @desc    Whether Google sign-in is available, and the id the button needs
+// @route   GET /api/auth/google/config
+// @access  Public
+export const getGoogleConfig: RequestHandler = (_req, res) => {
+  // Lets the client decide whether to render the button at all, so the only
+  // place Google has to be configured is the server's environment.
+  res.json({ enabled: googleAuthEnabled(), clientId: googleClientId() });
+};
+
+// @desc    Sign in (or sign up) with a Google ID token
+// @route   POST /api/auth/google
+// @access  Public
+export const googleLogin: RequestHandler = async (req, res) => {
+  try {
+    if (!googleAuthEnabled()) {
+      res.status(503).json({ message: 'Google sign-in is not configured' });
+      return;
+    }
+
+    const { credential } = req.body as { credential?: string };
+
+    if (!credential || typeof credential !== 'string') {
+      res.status(400).json({ message: 'Missing Google credential' });
+      return;
+    }
+
+    const identity = await verifyGoogleIdToken(credential);
+
+    // Match on the Google subject id first. It is stable for the life of the
+    // account, whereas an email address can be changed or reassigned.
+    let user = await User.findOne({ googleId: identity.googleId });
+
+    if (!user) {
+      const existing = await User.findOne({ email: identity.email });
+
+      if (existing) {
+        // Someone who registered with a password is now signing in with
+        // Google. Link the two rather than failing on the unique email index
+        // or creating a second account. Safe because Google asserted
+        // email_verified, so they demonstrably control this address.
+        existing.googleId = identity.googleId;
+        // That same proof settles our own verification question.
+        existing.isVerified = true;
+        await existing.save();
+        user = existing;
+        log.info({ userId: existing._id.toString() }, 'linked Google to existing account');
+      } else {
+        // A brand new account, with no password at all: it can only ever be
+        // signed into through Google unless the owner sets one via the
+        // password-reset flow.
+        user = await User.create({
+          name: identity.name,
+          email: identity.email,
+          googleId: identity.googleId,
+          isVerified: true,
+        });
+        log.info({ userId: user._id.toString() }, 'created account from Google sign-in');
+      }
+    }
+
+    // Deliberately no verification gate here. Google proved the address, so
+    // requiring a second confirmation email would be asking the user to prove
+    // something already proven.
+    res.json(session(user));
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({ message: error.message });
+      return;
+    }
+    log.error({ err: error }, 'Google login error');
+    res.status(400).json({ message: errorMessage(error, 'Google sign-in failed') });
   }
 };
 
