@@ -28,7 +28,6 @@ import ChatWidget from './components/ChatWidget';
 import './style.css';
 import './cart.css';
 import './merchandise.css';
-import './about.css';
 import './order.css';
 import './contact.css';
 import './auth.css';
