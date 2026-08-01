@@ -168,14 +168,172 @@ const menuItems: Partial<IMenuItem>[] = [
     rating: 4.4,
     reviewCount: 0,
   },
+  {
+    // Beans are a consumable, so they belong on the Order page rather than
+    // on the merchandise shelf, where they used to sit.
+    name: 'Coffee Beans - Premium Blend',
+    description: 'Our signature house blend, roasted in small batches. 250g pack of whole beans',
+    price: 499,
+    image: 'img/filter.png',
+    category: 'coffee',
+    kind: 'drink',
+    available: true,
+    stock: 40,
+    dietary: ['Vegan', 'Gluten-Free', 'Dairy-Free'],
+    tags: ['coffee', 'beans', 'whole bean', 'take home'],
+    customizations: [
+      {
+        name: 'Grind',
+        options: [
+          { name: 'Whole Bean', price: 0 },
+          { name: 'Coarse (French Press)', price: 0 },
+          { name: 'Medium (Filter)', price: 0 },
+          { name: 'Fine (Espresso)', price: 0 },
+        ],
+      },
+    ],
+    rating: 4.7,
+    reviewCount: 0,
+  },
+];
+
+/**
+ * The merchandise shelf.
+ *
+ * Real documents rather than a hardcoded array in the React bundle, so each
+ * one has a genuine ObjectId that /api/orders can price. Nothing consumable
+ * belongs here — beans moved to the menu above.
+ */
+const merchandiseItems: Partial<IMenuItem>[] = [
+  {
+    name: "Bharadwaj's Cafe T-Shirt",
+    description: 'Premium combed-cotton tee with the house bean mark on the chest',
+    price: 599,
+    image: 'img/merch/tshirt.svg',
+    category: 'apparel',
+    kind: 'merch',
+    stock: 40,
+    tags: ['apparel', 'tshirt', 'cotton'],
+    rating: 4.6,
+  },
+  {
+    name: 'Hoodie - Black',
+    description: 'Heavyweight brushed-fleece hoodie with a kangaroo pocket and drawstring hood',
+    price: 1299,
+    image: 'img/merch/hoodie.svg',
+    category: 'apparel',
+    kind: 'merch',
+    stock: 22,
+    tags: ['apparel', 'hoodie', 'winter'],
+    rating: 4.8,
+  },
+  {
+    name: 'Sweatshirt - Grey',
+    description: 'Classic crew-neck sweatshirt with ribbed cuffs and a vintage cafe print',
+    price: 999,
+    image: 'img/merch/sweatshirt.svg',
+    category: 'apparel',
+    kind: 'merch',
+    stock: 25,
+    tags: ['apparel', 'sweatshirt'],
+    rating: 4.5,
+  },
+  {
+    name: 'Cap - Embroidered Logo',
+    description: 'Six-panel cotton cap with an adjustable strap and embroidered bean mark',
+    price: 399,
+    image: 'img/merch/cap.svg',
+    category: 'apparel',
+    kind: 'merch',
+    stock: 50,
+    tags: ['apparel', 'cap', 'accessories'],
+    rating: 4.3,
+  },
+  {
+    name: 'Coffee Mug - Classic',
+    description: 'Chunky 350ml stoneware mug, dishwasher and microwave safe',
+    price: 299,
+    image: 'img/merch/mug.svg',
+    category: 'drinkware',
+    kind: 'merch',
+    stock: 60,
+    tags: ['drinkware', 'mug', 'ceramic'],
+    rating: 4.7,
+  },
+  {
+    name: 'Travel Tumbler',
+    description: 'Vacuum-insulated steel tumbler that keeps a flat white hot for six hours',
+    price: 799,
+    image: 'img/merch/tumbler.svg',
+    category: 'drinkware',
+    kind: 'merch',
+    stock: 35,
+    tags: ['drinkware', 'tumbler', 'insulated'],
+    rating: 4.9,
+  },
+  {
+    name: 'Water Bottle',
+    description: 'BPA-free 1L bottle with a leak-proof lid and the cafe wordmark',
+    price: 549,
+    image: 'img/merch/bottle.svg',
+    category: 'drinkware',
+    kind: 'merch',
+    stock: 45,
+    tags: ['drinkware', 'bottle', 'reusable'],
+    rating: 4.4,
+  },
+  {
+    name: 'Tote Bag',
+    description: 'Heavy canvas tote with reinforced handles, roomy enough for a laptop',
+    price: 449,
+    image: 'img/merch/tote.svg',
+    category: 'accessories',
+    kind: 'merch',
+    stock: 55,
+    tags: ['accessories', 'tote', 'canvas'],
+    rating: 4.6,
+  },
+  {
+    name: 'Keychain',
+    description: 'Solid brass keychain with an enamelled miniature cup charm',
+    price: 149,
+    image: 'img/merch/keychain.svg',
+    category: 'accessories',
+    kind: 'merch',
+    stock: 80,
+    tags: ['accessories', 'keychain', 'brass'],
+    rating: 4.2,
+  },
+  {
+    name: 'Notebook - Coffee Lover',
+    description: 'A5 ruled notebook, 160 pages of thick cream paper with a lay-flat binding',
+    price: 249,
+    image: 'img/merch/notebook.svg',
+    category: 'stationery',
+    kind: 'merch',
+    stock: 40,
+    tags: ['stationery', 'notebook', 'a5'],
+    rating: 4.5,
+  },
+  {
+    name: 'Coaster Set',
+    description: 'Set of four turned-acacia coasters, branded and finished with food-safe oil',
+    price: 199,
+    image: 'img/merch/coasters.svg',
+    category: 'home-decor',
+    kind: 'merch',
+    stock: 38,
+    tags: ['home', 'coasters', 'wood'],
+    rating: 4.4,
+  },
 ];
 
 const importData = async (): Promise<void> => {
   try {
     await connectDB();
     await MenuItem.deleteMany();
-    await MenuItem.insertMany(menuItems);
-    console.log('Data Imported!');
+    await MenuItem.insertMany([...menuItems, ...merchandiseItems]);
+    console.log(`Data Imported! ${menuItems.length} menu items, ${merchandiseItems.length} merch`);
     process.exit();
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : error);
