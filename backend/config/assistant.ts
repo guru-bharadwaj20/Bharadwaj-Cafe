@@ -1,4 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenAI, Type } from '@google/genai';
+import type { Content, FunctionDeclaration, Part } from '@google/genai';
 import type { Types } from 'mongoose';
 import MenuItem from '../models/MenuItem.js';
 import Order from '../models/Order.js';
@@ -22,15 +23,17 @@ const log = childLogger({ module: 'assistant' });
  * passed through the model.
  */
 
-export const assistantEnabled = (): boolean => Boolean(process.env.ANTHROPIC_API_KEY);
+const MODEL = 'gemini-2.5-flash';
 
-let client: Anthropic | null = null;
+export const assistantEnabled = (): boolean => Boolean(process.env.GEMINI_API_KEY);
 
-const getClient = (): Anthropic => {
+let client: GoogleGenAI | null = null;
+
+const getClient = (): GoogleGenAI => {
   if (!assistantEnabled()) {
     throw new ServiceUnavailableError('The AI assistant is not configured');
   }
-  client ??= new Anthropic();
+  client ??= new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   return client;
 };
 
@@ -52,26 +55,26 @@ discounts. For any of those, tell the customer a staff member will pick up
 the conversation shortly.`;
 
 /** What the model is allowed to look up. */
-const tools: Anthropic.Tool[] = [
+const tools: FunctionDeclaration[] = [
   {
     name: 'search_menu',
     description:
       'Search the current menu. Call this whenever the customer asks what is available, ' +
       'what something costs, whether an item is vegan or gluten-free, or for a recommendation.',
-    input_schema: {
-      type: 'object',
+    parameters: {
+      type: Type.OBJECT,
       properties: {
         query: {
-          type: 'string',
+          type: Type.STRING,
           description: 'Free-text search over item names, descriptions and tags.',
         },
         category: {
-          type: 'string',
+          type: Type.STRING,
           enum: ['coffee', 'tea', 'snacks', 'pastries'],
           description: 'Restrict results to one category.',
         },
         dietary: {
-          type: 'string',
+          type: Type.STRING,
           enum: ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'],
           description: 'Restrict results to items carrying this dietary tag.',
         },
@@ -83,11 +86,11 @@ const tools: Anthropic.Tool[] = [
     description:
       "Look up the customer's own recent orders. Call this when they ask about an order's " +
       'status, what they ordered before, or when something will be ready.',
-    input_schema: {
-      type: 'object',
+    parameters: {
+      type: Type.OBJECT,
       properties: {
         limit: {
-          type: 'integer',
+          type: Type.INTEGER,
           description: 'How many recent orders to return (1-10, default 5).',
         },
       },
@@ -98,7 +101,7 @@ const tools: Anthropic.Tool[] = [
     description:
       "Look up the customer's loyalty points, tier and lifetime spend. Call this when they " +
       'ask about points, rewards, or their membership tier.',
-    input_schema: { type: 'object', properties: {} },
+    parameters: { type: Type.OBJECT, properties: {} },
   },
 ];
 
@@ -223,30 +226,34 @@ export const askAssistant = async (
   history: AssistantTurn[],
   userId: Types.ObjectId | string
 ): Promise<AssistantReply> => {
-  const anthropic = getClient();
+  const genai = getClient();
 
-  const messages: Anthropic.MessageParam[] = history.map((turn) => ({
-    role: turn.role,
-    content: turn.text,
+  // Gemini names the assistant side of a conversation 'model', not 'assistant'.
+  const contents: Content[] = history.map((turn) => ({
+    role: turn.role === 'user' ? 'user' : 'model',
+    parts: [{ text: turn.text }],
   }));
 
   const toolsUsed: string[] = [];
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
-    const response = await anthropic.messages.create({
-      model: 'claude-opus-4-8',
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      tools,
-      messages,
+    const response = await genai.models.generateContent({
+      model: MODEL,
+      contents,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        tools: [{ functionDeclarations: tools }],
+        maxOutputTokens: 1024,
+        // Thinking is off: these are short support answers over tool output,
+        // and a thinking budget would spend the token cap before any text.
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     });
 
-    if (response.stop_reason !== 'tool_use') {
-      const text = response.content
-        .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-        .map((block) => block.text)
-        .join('\n')
-        .trim();
+    const calls = response.functionCalls ?? [];
+
+    if (calls.length === 0) {
+      const text = (response.text ?? '').trim();
 
       return {
         text: text || 'Sorry, I could not work that out. Let me get a staff member for you.',
@@ -255,41 +262,34 @@ export const askAssistant = async (
       };
     }
 
-    // Preserve the assistant turn verbatim — dropping the tool_use blocks
-    // would break the tool_result pairing on the next request.
-    messages.push({ role: 'assistant', content: response.content });
+    // Echo the requested calls back as the model turn. Dropping them would
+    // leave the following functionResponse parts unpaired.
+    contents.push({
+      role: 'model',
+      parts: calls.map((call) => ({ functionCall: { name: call.name, args: call.args } })),
+    });
 
-    const toolUses = response.content.filter(
-      (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use'
-    );
+    // All results go back in a single turn; splitting them across several
+    // teaches the model to stop making parallel calls.
+    const results: Part[] = [];
 
-    // All results go back in a single user message; splitting them across
-    // several teaches the model to stop making parallel calls.
-    const results: Anthropic.ToolResultBlockParam[] = [];
-
-    for (const toolUse of toolUses) {
-      toolsUsed.push(toolUse.name);
+    for (const call of calls) {
+      const name = call.name ?? 'unknown';
+      toolsUsed.push(name);
       try {
-        const result = await runTool(
-          toolUse.name,
-          toolUse.input as Record<string, unknown>,
-          userId
-        );
-        results.push({ type: 'tool_result', tool_use_id: toolUse.id, content: result });
+        const result = await runTool(name, call.args ?? {}, userId);
+        results.push({ functionResponse: { name, response: { result } } });
       } catch (error) {
-        log.error({ err: error, tool: toolUse.name }, 'assistant tool failed');
+        log.error({ err: error, tool: name }, 'assistant tool failed');
         // Reported as an error result rather than thrown, so the model can
         // apologise gracefully instead of the request failing outright.
         results.push({
-          type: 'tool_result',
-          tool_use_id: toolUse.id,
-          content: 'That lookup failed.',
-          is_error: true,
+          functionResponse: { name, response: { error: 'That lookup failed.' } },
         });
       }
     }
 
-    messages.push({ role: 'user', content: results });
+    contents.push({ role: 'user', parts: results });
   }
 
   log.warn({ toolsUsed }, 'assistant hit the tool-round limit');

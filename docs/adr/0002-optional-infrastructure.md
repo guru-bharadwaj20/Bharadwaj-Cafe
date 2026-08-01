@@ -24,7 +24,7 @@ behaviour when absent:
 | `RAZORPAY_*` | Cash on delivery; the UI never shows an online-payment option |
 | `CLOUDINARY_*` | Upload UI is hidden; image URLs are entered by hand |
 | `VAPID_*` | The notification toggle does not render |
-| `ANTHROPIC_API_KEY` | Chat behaves as before; staff answer every message |
+| `GEMINI_API_KEY` | Chat behaves as before; staff answer every message |
 | `EMAIL_*` | Mail is a logged no-op rather than a thrown error |
 
 Each is a `*Enabled()` predicate, and the corresponding `/config` endpoint

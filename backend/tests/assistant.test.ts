@@ -13,37 +13,37 @@ import { createUser, createAdmin, createMenuItem, placeOrder, expectFound } from
 
 // The SDK is stubbed: these tests are about our tool wiring, escalation and
 // isolation — not about the model's own behaviour.
-const messagesCreate = vi.fn();
-vi.mock('@anthropic-ai/sdk', () => ({
-  default: class {
-    messages = { create: messagesCreate };
+const generateContent = vi.fn();
+vi.mock('@google/genai', async (importOriginal) => ({
+  // `Type` is a real enum the tool declarations are built from, so only the
+  // client itself is replaced.
+  ...(await importOriginal<typeof import('@google/genai')>()),
+  GoogleGenAI: class {
+    models = { generateContent };
   },
 }));
 
 const app = createApp();
 
 /** A plain text reply with no tool use. */
-const textReply = (text: string) => ({
-  stop_reason: 'end_turn',
-  content: [{ type: 'text', text }],
-});
+const textReply = (text: string) => ({ text, functionCalls: [] });
 
 /** A turn that asks for one tool call. */
-const toolReply = (name: string, input: Record<string, unknown> = {}) => ({
-  stop_reason: 'tool_use',
-  content: [{ type: 'tool_use', id: `toolu_${name}`, name, input }],
+const toolReply = (name: string, args: Record<string, unknown> = {}) => ({
+  text: undefined,
+  functionCalls: [{ name, args }],
 });
 
 beforeAll(() => {
-  process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+  process.env.GEMINI_API_KEY = 'test-gemini-key';
 });
 
 afterAll(() => {
-  delete process.env.ANTHROPIC_API_KEY;
+  delete process.env.GEMINI_API_KEY;
 });
 
 beforeEach(() => {
-  messagesCreate.mockReset();
+  generateContent.mockReset();
 });
 
 /**
@@ -52,13 +52,14 @@ beforeEach(() => {
  * here rather than at every assertion.
  */
 const toolResultOnCall = (callIndex: number): string => {
-  const call = messagesCreate.mock.calls[callIndex] as
-    [{ messages: { content: { content: string }[] }[] }] | undefined;
-  const lastTurn = call?.[0].messages.at(-1);
-  if (!lastTurn) throw new Error(`No messages on model call ${callIndex}`);
-  const block = lastTurn.content[0];
-  if (!block) throw new Error(`No tool result on model call ${callIndex}`);
-  return block.content;
+  const call = generateContent.mock.calls[callIndex] as
+    | [{ contents: { parts: { functionResponse: { response: { result?: string } } }[] }[] }]
+    | undefined;
+  const lastTurn = call?.[0].contents.at(-1);
+  if (!lastTurn) throw new Error(`No contents on model call ${callIndex}`);
+  const part = lastTurn.parts[0];
+  if (!part) throw new Error(`No tool result on model call ${callIndex}`);
+  return part.functionResponse.response.result ?? '';
 };
 
 const send = (token: string, message: string) =>
@@ -67,7 +68,7 @@ const send = (token: string, message: string) =>
 describe('replying', () => {
   it('answers a customer message and stores the reply', async () => {
     const { token } = await createUser(app);
-    messagesCreate.mockResolvedValue(textReply('We open at 8am every day.'));
+    generateContent.mockResolvedValue(textReply('We open at 8am every day.'));
 
     const res = await send(token, 'What time do you open?').expect(200);
 
@@ -77,22 +78,22 @@ describe('replying', () => {
   });
 
   it('stays silent when no API key is configured', async () => {
-    delete process.env.ANTHROPIC_API_KEY;
+    delete process.env.GEMINI_API_KEY;
     try {
       const { token } = await createUser(app);
 
       const res = await send(token, 'Hello?').expect(200);
 
       expect(res.body.messages).toHaveLength(1);
-      expect(messagesCreate).not.toHaveBeenCalled();
+      expect(generateContent).not.toHaveBeenCalled();
     } finally {
-      process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+      process.env.GEMINI_API_KEY = 'test-gemini-key';
     }
   });
 
   it('still saves the customer message when the model call fails', async () => {
     const { token } = await createUser(app);
-    messagesCreate.mockRejectedValue(new Error('Anthropic API is down'));
+    generateContent.mockRejectedValue(new Error('Gemini API is down'));
 
     const res = await send(token, 'Are you there?').expect(200);
 
@@ -107,7 +108,7 @@ describe('tools', () => {
     const { token } = await createUser(app);
     await createMenuItem({ name: 'Oat Flat White', price: 180, description: 'Silky' });
 
-    messagesCreate
+    generateContent
       .mockResolvedValueOnce(toolReply('search_menu', { query: 'flat white' }))
       .mockResolvedValueOnce(textReply('Our Oat Flat White is Rs.180.'));
 
@@ -129,7 +130,7 @@ describe('tools', () => {
     // Another customer's order, which must never appear in my lookup.
     await placeOrder(app, theirs, [{ menuItem: item._id, quantity: 3 }]);
 
-    messagesCreate
+    generateContent
       .mockResolvedValueOnce(toolReply('get_my_recent_orders', {}))
       .mockResolvedValueOnce(textReply('You have not ordered anything yet.'));
 
@@ -148,7 +149,7 @@ describe('tools', () => {
 
     // Even if the model is manipulated into passing another id, the tool
     // ignores it — the user id comes from the verified session.
-    messagesCreate
+    generateContent
       .mockResolvedValueOnce(
         toolReply('get_my_recent_orders', { userId: victim._id.toString(), limit: 10 })
       )
@@ -164,7 +165,7 @@ describe('tools', () => {
   it("reports the customer's own loyalty status", async () => {
     const { token } = await createUser(app);
 
-    messagesCreate
+    generateContent
       .mockResolvedValueOnce(toolReply('get_my_loyalty_status', {}))
       .mockResolvedValueOnce(textReply('You are on Bronze with 0 points.'));
 
@@ -177,7 +178,7 @@ describe('tools', () => {
   it('reports a failed lookup as a tool error rather than failing the request', async () => {
     const { token } = await createUser(app);
 
-    messagesCreate
+    generateContent
       .mockResolvedValueOnce(toolReply('no_such_tool', {}))
       .mockResolvedValueOnce(textReply('Let me get someone to help.'));
 
@@ -191,11 +192,11 @@ describe('tools', () => {
     const { token } = await createUser(app);
 
     // A model that never stops asking for tools must not loop forever.
-    messagesCreate.mockResolvedValue(toolReply('search_menu', { query: 'x' }));
+    generateContent.mockResolvedValue(toolReply('search_menu', { query: 'x' }));
 
     const res = await send(token, 'Loop please').expect(200);
 
-    expect(messagesCreate.mock.calls.length).toBeLessThanOrEqual(5);
+    expect(generateContent.mock.calls.length).toBeLessThanOrEqual(5);
     expect(res.body.messages[1].message).toMatch(/staff member/i);
     expect(res.body.escalated).toBe(true);
   });
@@ -204,7 +205,7 @@ describe('tools', () => {
 describe('escalation', () => {
   it('hands over to staff when the assistant cannot answer', async () => {
     const { token } = await createUser(app);
-    messagesCreate.mockResolvedValue({ stop_reason: 'end_turn', content: [] });
+    generateContent.mockResolvedValue({ text: '', functionCalls: [] });
 
     const res = await send(token, 'Refund my order please').expect(200);
 
@@ -216,7 +217,7 @@ describe('escalation', () => {
     const { token } = await createUser(app);
     const { token: adminToken } = await createAdmin(app);
 
-    messagesCreate.mockResolvedValue(textReply('Happy to help!'));
+    generateContent.mockResolvedValue(textReply('Happy to help!'));
     await send(token, 'Hello').expect(200);
 
     const chat = expectFound(await Chat.findOne({}));
@@ -226,12 +227,12 @@ describe('escalation', () => {
       .send({ message: 'Hi, this is Priya from the cafe.' })
       .expect(200);
 
-    messagesCreate.mockClear();
+    generateContent.mockClear();
 
     // A customer reply after staff joined must not be answered by the AI.
     const res = await send(token, 'Thanks Priya!').expect(200);
 
-    expect(messagesCreate).not.toHaveBeenCalled();
+    expect(generateContent).not.toHaveBeenCalled();
     expect(res.body.messages.at(-1).sender).toBe('user');
   });
 });

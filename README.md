@@ -41,7 +41,7 @@ unconfigured ([ADR 0002](docs/adr/0002-optional-infrastructure.md)).
 | Data | MongoDB + Mongoose; aggregation pipelines for analytics |
 | Cache & jobs | Redis + BullMQ, both optional |
 | Payments | Razorpay with signature-verified webhooks |
-| AI | Claude with session-scoped tools |
+| AI | Google Gemini with session-scoped tools |
 | Frontend | React 18 + Vite, installable PWA |
 
 The background worker runs as a separate process, so a burst of email retries
