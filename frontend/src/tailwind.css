@@ -1,0 +1,13 @@
+/**
+ * Tailwind's utilities.
+ *
+ * Imported after every legacy stylesheet on purpose. Utilities and the old
+ * class rules often have the same specificity, and in a tie the later rule
+ * wins — so a component that has been migrated gets its utilities honoured
+ * even while the stylesheet it used to depend on is still loaded.
+ *
+ * `@tailwind base` is absent: Preflight is disabled in tailwind.config.js
+ * while the two systems coexist. See the comment there.
+ */
+@tailwind components;
+@tailwind utilities;
