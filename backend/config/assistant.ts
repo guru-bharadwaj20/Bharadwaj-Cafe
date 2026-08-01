@@ -118,7 +118,9 @@ const runTool = async (
 ): Promise<string> => {
   switch (name) {
     case 'search_menu': {
-      const query: Record<string, unknown> = { available: true };
+      // Drinks only — this tool answers "what can I order?", and merchandise
+      // is not on the menu.
+      const query: Record<string, unknown> = { available: true, kind: 'drink' };
 
       if (typeof input.query === 'string' && input.query.trim()) {
         const term = input.query.trim();
