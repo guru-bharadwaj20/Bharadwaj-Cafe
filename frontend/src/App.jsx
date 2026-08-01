@@ -31,7 +31,6 @@ import './merchandise.css';
 import './about.css';
 import './order.css';
 import './contact.css';
-import './footer.css';
 import './auth.css';
 import './landing.css';
 import './profile.css';
