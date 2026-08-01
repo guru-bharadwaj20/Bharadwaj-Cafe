@@ -234,7 +234,7 @@ jobs:
       # Build only — no push. This exists to catch a broken Dockerfile at PR
       # time rather than at deploy time.
       - name: Build API image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           push: false
@@ -244,7 +244,7 @@ jobs:
           cache-to: type=gha,scope=api,mode=max
 
       - name: Build web image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           push: false
