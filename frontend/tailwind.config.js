@@ -28,6 +28,13 @@ export default {
         secondary: 'var(--secondary-color)',
         'light-pink': 'var(--light-pink-color)',
         'medium-gray': 'var(--medium-gray-color)',
+
+        // The footer runs on its own cool-slate palette, deliberately outside
+        // the warm brand ramp. Named here because they repeat; the true
+        // one-offs stay as arbitrary values at the point of use.
+        'footer-slate': '#232f3e',
+        'footer-deep': '#131921',
+        'footer-link': '#ddd',
       },
 
       fontFamily: {
@@ -62,6 +69,18 @@ export default {
 
       maxWidth: {
         site: 'var(--site-max-width)',
+      },
+
+      keyframes: {
+        heartbeat: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '25%': { transform: 'scale(1.2)' },
+          '50%': { transform: 'scale(1)' },
+        },
+      },
+
+      animation: {
+        heartbeat: 'heartbeat 1.5s ease-in-out infinite',
       },
     },
   },
