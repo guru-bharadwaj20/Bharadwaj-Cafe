@@ -192,11 +192,25 @@ const capture = async () => {
         }
         await page.evaluate(() => window.scrollTo(0, 0));
 
-        // Two sources of false positives, both measured: capturing before the
-        // webfonts land shifts every glyph a pixel or two and lights up the
-        // whole page, and a field left focused blinks a caret that lands in
-        // roughly half the screenshots.
+        // Everything below exists because a run disagreed with itself. Each
+        // was measured by capturing twice without touching the code.
         await page.evaluate(() => document.fonts.ready);
+        // Late images shift the layout under the screenshot; the header logo
+        // was ghosting the whole mobile cart page this way.
+        await page.evaluate(() =>
+          Promise.all(
+            Array.from(document.images)
+              .filter((img) => !img.complete)
+              .map((img) => new Promise((res) => (img.onload = img.onerror = res)))
+          )
+        );
+        // The chat launcher pulses forever, so it lands at a different point
+        // in its cycle each run. Freezing animations makes the comparison
+        // meaningful; both sides are frozen identically.
+        await page.addStyleTag({
+          content:
+            '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}',
+        });
         await page.evaluate(() => document.activeElement?.blur());
         await page.waitForTimeout(150);
         await page.screenshot({
