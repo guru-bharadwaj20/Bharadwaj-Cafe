@@ -5,6 +5,47 @@ import { api } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { resolveImage } from '../assets/cloudinary';
 import { loadingContainer, spinner } from '../styles/feedback';
+import {
+  adminPage,
+  adminHeader,
+  adminHeaderTitle,
+  adminHeaderText,
+  adminTabs,
+  adminTabIdle,
+  adminTabActive,
+  adminTabIcon,
+  statsGrid,
+  statCard,
+  statIcon,
+  statValue,
+  statLabel,
+  adminSection,
+  adminSectionTitle,
+  sectionHeader,
+  tableWrap,
+  table,
+  th,
+  td,
+  tr,
+  statusBadge,
+  statusSelect,
+  roleBadge,
+  verified,
+  notVerified,
+  btnView,
+  btnEdit,
+  btnDelete,
+  btnAdd,
+  menuGrid,
+  menuCard,
+  menuCardImage,
+  menuCardContent,
+  menuCardTitle,
+  menuCardText,
+  menuCardFooter,
+  menuCardPrice,
+  menuActions,
+} from '../styles/admin';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -35,7 +76,7 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="admin-dashboard">
+      <div className={adminPage}>
         <div className={loadingContainer}>
           <div className={spinner}></div>
           <p>Loading dashboard...</p>
@@ -45,110 +86,110 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="admin-dashboard" id="main-content">
-      <div className="admin-header">
-        <h1>
+    <div className={adminPage} id="main-content">
+      <div className={adminHeader}>
+        <h1 className={adminHeaderTitle}>
           <i className="fas fa-dashboard" aria-hidden="true"></i> Admin Dashboard
         </h1>
-        <p>Welcome back, {user?.name}!</p>
+        <p className={adminHeaderText}>Welcome back, {user?.name}!</p>
       </div>
 
-      <div className="admin-tabs">
+      <div className={adminTabs}>
         <button
-          className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+          className={activeTab === 'overview' ? adminTabActive : adminTabIdle}
           onClick={() => setActiveTab('overview')}
         >
-          <i className="fas fa-chart-line" aria-hidden="true"></i> Overview
+          <i className={`fas fa-chart-line ${adminTabIcon}`} aria-hidden="true"></i> Overview
         </button>
         <button
-          className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
+          className={activeTab === 'orders' ? adminTabActive : adminTabIdle}
           onClick={() => setActiveTab('orders')}
         >
-          <i className="fas fa-shopping-bag" aria-hidden="true"></i> Orders
+          <i className={`fas fa-shopping-bag ${adminTabIcon}`} aria-hidden="true"></i> Orders
         </button>
         <button
-          className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+          className={activeTab === 'users' ? adminTabActive : adminTabIdle}
           onClick={() => setActiveTab('users')}
         >
-          <i className="fas fa-users" aria-hidden="true"></i> Users
+          <i className={`fas fa-users ${adminTabIcon}`} aria-hidden="true"></i> Users
         </button>
         <button
-          className={`tab-btn ${activeTab === 'menu' ? 'active' : ''}`}
+          className={activeTab === 'menu' ? adminTabActive : adminTabIdle}
           onClick={() => setActiveTab('menu')}
         >
-          <i className="fas fa-utensils" aria-hidden="true"></i> Menu
+          <i className={`fas fa-utensils ${adminTabIcon}`} aria-hidden="true"></i> Menu
         </button>
       </div>
 
       {activeTab === 'overview' && stats && (
-        <div className="overview-section">
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon revenue">
+        <div className={adminSection}>
+          <div className={statsGrid}>
+            <div className={statCard}>
+              <div className={statIcon.revenue}>
                 <i className="fas fa-dollar-sign" aria-hidden="true"></i>
               </div>
-              <div className="stat-info">
-                <h3>₹{stats.totalRevenue?.toLocaleString()}</h3>
-                <p>Total Revenue</p>
+              <div>
+                <h3 className={statValue}>₹{stats.totalRevenue?.toLocaleString()}</h3>
+                <p className={statLabel}>Total Revenue</p>
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-icon orders">
+            <div className={statCard}>
+              <div className={statIcon.orders}>
                 <i className="fas fa-shopping-cart" aria-hidden="true"></i>
               </div>
-              <div className="stat-info">
-                <h3>{stats.totalOrders}</h3>
-                <p>Total Orders</p>
+              <div>
+                <h3 className={statValue}>{stats.totalOrders}</h3>
+                <p className={statLabel}>Total Orders</p>
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-icon users">
+            <div className={statCard}>
+              <div className={statIcon.users}>
                 <i className="fas fa-user" aria-hidden="true"></i>
               </div>
-              <div className="stat-info">
-                <h3>{stats.totalUsers}</h3>
-                <p>Total Users</p>
+              <div>
+                <h3 className={statValue}>{stats.totalUsers}</h3>
+                <p className={statLabel}>Total Users</p>
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-icon menu">
+            <div className={statCard}>
+              <div className={statIcon.menu}>
                 <i className="fas fa-coffee" aria-hidden="true"></i>
               </div>
-              <div className="stat-info">
-                <h3>{stats.totalMenuItems}</h3>
-                <p>Menu Items</p>
+              <div>
+                <h3 className={statValue}>{stats.totalMenuItems}</h3>
+                <p className={statLabel}>Menu Items</p>
               </div>
             </div>
           </div>
 
-          <div className="recent-orders">
-            <h2>Recent Orders</h2>
-            <div className="orders-table">
-              <table>
+          <div>
+            <h2 className={adminSectionTitle}>Recent Orders</h2>
+            <div className={tableWrap}>
+              <table className={table}>
                 <thead>
                   <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Items</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
+                    <th className={th}>Order ID</th>
+                    <th className={th}>Customer</th>
+                    <th className={th}>Items</th>
+                    <th className={th}>Amount</th>
+                    <th className={th}>Status</th>
+                    <th className={th}>Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {stats.recentOrders?.map((order) => (
-                    <tr key={order._id}>
-                      <td>#{order._id.slice(-6)}</td>
-                      <td>{order.user?.name || order.customerName}</td>
-                      <td>{order.items.length}</td>
-                      <td>₹{order.totalAmount}</td>
-                      <td>
-                        <span className={`status-badge ${order.status}`}>{order.status}</span>
+                    <tr key={order._id} className={tr}>
+                      <td className={td}>#{order._id.slice(-6)}</td>
+                      <td className={td}>{order.user?.name || order.customerName}</td>
+                      <td className={td}>{order.items.length}</td>
+                      <td className={td}>₹{order.totalAmount}</td>
+                      <td className={td}>
+                        <span className={statusBadge(order.status)}>{order.status}</span>
                       </td>
-                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td className={td}>{new Date(order.createdAt).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -196,42 +237,42 @@ const OrdersManagement = ({ token }) => {
     }
   };
 
-  if (loading) return <div className="loading">Loading orders...</div>;
+  if (loading) return <div className={loadingContainer}>Loading orders...</div>;
 
   return (
-    <div className="management-section">
+    <div className={adminSection}>
       <h2>
         <i className="fas fa-shopping-bag" aria-hidden="true"></i> All Orders ({orders.length})
       </h2>
-      <div className="orders-table">
-        <table>
+      <div className={tableWrap}>
+        <table className={table}>
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Email</th>
-              <th>Items</th>
-              <th>Amount</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Action</th>
+              <th className={th}>Order ID</th>
+              <th className={th}>Customer</th>
+              <th className={th}>Email</th>
+              <th className={th}>Items</th>
+              <th className={th}>Amount</th>
+              <th className={th}>Type</th>
+              <th className={th}>Status</th>
+              <th className={th}>Date</th>
+              <th className={th}>Action</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order._id}>
-                <td>#{order._id.slice(-6)}</td>
-                <td>{order.user?.name || order.customerName}</td>
-                <td>{order.customerEmail}</td>
-                <td>{order.items.length}</td>
-                <td>₹{order.totalAmount}</td>
-                <td>{order.orderType}</td>
-                <td>
+              <tr key={order._id} className={tr}>
+                <td className={td}>#{order._id.slice(-6)}</td>
+                <td className={td}>{order.user?.name || order.customerName}</td>
+                <td className={td}>{order.customerEmail}</td>
+                <td className={td}>{order.items.length}</td>
+                <td className={td}>₹{order.totalAmount}</td>
+                <td className={td}>{order.orderType}</td>
+                <td className={td}>
                   <select
                     value={order.status}
                     onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-                    className={`status-select ${order.status}`}
+                    className={statusSelect(order.status)}
                   >
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
@@ -241,9 +282,9 @@ const OrdersManagement = ({ token }) => {
                     <option value="cancelled">Cancelled</option>
                   </select>
                 </td>
-                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <button className="btn-view" onClick={() => toast.info(`Order ${order._id}`)}>
+                <td className={td}>{new Date(order.createdAt).toLocaleDateString()}</td>
+                <td className={td}>
+                  <button className={btnView} onClick={() => toast.info(`Order ${order._id}`)}>
                     <i className="fas fa-eye" aria-hidden="true"></i>
                   </button>
                 </td>
@@ -289,48 +330,48 @@ const UsersManagement = ({ token }) => {
     }
   };
 
-  if (loading) return <div className="loading">Loading users...</div>;
+  if (loading) return <div className={loadingContainer}>Loading users...</div>;
 
   return (
-    <div className="management-section">
+    <div className={adminSection}>
       <h2>
         <i className="fas fa-users" aria-hidden="true"></i> All Users ({users.length})
       </h2>
-      <div className="orders-table">
-        <table>
+      <div className={tableWrap}>
+        <table className={table}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Verified</th>
-              <th>Registered</th>
-              <th>Action</th>
+              <th className={th}>Name</th>
+              <th className={th}>Email</th>
+              <th className={th}>Role</th>
+              <th className={th}>Verified</th>
+              <th className={th}>Registered</th>
+              <th className={th}>Action</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
-                  <span className={`role-badge ${user.role}`}>{user.role}</span>
+              <tr key={user._id} className={tr}>
+                <td className={td}>{user.name}</td>
+                <td className={td}>{user.email}</td>
+                <td className={td}>
+                  <span className={roleBadge(user.role)}>{user.role}</span>
                 </td>
-                <td>
+                <td className={td}>
                   {user.isVerified ? (
-                    <span className="verified">
+                    <span className={verified}>
                       <i className="fas fa-check-circle" aria-hidden="true"></i> Yes
                     </span>
                   ) : (
-                    <span className="not-verified">
+                    <span className={notVerified}>
                       <i className="fas fa-times-circle" aria-hidden="true"></i> No
                     </span>
                   )}
                 </td>
-                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                <td>
+                <td className={td}>{new Date(user.createdAt).toLocaleDateString()}</td>
+                <td className={td}>
                   {user.role !== 'admin' && (
-                    <button className="btn-delete" onClick={() => deleteUser(user._id)}>
+                    <button className={btnDelete} onClick={() => deleteUser(user._id)}>
                       <i className="fas fa-trash" aria-hidden="true"></i>
                     </button>
                   )}
@@ -377,32 +418,32 @@ const MenuManagement = ({ token }) => {
     }
   };
 
-  if (loading) return <div className="loading">Loading menu...</div>;
+  if (loading) return <div className={loadingContainer}>Loading menu...</div>;
 
   return (
-    <div className="management-section">
-      <div className="section-header">
+    <div className={adminSection}>
+      <div className={sectionHeader}>
         <h2>
           <i className="fas fa-utensils" aria-hidden="true"></i> Menu Items ({menuItems.length})
         </h2>
-        <button className="btn-add">
+        <button className={btnAdd}>
           <i className="fas fa-plus" aria-hidden="true"></i> Add New Item
         </button>
       </div>
-      <div className="menu-grid">
+      <div className={menuGrid}>
         {menuItems.map((item) => (
-          <div key={item._id} className="menu-card">
-            <img src={resolveImage(item.image)} alt={item.name} />
-            <div className="menu-card-content">
-              <h3>{item.name}</h3>
-              <p>{item.description}</p>
-              <div className="menu-card-footer">
-                <span className="price">₹{item.price}</span>
-                <div className="menu-actions">
-                  <button className="btn-edit">
+          <div key={item._id} className={menuCard}>
+            <img src={resolveImage(item.image)} alt={item.name} className={menuCardImage} />
+            <div className={menuCardContent}>
+              <h3 className={menuCardTitle}>{item.name}</h3>
+              <p className={menuCardText}>{item.description}</p>
+              <div className={menuCardFooter}>
+                <span className={menuCardPrice}>₹{item.price}</span>
+                <div className={menuActions}>
+                  <button className={btnEdit}>
                     <i className="fas fa-edit" aria-hidden="true"></i>
                   </button>
-                  <button className="btn-delete" onClick={() => deleteMenuItem(item._id)}>
+                  <button className={btnDelete} onClick={() => deleteMenuItem(item._id)}>
                     <i className="fas fa-trash" aria-hidden="true"></i>
                   </button>
                 </div>
