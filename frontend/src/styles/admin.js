@@ -20,6 +20,8 @@
  *    className, so `${base} font-bold` is not a reliable override.
  */
 
+import { statusColours } from './status';
+
 /* ------------------------------------------------------------- page shell -- */
 
 export const adminPage = 'min-h-screen bg-dark pb-[50px] pt-10';
@@ -108,26 +110,18 @@ export const tr = '[&:hover>td]:bg-[#3a3a3a] [&:last-child>td]:border-b-0';
 /* ----------------------------------------------------------------- badges -- */
 
 /**
- * Order status, as six fixed pairs.
+ * Order status.
  *
  * The pill and the `<select>` used the same six colours through two separate
- * rule blocks in admin.css; one map serves both, so they cannot drift apart.
+ * rule blocks in admin.css, and order-history.css held a third copy. They all
+ * come from styles/status.js now, so they cannot drift apart.
  */
-const STATUS = {
-  pending: 'bg-[#ffa500] text-black',
-  confirmed: 'bg-[#2196f3] text-white',
-  preparing: 'bg-[#9c27b0] text-white',
-  ready: 'bg-[#ff9800] text-black',
-  delivered: 'bg-[#4caf50] text-white',
-  cancelled: 'bg-[#f44336] text-white',
-};
-
 const badgeBox = 'rounded-[20px] px-3 py-[5px] text-[12px] font-bold';
 
-export const statusBadge = (status) => `${badgeBox} uppercase ${STATUS[status] ?? ''}`;
+export const statusBadge = (status) => `${badgeBox} uppercase ${statusColours(status)}`;
 
 export const statusSelect = (status) =>
-  `cursor-pointer rounded-[5px] border-none px-3 py-2 font-bold ${STATUS[status] ?? ''}`;
+  `cursor-pointer rounded-[5px] border-none px-3 py-2 font-bold ${statusColours(status)}`;
 
 export const roleBadge = (role) =>
   `${badgeBox} ${role === 'admin' ? 'bg-secondary text-black' : 'bg-[#2196f3] text-white'}`;

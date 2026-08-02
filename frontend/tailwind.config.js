@@ -114,10 +114,21 @@ export default {
           '25%': { transform: 'scale(1.2)' },
           '50%': { transform: 'scale(1)' },
         },
+
+        // The glow on the current step of the order tracker. Named rather than
+        // reusing Tailwind's own `pulse`, which fades opacity; this one holds
+        // the step fully visible and breathes the shadow around it. It came
+        // from order-history.css, where it was also called `pulse` — which
+        // would have quietly shadowed the built-in one for the whole site.
+        'track-pulse': {
+          '0%, 100%': { boxShadow: '0 0 15px rgba(243, 150, 28, 0.5)' },
+          '50%': { boxShadow: '0 0 25px rgba(243, 150, 28, 0.8)' },
+        },
       },
 
       animation: {
         heartbeat: 'heartbeat 1.5s ease-in-out infinite',
+        'track-pulse': 'track-pulse 2s infinite',
       },
     },
   },
