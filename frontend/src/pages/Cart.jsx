@@ -6,6 +6,7 @@ import { openCheckout } from '../utils/razorpay';
 import { useNavigate } from 'react-router-dom';
 import { btnPrimary, btnSecondary } from '../styles/buttons';
 import { useToast } from '../context/ToastContext';
+import { resolveImage } from '../assets/cloudinary';
 
 const Cart = () => {
   const { toast } = useToast();
@@ -283,7 +284,7 @@ const Cart = () => {
             <div className="cart-items">
               {cartItems.map((item) => (
                 <div key={item._id} className="cart-item">
-                  <img src={item.image} alt={item.name} />
+                  <img src={resolveImage(item.image)} alt={item.name} />
                   <div className="cart-item-details">
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>

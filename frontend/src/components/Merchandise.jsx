@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { useCart } from '../context/CartContext';
+import { resolveImage } from '../assets/cloudinary';
 import {
   addToCartBtn,
   addToCartBtnAdded,
@@ -86,7 +87,7 @@ const Merchandise = () => {
             {items.map((item) => (
               <li className={shopCard} key={item._id}>
                 <div className={merchBadge}>{categoryLabel(item.category)}</div>
-                <img src={item.image} alt={item.name} className={shopImage} />
+                <img src={resolveImage(item.image)} alt={item.name} className={shopImage} />
                 <div className={shopDetails}>
                   <h3 className={shopName}>{item.name}</h3>
                   <p className={shopText}>{item.description}</p>

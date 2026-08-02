@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
+import { IMG } from '../assets/cloudinary';
 
 /**
  * Staff sign-in, separate from the customer form.
@@ -53,7 +54,7 @@ const AdminLogin = () => {
           {/* On a maroon chip: the logo is cream lettering drawn for dark
               backgrounds and all but disappears against the white card. */}
           <span className="mx-auto mb-4 inline-flex items-center justify-center rounded-[14px] bg-primary px-5 py-3">
-            <img src="/img/logo.png" alt="Bharadwaj's Cafe" className="h-[48px] w-auto" />
+            <img src={IMG.logo} alt="Bharadwaj's Cafe" className="h-[48px] w-auto" />
           </span>
           <span className="inline-block rounded-s bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-secondary">
             Staff Access

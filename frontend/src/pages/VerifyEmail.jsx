@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
 import { btnPrimary, btnSecondary } from '../styles/buttons';
+import { IMG } from '../assets/cloudinary';
 
 const VerifyEmail = () => {
   const { token } = useParams();
@@ -37,7 +38,7 @@ const VerifyEmail = () => {
         <div className="auth-right center-form">
           <div className="auth-form-container">
             <div className="auth-header">
-              <img src="/img/logo.png" alt="Bharadwaj's Cafe" className="auth-logo" />
+              <img src={IMG.logo} alt="Bharadwaj's Cafe" className="auth-logo" />
               <h1>Email Verification</h1>
             </div>
 

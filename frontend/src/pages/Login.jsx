@@ -4,6 +4,7 @@ import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
+import { IMG } from '../assets/cloudinary';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ const Login = () => {
     <div className="auth-page" id="main-content">
       <div className="auth-container">
         <div className="auth-left">
-          <img src="img/coffee-hero-section.png" alt="Coffee" className="auth-image" />
+          <img src={IMG.coffeeHeroSection} alt="Coffee" className="auth-image" />
           <div className="auth-overlay">
             <h2>Welcome Back!</h2>
             <p>Login to explore our amazing coffee collection</p>
@@ -85,7 +86,7 @@ const Login = () => {
         <div className="auth-right">
           <div className="auth-form-container">
             <div className="auth-header">
-              <img src="img/logo.png" alt="Bharadwaj's Cafe" className="auth-logo" />
+              <img src={IMG.logo} alt="Bharadwaj's Cafe" className="auth-logo" />
               <h1>Login to Your Account</h1>
               <p>Enter your credentials to continue</p>
             </div>

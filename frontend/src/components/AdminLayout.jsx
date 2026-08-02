@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { textOnGlass, textOnGlassSoft, hoverOnGlass, borderOnGlass } from '../styles/glass';
+import { IMG } from '../assets/cloudinary';
 
 /**
  * Shell for the admin console.
@@ -30,7 +31,7 @@ const AdminLayout = ({ children }) => {
       <header className="sticky top-0 z-20 border-x-0 border-b border-t-0 border-solid border-[rgba(255,255,255,0.12)] bg-primary">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-4 px-5 py-3">
           <div className="flex items-center gap-3">
-            <img src="/img/logo.png" alt="" className="h-10 w-auto" />
+            <img src={IMG.logo} alt="" className="h-10 w-auto" />
             <span className="rounded-s bg-secondary px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">
               Admin Console
             </span>

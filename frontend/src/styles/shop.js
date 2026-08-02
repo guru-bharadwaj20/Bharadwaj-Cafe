@@ -94,7 +94,8 @@ export const merchBadge = [
 
 export const dietaryTags = 'my-2 flex flex-wrap gap-[5px]';
 
-export const dietaryTag = 'rounded-[12px] bg-secondary px-2 py-[3px] text-[11px] font-bold text-black';
+export const dietaryTag =
+  'rounded-[12px] bg-secondary px-2 py-[3px] text-[11px] font-bold text-black';
 
 export const ratingRow = 'my-[5px] flex items-center gap-[5px] text-s text-secondary';
 

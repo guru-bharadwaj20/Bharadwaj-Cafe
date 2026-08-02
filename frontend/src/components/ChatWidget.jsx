@@ -156,7 +156,10 @@ const ChatWidget = () => {
               the current sentence before announcing a new reply. */}
           <div
             className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-[15px]"
-            role="log" aria-live="polite" aria-label="Conversation">
+            role="log"
+            aria-live="polite"
+            aria-label="Conversation"
+          >
             {/* An empty conversation used to be a grey void with nothing in it
                 and no hint of what this box was for. */}
             {!chat?.messages?.length && (
@@ -192,9 +195,7 @@ const ChatWidget = () => {
                 {msg.sender === 'admin' && (
                   <span className={`${badgeBase} bg-[#1baf7a] text-white`}>Staff</span>
                 )}
-                <div
-                  className={`mb-[5px] ${msg.sender === 'assistant' ? assistantContent : ''}`}
-                >
+                <div className={`mb-[5px] ${msg.sender === 'assistant' ? assistantContent : ''}`}>
                   {msg.message}
                 </div>
                 <span className="text-[10px] opacity-70">
