@@ -302,7 +302,13 @@
   width: 100%;
   padding: 12px;
   font: inherit;
-  color: inherit;
+  /*
+   * Stated, not inherited. Nothing on the ancestor chain sets a colour, so
+   * `color: inherit` resolved to the UA default black and put near-black text
+   * on this panel's 6%-white field. The sibling `.payment-form input` rule has
+   * always asked for #fff; these two were simply missed.
+   */
+  color: var(--white-color);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
