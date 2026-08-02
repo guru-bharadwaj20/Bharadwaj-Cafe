@@ -1,7 +1,7 @@
 .admin-dashboard {
   min-height: 100vh;
   background: var(--dark-color);
-  padding: 100px 0 50px;
+  padding: 40px 0 50px;
 }
 
 .admin-header {

@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Header from './components/Header';
+import AdminRoute from './components/AdminRoute';
+import AdminLayout from './components/AdminLayout';
+import FloatingNav from './components/FloatingNav';
+import CartToast from './components/CartToast';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import AdminLogin from './pages/AdminLogin';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -39,17 +42,31 @@ import './analytics.css';
 // Last, so utilities beat same-specificity legacy rules during the migration.
 import './tailwind.css';
 
+/**
+ * A signed-in customer page: the content, the floating nav and the cart toast.
+ *
+ * Every route used to spell this out, which is how the admin links ended up in
+ * the customer navbar. Staff pages now go through `Admin` below instead, and
+ * share nothing with this shell.
+ *
+ * `pb-[120px]` keeps the last of the page clear of the docked nav.
+ */
+const Customer = ({ children }) => (
+  <ProtectedRoute>
+    <div className="pb-[120px]">{children}</div>
+    <FloatingNav />
+    <CartToast />
+  </ProtectedRoute>
+);
+
+/** A staff page: role-gated, inside the console shell. */
+const Admin = ({ children }) => (
+  <AdminRoute>
+    <AdminLayout>{children}</AdminLayout>
+  </AdminRoute>
+);
+
 function App() {
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-
-  useEffect(() => {
-    if (showMobileMenu) {
-      document.body.classList.add('show-mobile-menu');
-    } else {
-      document.body.classList.remove('show-mobile-menu');
-    }
-  }, [showMobileMenu]);
-
   return (
     <AuthProvider>
       <CartProvider>
@@ -60,180 +77,141 @@ function App() {
             Skip to main content
           </a>
           <Routes>
-            {/* Public Routes */}
+            {/* Public */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
-            {/* Protected Routes */}
+            {/* Customer */}
             <Route
               path="/home"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <Home />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <Home />
+                </Customer>
               }
             />
             <Route
               path="/about"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <AboutPage />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <AboutPage />
+                </Customer>
               }
             />
             <Route
               path="/order"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <OrderPage />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <OrderPage />
+                </Customer>
               }
             />
             <Route
               path="/contact"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <ContactPage />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <ContactPage />
+                </Customer>
               }
             />
             <Route
               path="/merchandise"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <MerchandisePage />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <MerchandisePage />
+                </Customer>
               }
             />
             <Route
               path="/cart"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <Cart />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <Cart />
+                </Customer>
               }
             />
             <Route
               path="/profile"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <Profile />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <Profile />
+                </Customer>
               }
             />
             <Route
               path="/order-history"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <OrderHistory />
-                  </>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <AdminDashboard />
-                  </>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <AnalyticsPage />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <OrderHistory />
+                </Customer>
               }
             />
             <Route
               path="/wishlist"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <WishlistPage />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <WishlistPage />
+                </Customer>
               }
             />
             <Route
               path="/addresses"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <AddressManagement />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <AddressManagement />
+                </Customer>
               }
             />
             <Route
               path="/loyalty"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <LoyaltyPage />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <LoyaltyPage />
+                </Customer>
               }
             />
             <Route
               path="/blog"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <BlogList />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <BlogList />
+                </Customer>
               }
             />
             <Route
               path="/blog/:slug"
               element={
-                <ProtectedRoute>
-                  <>
-                    <Header showMobileMenu={showMobileMenu} setShowMobileMenu={setShowMobileMenu} />
-                    <BlogDetail />
-                  </>
-                </ProtectedRoute>
+                <Customer>
+                  <BlogDetail />
+                </Customer>
               }
             />
+
+            {/* Staff */}
+            <Route
+              path="/admin"
+              element={
+                <Admin>
+                  <AdminDashboard />
+                </Admin>
+              }
+            />
+            <Route
+              path="/admin/analytics"
+              element={
+                <Admin>
+                  <AnalyticsPage />
+                </Admin>
+              }
+            />
+            {/* Analytics used to sit at the top level, alongside the customer
+                pages. Kept as a redirect so old links and bookmarks survive. */}
+            <Route path="/analytics" element={<Navigate to="/admin/analytics" replace />} />
 
             {/* Redirect any unknown routes to landing */}
             <Route path="*" element={<Navigate to="/" replace />} />

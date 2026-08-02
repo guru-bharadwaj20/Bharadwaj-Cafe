@@ -70,7 +70,10 @@ const Contact = () => {
   };
 
   return (
-    <section className="bg-light-pink py-[100px] max-[900px]:py-20" id="contact">
+    <section
+      className="bg-light-pink pb-[100px] pt-10 max-[900px]:pb-20 max-[900px]:pt-8"
+      id="contact"
+    >
       <h2 className="section-title">Contact Us</h2>
       <div className="mx-auto flex max-w-site items-start justify-between gap-12 px-5 max-[900px]:flex-col-reverse max-[900px]:items-center max-[900px]:gap-[30px]">
         <ul className="flex-1">

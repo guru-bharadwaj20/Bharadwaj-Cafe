@@ -3,7 +3,7 @@
 .profile-page {
   min-height: 100vh;
   background: var(--light-pink-color);
-  padding: 100px 0 50px;
+  padding: 40px 0 50px;
 }
 
 .profile-container {

@@ -13,7 +13,13 @@
  */
 
 /** Full-height dark section wrapper. */
-export const shopSection = 'min-h-screen bg-dark py-[100px] text-white max-[900px]:py-20';
+/*
+ * Asymmetric on purpose. The 100px top used to be clearance for the fixed
+ * header; with the nav docked at the bottom there is nothing up there to clear,
+ * and a 100px gap above the title just read as a rendering fault.
+ */
+export const shopSection =
+  'min-h-screen bg-dark pb-[100px] pt-10 text-white max-[900px]:pb-20 max-[900px]:pt-8';
 
 /**
  * The dark-section title. Carries its own amber underline through `after:`,
