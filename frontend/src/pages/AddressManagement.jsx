@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 
 /**
  * Saved delivery addresses.
@@ -50,6 +51,7 @@ const cardAction =
   'flex flex-1 cursor-pointer items-center justify-center gap-[5px] rounded-[5px] border-none p-2 text-[12px] text-white transition-all duration-300 hover:-translate-y-0.5';
 
 const AddressManagement = () => {
+  const { toast } = useToast();
   const { user } = useAuth();
   const [addresses, setAddresses] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -91,9 +93,9 @@ const AddressManagement = () => {
 
       resetForm();
       fetchAddresses();
-      alert(editingAddress ? 'Address updated!' : 'Address added!');
+      toast.success(editingAddress ? 'Address updated!' : 'Address added!');
     } catch {
-      alert('Failed to save address');
+      toast.error('Failed to save address');
     }
   };
 
@@ -109,7 +111,7 @@ const AddressManagement = () => {
       await api.deleteAddress(id, user?.token);
       fetchAddresses();
     } catch {
-      alert('Failed to delete address');
+      toast.error('Failed to delete address');
     }
   };
 
@@ -118,7 +120,7 @@ const AddressManagement = () => {
       await api.setDefaultAddress(id, user?.token);
       fetchAddresses();
     } catch {
-      alert('Failed to set default address');
+      toast.error('Failed to set default address');
     }
   };
 

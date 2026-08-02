@@ -5,8 +5,10 @@ import { api } from '../utils/api';
 import { openCheckout } from '../utils/razorpay';
 import { useNavigate } from 'react-router-dom';
 import { btnPrimary, btnSecondary } from '../styles/buttons';
+import { useToast } from '../context/ToastContext';
 
 const Cart = () => {
+  const { toast } = useToast();
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ const Cart = () => {
 
   const handleProceedToPay = () => {
     if (cartItems.length === 0) {
-      alert('Your cart is empty!');
+      toast.error('Your cart is empty!');
       return;
     }
     setOrderError('');

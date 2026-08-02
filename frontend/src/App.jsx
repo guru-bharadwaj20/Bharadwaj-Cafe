@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { ToastProvider } from './context/ToastContext';
+import ToastHost from './components/ToastHost';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './components/AdminLayout';
@@ -83,160 +85,165 @@ const Admin = ({ children }) => (
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <Router>
-          {/* First focusable element on every page. Visually hidden until
+      <ToastProvider>
+        <CartProvider>
+          <Router>
+            {/* First focusable element on every page. Visually hidden until
               focused, so keyboard users can jump straight to the content. */}
-          <a href="#main-content" className="skip-link">
-            Skip to main content
-          </a>
-          <Routes>
-            {/* Public */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/verify-email/:token" element={<VerifyEmail />} />
+            <a href="#main-content" className="skip-link">
+              Skip to main content
+            </a>
+            <Routes>
+              {/* Public */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
-            {/* Customer */}
-            <Route
-              path="/home"
-              element={
-                <Customer>
-                  <Home />
-                </Customer>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <Customer>
-                  <AboutPage />
-                </Customer>
-              }
-            />
-            <Route
-              path="/order"
-              element={
-                <Customer>
-                  <OrderPage />
-                </Customer>
-              }
-            />
-            {/* Contact lives on the About page now. Kept as a route rather
+              {/* Customer */}
+              <Route
+                path="/home"
+                element={
+                  <Customer>
+                    <Home />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <Customer>
+                    <AboutPage />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/order"
+                element={
+                  <Customer>
+                    <OrderPage />
+                  </Customer>
+                }
+              />
+              {/* Contact lives on the About page now. Kept as a route rather
                 than a redirect so the footer's "Contact Us" link and any
                 bookmarks land somewhere useful instead of 404-ing to the
                 landing page. */}
-            <Route
-              path="/contact"
-              element={
-                <Customer>
-                  <AboutPage />
-                </Customer>
-              }
-            />
-            <Route
-              path="/merchandise"
-              element={
-                <Customer>
-                  <MerchandisePage />
-                </Customer>
-              }
-            />
-            <Route
-              path="/cart"
-              element={
-                <Customer>
-                  <Cart />
-                </Customer>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <Customer>
-                  <Profile />
-                </Customer>
-              }
-            />
-            <Route
-              path="/order-history"
-              element={
-                <Customer>
-                  <OrderHistory />
-                </Customer>
-              }
-            />
-            <Route
-              path="/wishlist"
-              element={
-                <Customer>
-                  <WishlistPage />
-                </Customer>
-              }
-            />
-            <Route
-              path="/addresses"
-              element={
-                <Customer>
-                  <AddressManagement />
-                </Customer>
-              }
-            />
-            <Route
-              path="/loyalty"
-              element={
-                <Customer>
-                  <LoyaltyPage />
-                </Customer>
-              }
-            />
-            <Route
-              path="/blog"
-              element={
-                <Customer>
-                  <BlogList />
-                </Customer>
-              }
-            />
-            <Route
-              path="/blog/:slug"
-              element={
-                <Customer>
-                  <BlogDetail />
-                </Customer>
-              }
-            />
+              <Route
+                path="/contact"
+                element={
+                  <Customer>
+                    <AboutPage />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/merchandise"
+                element={
+                  <Customer>
+                    <MerchandisePage />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/cart"
+                element={
+                  <Customer>
+                    <Cart />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <Customer>
+                    <Profile />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/order-history"
+                element={
+                  <Customer>
+                    <OrderHistory />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/wishlist"
+                element={
+                  <Customer>
+                    <WishlistPage />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/addresses"
+                element={
+                  <Customer>
+                    <AddressManagement />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/loyalty"
+                element={
+                  <Customer>
+                    <LoyaltyPage />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/blog"
+                element={
+                  <Customer>
+                    <BlogList />
+                  </Customer>
+                }
+              />
+              <Route
+                path="/blog/:slug"
+                element={
+                  <Customer>
+                    <BlogDetail />
+                  </Customer>
+                }
+              />
 
-            {/* Staff */}
-            <Route
-              path="/admin"
-              element={
-                <Admin>
-                  <AdminDashboard />
-                </Admin>
-              }
-            />
-            <Route
-              path="/admin/analytics"
-              element={
-                <Admin>
-                  <AnalyticsPage />
-                </Admin>
-              }
-            />
-            {/* Analytics used to sit at the top level, alongside the customer
+              {/* Staff */}
+              <Route
+                path="/admin"
+                element={
+                  <Admin>
+                    <AdminDashboard />
+                  </Admin>
+                }
+              />
+              <Route
+                path="/admin/analytics"
+                element={
+                  <Admin>
+                    <AnalyticsPage />
+                  </Admin>
+                }
+              />
+              {/* Analytics used to sit at the top level, alongside the customer
                 pages. Kept as a redirect so old links and bookmarks survive. */}
-            <Route path="/analytics" element={<Navigate to="/admin/analytics" replace />} />
+              <Route path="/analytics" element={<Navigate to="/admin/analytics" replace />} />
 
-            {/* Redirect any unknown routes to landing */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-          <ChatWidget />
-        </Router>
-      </CartProvider>
+              {/* Redirect any unknown routes to landing */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+            <ChatWidget />
+            {/* Outside Routes: notifications outlive the page that raised
+                them, and the admin console needs them too. */}
+            <ToastHost />
+          </Router>
+        </CartProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }

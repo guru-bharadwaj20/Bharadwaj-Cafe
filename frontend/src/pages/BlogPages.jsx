@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 
 export const BlogList = () => {
   const navigate = useNavigate();
@@ -84,6 +85,7 @@ export const BlogList = () => {
 };
 
 export const BlogDetail = () => {
+  const { toast } = useToast();
   const { slug } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -107,7 +109,7 @@ export const BlogDetail = () => {
 
   const handleLike = async () => {
     if (!user) {
-      alert('Please login to like');
+      toast.error('Please login to like');
       return;
     }
     try {

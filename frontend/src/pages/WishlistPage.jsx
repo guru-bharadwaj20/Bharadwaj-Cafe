@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 
 /**
  * Wishlist.
@@ -19,6 +20,7 @@ const amberLift =
 const gutter = 'mx-auto max-w-[1200px] px-5';
 
 const WishlistPage = () => {
+  const { toast } = useToast();
   const { user } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
@@ -45,13 +47,14 @@ const WishlistPage = () => {
       const data = await api.removeFromWishlist(itemId, user?.token);
       setWishlist(data);
     } catch {
-      alert('Failed to remove item');
+      toast.error('Failed to remove item');
     }
   };
 
+  // No notification here: `CartToast` already confirms every add, with the
+  // item's name and a way to the basket. A second one would double up.
   const handleAddToCart = (item) => {
     addToCart(item);
-    alert('Added to cart!');
   };
 
   const handleClearWishlist = async () => {
@@ -60,7 +63,7 @@ const WishlistPage = () => {
       await api.clearWishlist(user?.token);
       fetchWishlist();
     } catch {
-      alert('Failed to clear wishlist');
+      toast.error('Failed to clear wishlist');
     }
   };
 

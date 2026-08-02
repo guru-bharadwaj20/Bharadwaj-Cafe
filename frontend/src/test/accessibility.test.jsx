@@ -18,6 +18,7 @@ import Register from '../pages/Register';
 import Cart from '../pages/Cart';
 import { AuthProvider } from '../context/AuthContext';
 import { CartProvider } from '../context/CartContext';
+import { ToastProvider } from '../context/ToastContext';
 import { api } from '../utils/api';
 
 expect.extend(matchers);
@@ -40,7 +41,9 @@ const renderPage = (ui) =>
   render(
     <MemoryRouter>
       <AuthProvider>
-        <CartProvider>{ui}</CartProvider>
+        <ToastProvider>
+          <CartProvider>{ui}</CartProvider>
+        </ToastProvider>
       </AuthProvider>
     </MemoryRouter>
   );
