@@ -23,8 +23,15 @@ const messageVariant = {
 const badgeBase =
   'mb-1 inline-block rounded-[10px] px-2 py-[2px] text-[0.7rem] font-semibold tracking-[0.02em]';
 
+/*
+ * The three zeroed sides are load-bearing. `border-solid` sets the style on all
+ * four sides, and with Preflight off the other three fall back to the CSS
+ * initial width of `medium` (3px) rather than 0 -- a one-sided border utility
+ * quietly draws a box. These zeroes touch different properties from
+ * `border-l-[3px]`, so no stylesheet-order tie-break is involved.
+ */
 const assistantContent =
-  'border-l-[3px] border-solid border-secondary bg-[rgba(243,150,28,0.12)]';
+  'border-y-0 border-l-[3px] border-r-0 border-solid border-secondary bg-[rgba(243,150,28,0.12)]';
 
 const ChatWidget = () => {
   const { user } = useAuth();
@@ -152,7 +159,7 @@ const ChatWidget = () => {
           </div>
 
           <form
-            className="flex gap-2.5 border-t border-solid border-[#3a3a3a] p-[15px]"
+            className="flex gap-2.5 border-x-0 border-b-0 border-t border-solid border-[#3a3a3a] p-[15px]"
             onSubmit={handleSendMessage}
           >
             <input
