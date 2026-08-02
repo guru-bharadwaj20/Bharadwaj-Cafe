@@ -72,12 +72,31 @@ const sampleCart = async () => {
   return menu.slice(0, 2).map((item, i) => ({ ...item, quantity: i + 1 }));
 };
 
+/**
+ * Puts a couple of items on the wishlist.
+ *
+ * Without this the wishlist route only ever renders its empty state, so the
+ * card, the remove button and the add-to-cart button go unchecked — which is
+ * most of the page.
+ */
+const seedWishlist = async (token) => {
+  const menu = await (await fetch(`${API}/menu`)).json();
+  for (const item of menu.slice(0, 2)) {
+    await fetch(`${API}/wishlist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ menuItemId: item._id }),
+    });
+  }
+};
+
 const capture = async () => {
   const outDir = dir(MODE);
   ensure(outDir);
 
   const session = await makeSession();
   const cart = await sampleCart();
+  await seedWishlist(session.token);
   const browser = await chromium.launch();
   const problems = [];
 
