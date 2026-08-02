@@ -205,6 +205,17 @@ If a diff shows uniform ghosting across the entire page rather than a change
 in one region, suspect the harness before the CSS â€” and confirm it by
 capturing twice without touching the code.
 
+- **Smooth scrolling.** The about page scrolls to its contact anchor on mount,
+  and a full-page screenshot draws fixed elements — the nav, the cart bubble —
+  wherever the viewport is mid-glide: ~1% desktop, ~3% mobile, on a page nothing
+  had touched. The page now honours `prefers-reduced-motion` and the harness
+  emulates it.
+- **Rate limiting.** Several captures back to back trip the API limiter. A 429
+  used to sail through: every protected route bounced to /login, every
+  screenshot came out at viewport height, and the diff reported that most of
+  the site had changed size. It now refuses to capture without a session,
+  because a comparison built on a failed login is fabricated, not degraded.
+
 **Still outstanding:** `cart-checkout-mobile` reports around 0.9% between runs
 of identical code. It is confined to the mobile header â€” the logo ghosts
 vertically and the launcher still shows â€” while the page body is clean. Do not
