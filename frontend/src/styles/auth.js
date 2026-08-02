@@ -13,8 +13,7 @@
 
 /* ---------------------------------------------------------------- layout -- */
 
-export const authPage =
-  'flex min-h-screen items-center justify-center bg-primary p-5 to-600:p-2.5';
+export const authPage = 'flex min-h-screen items-center justify-center bg-primary p-5 to-600:p-2.5';
 
 export const authContainer =
   'flex w-full max-w-[1100px] flex-row overflow-hidden rounded-[20px] bg-white shadow-[0_10px_40px_rgba(0,0,0,0.3)] to-900:flex-col';
@@ -23,8 +22,7 @@ export const authContainer =
 export const authLeft =
   'relative flex min-h-[600px] flex-1 items-center justify-center bg-primary p-10 to-900:min-h-[250px] to-900:px-5 to-900:py-[30px]';
 
-export const authImage =
-  'absolute h-auto w-full max-w-[400px] opacity-30 to-900:max-w-[250px]';
+export const authImage = 'absolute h-auto w-full max-w-[400px] opacity-30 to-900:max-w-[250px]';
 
 export const authOverlay = 'relative z-[1] text-center text-white';
 export const authOverlayTitle = 'mb-[15px] font-script text-xxl text-secondary';
@@ -115,8 +113,7 @@ export const forgotLink =
 export const authDivider =
   "relative my-[25px] text-center before:absolute before:inset-x-0 before:top-1/2 before:h-px before:bg-[#e0e0e0] before:content-['']";
 
-export const authDividerLabel =
-  'relative bg-white px-[15px] text-s font-medium text-[#999]';
+export const authDividerLabel = 'relative bg-white px-[15px] text-s font-medium text-[#999]';
 
 /** Google renders its own button in here and its branding terms forbid
     restyling it, so this only centres what Google draws. */

@@ -35,7 +35,6 @@ import './landing.css';
 import './profile.css';
 import './admin.css';
 import './order-history.css';
-import './analytics.css';
 
 // Last, so utilities beat same-specificity legacy rules during the migration.
 import './tailwind.css';
