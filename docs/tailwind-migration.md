@@ -14,7 +14,7 @@ Both servers must be running. Every route is captured at 1440px and 390px,
 signed in, with a seeded cart. Expect a permanent ~0.2% delta on the profile
 pages: each run registers a throwaway account, so the name on screen differs.
 
-## Done
+## Done — 8 of 20 stylesheets
 
 | Stylesheet | Replaced by | Diff |
 | --- | --- | --- |
@@ -23,6 +23,18 @@ pages: each run registers a throwaway account, so the name on screen differs.
 | `contact.css` | `components/Contact.jsx` | 0.00% |
 | `order.css`, `merchandise.css` | `styles/shop.js` | 0.00% |
 | `search-filters.css` | `components/SearchFilters.jsx` | 0.00% |
+| `chat.css` | `components/ChatWidget.jsx` | structural |
+| `wishlist.css` | `pages/WishlistPage.jsx` | 0.00% |
+| button rules in `cart.css` + `landing.css` | `styles/buttons.js` | 0.00% |
+
+The chat widget is checked structurally rather than by pixels: its panel holds
+a live Gemini reply, so the text differs between runs. Panel size, message
+border-radius, alignment and colours were compared instead.
+
+## Remaining — 12 stylesheets
+
+`address` · `admin` · `analytics` · `auth` · `blog` · `cart` · `landing` ·
+`loyalty` · `order-history` · `profile` · `reviews` · `style`
 
 ## Traps
 
@@ -53,38 +65,41 @@ before deleting it.
 a `:root` block inside a 900px media query that retuned the type scale for the
 entire site. It now lives in `style.css` next to the tokens it overrides.
 
-## The blocker for the rest
+## Shared classes across stylesheets
 
-Several class names are defined in more than one stylesheet, so which
-definition applies depends on the import order in `App.jsx` rather than on
-anything local:
+Some class names are declared in more than one stylesheet, so which declaration
+applies depends on the import order in `App.jsx` rather than on anything local.
+This is the main reason files cannot simply be taken one at a time.
 
-- `.btn-primary` / `.btn-secondary` — declared in both `cart.css` and
-  `landing.css`, used by `Cart`, `Landing`, `OrderHistory` and `VerifyEmail`.
-  `landing.css` is imported later and wins, so the cart's buttons currently
-  take their text colour and hover from the landing page: maroon text rather
-  than the black `cart.css` asks for, and a white hover rather than a darker
-  amber. The padding still comes from `cart.css`. This is a live inconsistency,
-  not only a migration hazard.
+`.btn-primary` / `.btn-secondary` were the worst case and are **now resolved**:
+declared in both `cart.css` and `landing.css`, with `landing.css` imported
+later and therefore winning the colours and hover on all four consuming pages,
+while `cart.css` kept the box. The cart's secondary button rendered as
+landing's transparent white-bordered button rather than the solid grey
+`cart.css` asks for. Both now live in `styles/buttons.js`.
+
+Still outstanding:
+
 - `.form-group` — declared in `address.css`, `auth.css`, `cart.css`,
-  `profile.css` and `reviews.css`.
-- `.section-title` — declared in `style.css` and overridden per section.
-
-The consequence is that these files cannot be migrated one at a time. Deleting
-`cart.css` alone hands its buttons to `landing.css`, which changes them.
+  `profile.css` and `reviews.css`. Lift this next, the same way, before
+  migrating any of those five files individually.
+- `.loading-container` / `.spinner` — used by the wishlist and account pages,
+  declared elsewhere.
+- `.section-title` — declared in `style.css` and overridden per section. The
+  dark-section variant already lives in `styles/shop.js`.
 
 ## Suggested order for the rest
 
-1. **Shared primitives first.** Lift `.btn-primary`, `.btn-secondary` and
-   `.form-group` into `styles/` modules and update all callers in one commit.
-   Decide deliberately which of the competing definitions is correct — that is
-   a design decision, not a mechanical one, and it is where the site stops
-   looking inconsistent.
-2. Self-contained pages, cheapest first: `chat.css`, `wishlist.css`,
-   `blog.css`, `loyalty.css`, `reviews.css`, `address.css`.
+1. **Lift `.form-group`** into a `styles/forms.js` module and update all five
+   callers in one commit, exactly as was done for the buttons. Encode what the
+   browser currently resolves to, then change it deliberately afterwards if
+   the resolution is not what you want.
+2. Self-contained pages, cheapest first: `blog.css`, `loyalty.css`,
+   `reviews.css`, `address.css`.
 3. `auth.css` — one stylesheet, five components (`Login`, `Register`,
    `ForgotPassword`, `ResetPassword`, `VerifyEmail`).
-4. `cart.css` and `landing.css` together, after step 1.
+4. `cart.css` and `landing.css` — their button rules are already gone, so
+   what remains is page-local.
 5. `profile.css`, `order-history.css`, `admin.css`, `analytics.css`.
 6. `style.css` last: it holds the tokens, the reset and the header, so it is
    what everything else is measured against.
@@ -92,3 +107,11 @@ The consequence is that these files cannot be migrated one at a time. Deleting
    `tailwind.config.js`, drop the `border-solid` pairings, and re-run the diff.
    Expect real changes here — Preflight resets `img`, headings and lists — so
    this is its own commit with its own review.
+
+## Verifying a page that needs data
+
+The harness signs in, seeds a cart and seeds a wishlist. A route that renders
+only an empty state proves almost nothing, so before migrating a data-driven
+page, check that the captured screenshot actually shows the component. Extend
+`seedWishlist` in `scripts/ui-snapshot.mjs` for the equivalent on other pages —
+orders, addresses, reviews and loyalty all currently capture empty.
