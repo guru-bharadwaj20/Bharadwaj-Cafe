@@ -8,6 +8,11 @@ import { api } from '../utils/api';
  * The file never touches our server: we only issue a short-lived signature
  * that fixes the folder, formats and transformation. That keeps large uploads
  * off the API entirely.
+ *
+ * Migrated from admin.css. Note that nothing imports this component -- the
+ * admin dashboard's "Add New Item" button has no handler yet -- so these
+ * styles are a faithful port of what the stylesheet said rather than something
+ * a screenshot has confirmed.
  */
 const ImageUpload = ({ kind = 'menu', value, onChange, label = 'Image' }) => {
   const { user } = useAuth();
@@ -59,12 +64,16 @@ const ImageUpload = ({ kind = 'menu', value, onChange, label = 'Image' }) => {
   const inputId = `image-upload-${kind}`;
 
   return (
-    <div className="image-upload">
+    <div className="my-3 flex flex-col gap-2">
       <label htmlFor={inputId}>{label}</label>
 
       {value && (
-        <div className="image-upload-preview">
-          <img src={value} alt="Selected upload preview" />
+        <div className="flex items-start gap-3">
+          <img
+            src={value}
+            alt="Selected upload preview"
+            className="h-[120px] w-[120px] rounded-md border border-solid border-[rgba(255,255,255,0.2)] object-cover"
+          />
           <button type="button" onClick={() => onChange('')} disabled={uploading}>
             Remove
           </button>
@@ -80,9 +89,9 @@ const ImageUpload = ({ kind = 'menu', value, onChange, label = 'Image' }) => {
         disabled={uploading}
       />
 
-      {uploading && <p className="image-upload-status">Uploading…</p>}
+      {uploading && <p className="text-s text-secondary">Uploading…</p>}
       {error && (
-        <p className="image-upload-error" role="alert">
+        <p className="text-s text-[#f44336]" role="alert">
           {error}
         </p>
       )}
