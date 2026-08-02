@@ -54,6 +54,24 @@ export default {
         'footer-slate': '#232f3e',
         'footer-deep': '#131921',
         'footer-link': '#ddd',
+
+        // The analytics dashboard runs on its own palette, and unlike the rest
+        // of the site it has a validated dark mode: two hand-checked sets of
+        // values rather than an automatic inversion. The variables are declared
+        // per mode on `.viz-root` in src/tailwind.css; these names are how a
+        // utility reaches them. Prefixed `viz-` because `--text-primary` and
+        // the brand's `--primary-color` are unrelated colours that would
+        // otherwise both want to be called `primary`.
+        'viz-surface-1': 'var(--surface-1)',
+        'viz-surface-2': 'var(--surface-2)',
+        'viz-text': 'var(--text-primary)',
+        'viz-text-soft': 'var(--text-secondary)',
+        'viz-text-muted': 'var(--text-muted)',
+        'viz-series-1': 'var(--series-1)',
+        'viz-series-2': 'var(--series-2)',
+        'viz-good': 'var(--status-good)',
+        'viz-critical': 'var(--status-critical)',
+        'viz-grid': 'var(--grid)',
       },
 
       fontFamily: {

@@ -39,5 +39,62 @@
   --tw-scale-y: 1;
 }
 
+/*
+ * The analytics dashboard's palette, which came here when analytics.css was
+ * migrated.
+ *
+ * These are custom-property *declarations*, not styling: three blocks that set
+ * the same ten variables to different values depending on the mode. No utility
+ * can express that, because there is no element being styled -- which is the
+ * same reason the site's own tokens live in a stylesheet rather than in a
+ * component. `bg-viz-surface-1` and the rest read these; the mapping is in
+ * tailwind.config.js.
+ *
+ * Dark is a separate validated palette, not an inversion of the light one:
+ *   light  series-1 #2a78d6 on surface #fcfcfb
+ *   dark   series-1 #3987e5 on surface #1a1a19
+ * Both sets pass the lightness band, chroma floor, CVD separation,
+ * normal-vision floor and 3:1 contrast checks.
+ */
+.viz-root {
+  color-scheme: light;
+  --surface-1: #fcfcfb;
+  --surface-2: #f0efec;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #75746f;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --status-good: #0ca30c;
+  --status-critical: #d03b3b;
+  --grid: rgba(11, 11, 11, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --surface-2: #262625;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #97968d;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --grid: rgba(255, 255, 255, 0.1);
+  }
+}
+
+:root[data-theme='dark'] .viz-root {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --surface-2: #262625;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #97968d;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --grid: rgba(255, 255, 255, 0.1);
+}
+
 @tailwind components;
 @tailwind utilities;

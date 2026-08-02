@@ -38,14 +38,12 @@ const summaryTotal =
 const cartItem =
   'flex items-center gap-5 rounded-[10px] bg-[#2a2a2a] p-5 to-768:flex-col to-768:items-start';
 
-const cartItemImage =
-  'h-[120px] w-[120px] rounded-s object-cover to-768:h-[200px] to-768:w-full';
+const cartItemImage = 'h-[120px] w-[120px] rounded-s object-cover to-768:h-[200px] to-768:w-full';
 
 const cartItemActions =
   'flex flex-col items-end gap-[15px] to-768:w-full to-768:flex-row to-768:items-center to-768:justify-between';
 
-const quantityControls =
-  'flex items-center gap-2.5 rounded-[25px] bg-[#1a1a1a] px-[15px] py-[5px]';
+const quantityControls = 'flex items-center gap-2.5 rounded-[25px] bg-[#1a1a1a] px-[15px] py-[5px]';
 
 const quantityButton =
   'cursor-pointer border-none bg-transparent px-2.5 py-[5px] text-[16px] text-secondary transition-transform duration-200 hover:scale-[1.2]';
@@ -391,7 +389,10 @@ const Cart = () => {
         <h2 className="section-title text-white">Your Cart</h2>
         {cartItems.length === 0 ? (
           <div className="px-5 py-[60px] text-center text-white">
-            <i className="fas fa-shopping-cart mb-5 text-[80px] text-secondary" aria-hidden="true"></i>
+            <i
+              className="fas fa-shopping-cart mb-5 text-[80px] text-secondary"
+              aria-hidden="true"
+            ></i>
             <p className="mb-[30px] text-[20px]">Your cart is empty</p>
             <button className={btnPrimary} onClick={() => navigate('/order')}>
               Browse Menu

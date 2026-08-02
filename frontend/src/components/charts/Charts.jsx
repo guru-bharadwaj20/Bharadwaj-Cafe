@@ -10,9 +10,27 @@ import { useState, useId } from 'react';
  * Conventions that apply to all of them:
  * - One value axis. Never two — a second scale makes a chart unreadable.
  * - Colour comes from CSS custom properties, so light and dark are two
- *   validated palettes rather than an automatic flip.
+ *   validated palettes rather than an automatic flip. The `viz-*` colours are
+ *   those properties; they are declared per mode on `.viz-root` in tailwind.css.
  * - Every chart has a table fallback, so identity never rests on colour.
  */
+
+/*
+ * Migrated from analytics.css.
+ *
+ * `font-variant-numeric` is written as an arbitrary declaration rather than
+ * with the `tabular-nums` utility. That utility composes its value out of five
+ * `--tw-numeric-*` variables which Preflight is what normally declares, and
+ * Preflight is off here — the same way every transform utility was silently
+ * dead until src/tailwind.css declared the transform variables by hand. A raw
+ * declaration has no variables to be missing.
+ */
+const tabular = '[font-variant-numeric:tabular-nums]';
+
+const chart = 'mx-0 mb-7 mt-0 rounded-s bg-viz-surface-2 p-5';
+const chartTitle = 'mb-3 text-n font-semibold text-viz-text';
+const chartTooltip = 'mt-2.5 min-h-[1.2em] text-[0.85rem] text-viz-text-soft';
+const axisLabel = 'fill-viz-text-muted text-[11px]';
 
 const formatCurrency = (value) => `₹${Math.round(value).toLocaleString('en-IN')}`;
 
@@ -21,12 +39,12 @@ export const StatTile = ({ label, value, delta, format = 'number' }) => {
   const display = format === 'currency' ? formatCurrency(value) : value.toLocaleString('en-IN');
 
   return (
-    <div className="stat-tile">
-      <span className="stat-tile-label">{label}</span>
-      <strong className="stat-tile-value">{display}</strong>
+    <div className="flex flex-col gap-1 rounded-s bg-viz-surface-2 p-4">
+      <span className="text-[0.85rem] text-viz-text-soft">{label}</span>
+      <strong className={`text-[1.6rem] font-bold text-viz-text ${tabular}`}>{display}</strong>
       {delta !== null && delta !== undefined && (
-        <span className={`stat-tile-delta ${delta >= 0 ? 'up' : 'down'}`}>
-          {/* An arrow plus a sign, so the direction is not colour-only. */}
+        // The arrow in the markup carries direction; colour only reinforces it.
+        <span className={`text-[0.8rem] ${delta >= 0 ? 'text-viz-good' : 'text-viz-critical'}`}>
           {delta >= 0 ? '▲' : '▼'} {Math.abs(delta)}% vs previous period
         </span>
       )}
@@ -68,14 +86,14 @@ export const RevenueChart = ({ series }) => {
   }));
 
   return (
-    <figure className="chart">
-      <figcaption className="chart-title">Revenue per day</figcaption>
+    <figure className={chart}>
+      <figcaption className={chartTitle}>Revenue per day</figcaption>
 
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label={`Revenue per day over the last ${series.length} days`}
-        className="chart-svg"
+        className="h-auto w-full overflow-visible"
         onMouseLeave={() => setHover(null)}
       >
         <defs>
@@ -85,6 +103,7 @@ export const RevenueChart = ({ series }) => {
           </linearGradient>
         </defs>
 
+        {/* Grid and axes stay recessive so the data reads first. */}
         {ticks.map((tick) => (
           <g key={tick.value}>
             <line
@@ -92,16 +111,25 @@ export const RevenueChart = ({ series }) => {
               x2={width - padding.right}
               y1={tick.y}
               y2={tick.y}
-              className="chart-grid"
+              className="stroke-viz-grid stroke-1"
             />
-            <text x={padding.left - 8} y={tick.y + 4} textAnchor="end" className="chart-axis-label">
+            <text x={padding.left - 8} y={tick.y + 4} textAnchor="end" className={axisLabel}>
               {formatCurrency(tick.value)}
             </text>
           </g>
         ))}
 
         <polygon points={area} fill={`url(#${gradientId})`} />
-        <polyline points={line} className="chart-line" />
+        {/* `strokeLinejoin` and `strokeLinecap` are SVG presentation attributes
+            rather than utilities: there is no core utility for either, and an
+            attribute is plainer than two arbitrary declarations. Nothing in the
+            cascade competes with them now that analytics.css is gone. */}
+        <polyline
+          points={line}
+          className="fill-none stroke-viz-series-1 stroke-2"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
 
         {/* Invisible full-height bands give a hit target far larger than the
             2px line, so hovering does not require pixel precision. */}
@@ -124,26 +152,28 @@ export const RevenueChart = ({ series }) => {
               x2={x(hover.index)}
               y1={padding.top}
               y2={padding.top + plotHeight}
-              className="chart-crosshair"
+              className="stroke-viz-text-muted stroke-1"
+              strokeDasharray="3 3"
             />
-            <circle cx={x(hover.index)} cy={y(hover.revenue)} r="5" className="chart-marker" />
+            {/* A surface ring keeps the marker legible over the area fill. */}
+            <circle
+              cx={x(hover.index)}
+              cy={y(hover.revenue)}
+              r="5"
+              className="fill-viz-series-1 stroke-viz-surface-2 stroke-2"
+            />
           </g>
         )}
 
-        <text x={padding.left} y={height - 8} className="chart-axis-label" textAnchor="start">
+        <text x={padding.left} y={height - 8} className={axisLabel} textAnchor="start">
           {series[0]?.date}
         </text>
-        <text
-          x={width - padding.right}
-          y={height - 8}
-          className="chart-axis-label"
-          textAnchor="end"
-        >
+        <text x={width - padding.right} y={height - 8} className={axisLabel} textAnchor="end">
           {series.at(-1)?.date}
         </text>
       </svg>
 
-      <div className="chart-tooltip" role="status">
+      <div className={chartTooltip} role="status">
         {hover
           ? `${hover.date}: ${formatCurrency(hover.revenue)} from ${hover.orders} order${
               hover.orders === 1 ? '' : 's'
@@ -158,9 +188,9 @@ export const RevenueChart = ({ series }) => {
 export const TopItemsChart = ({ items }) => {
   if (items.length === 0) {
     return (
-      <figure className="chart">
-        <figcaption className="chart-title">Best sellers</figcaption>
-        <p className="chart-empty">No sales in this period yet.</p>
+      <figure className={chart}>
+        <figcaption className={chartTitle}>Best sellers</figcaption>
+        <p className="text-s text-viz-text-muted">No sales in this period yet.</p>
       </figure>
     );
   }
@@ -168,18 +198,27 @@ export const TopItemsChart = ({ items }) => {
   const max = Math.max(...items.map((item) => item.unitsSold));
 
   return (
-    <figure className="chart">
-      <figcaption className="chart-title">Best sellers by units</figcaption>
+    <figure className={chart}>
+      <figcaption className={chartTitle}>Best sellers by units</figcaption>
 
-      <ul className="bar-list">
+      <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
         {items.map((item) => (
-          <li key={item.menuItem}>
-            <span className="bar-label">{item.name}</span>
-            <span className="bar-track">
-              <span className="bar-fill" style={{ width: `${(item.unitsSold / max) * 100}%` }} />
+          <li
+            key={item.menuItem}
+            className="grid grid-cols-[minmax(90px,1fr)_2fr_auto] items-center gap-2.5 text-[0.85rem] to-600:grid-cols-1 to-600:gap-1"
+          >
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap text-viz-text-soft">
+              {item.name}
+            </span>
+            <span className="block h-[14px] overflow-hidden rounded-[4px] bg-viz-grid">
+              {/* Rounded data-end only, anchored to the baseline. */}
+              <span
+                className="block h-full rounded-r-[4px] bg-viz-series-1"
+                style={{ width: `${(item.unitsSold / max) * 100}%` }}
+              />
             </span>
             {/* Direct labels, so the value never depends on reading the axis. */}
-            <span className="bar-value">
+            <span className={`whitespace-nowrap text-viz-text-muted ${tabular}`}>
               {item.unitsSold} · {formatCurrency(item.revenue)}
             </span>
           </li>
@@ -200,27 +239,39 @@ export const PeakHoursChart = ({ hours }) => {
   );
 
   return (
-    <figure className="chart">
-      <figcaption className="chart-title">Orders by hour of day</figcaption>
+    <figure className={chart}>
+      <figcaption className={chartTitle}>Orders by hour of day</figcaption>
 
-      <div className="column-chart" onMouseLeave={() => setHover(null)}>
+      {/* gap-0.5 is the 2px surface gap between adjacent marks. */}
+      <div
+        className="flex h-[160px] items-end gap-0.5 pb-[18px]"
+        onMouseLeave={() => setHover(null)}
+      >
         {hours.map((point) => (
           <div
             key={point.hour}
-            className="column"
+            className="relative flex h-full flex-1 items-end"
             onMouseEnter={() => setHover(point)}
             title={`${point.hour}:00 — ${point.orders} orders`}
           >
             <div
-              className={`column-fill ${point.hour === busiest.hour && point.orders > 0 ? 'peak' : ''}`}
+              className={`min-h-[2px] w-full rounded-t-[4px] ${
+                point.hour === busiest.hour && point.orders > 0
+                  ? 'bg-viz-series-2'
+                  : 'bg-viz-series-1'
+              }`}
               style={{ height: `${(point.orders / max) * 100}%` }}
             />
-            {point.hour % 6 === 0 && <span className="column-label">{point.hour}:00</span>}
+            {point.hour % 6 === 0 && (
+              <span className="absolute -bottom-[18px] left-0 whitespace-nowrap text-[10px] text-viz-text-muted">
+                {point.hour}:00
+              </span>
+            )}
           </div>
         ))}
       </div>
 
-      <div className="chart-tooltip" role="status">
+      <div className={chartTooltip} role="status">
         {hover
           ? `${String(hover.hour).padStart(2, '0')}:00 — ${hover.orders} order${
               hover.orders === 1 ? '' : 's'
