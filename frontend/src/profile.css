@@ -238,15 +238,13 @@
   display: flex;
   gap: 15px;
   /*
-   * 20px, not the 30px this file used to ask for. `.form-actions` is declared
-   * bare in reviews.css too, and address.css declared it as well until it was
-   * migrated; address.css is imported later than this file, so its 20px is
-   * what these buttons have always rendered with. Stated here so removing
-   * address.css does not silently move the profile page. The gap is likewise
-   * overridden to 10px by reviews.css, which is imported later still.
-   *
-   * Whether 20px/10px is the wanted spacing is a separate, deliberate
-   * decision -- see docs/tailwind-migration.md.
+   * `.form-actions` used to be declared bare in three files at once —
+   * here, address.css and reviews.css — so what these buttons rendered with
+   * was decided by import order rather than by this file: 20px from
+   * address.css and a 10px gap from reviews.css, neither of which profile
+   * asked for. Both of those stylesheets are now gone, so this declaration is
+   * finally the only one, and the 15px gap above is honoured for the first
+   * time. The 20px is kept deliberately; 30px was never what shipped.
    */
   margin-top: 20px;
 }
