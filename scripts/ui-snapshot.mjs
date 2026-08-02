@@ -115,6 +115,41 @@ const seedWishlist = async (token) => {
   }
 };
 
+/**
+ * Saves two addresses, one of them the default.
+ *
+ * Without this the addresses route only renders "No saved addresses yet", so
+ * the card, the default badge, the label row and the three action buttons —
+ * most of the page — go unchecked. Two of them, because the default badge and
+ * the "Set as Default" button only appear when there is something to compare.
+ */
+const seedAddresses = async (token) => {
+  const base = {
+    fullName: 'UI Snapshot',
+    phone: '9876543210',
+    city: 'Bengaluru',
+    state: 'Karnataka',
+    pincode: '560001',
+  };
+  const addresses = [
+    {
+      ...base,
+      label: 'Home',
+      addressLine1: '581, MG Road',
+      landmark: 'Opposite the park',
+      isDefault: true,
+    },
+    { ...base, label: 'Work', addressLine1: '12 Residency Road', addressLine2: 'Level 4' },
+  ];
+  for (const address of addresses) {
+    await fetch(`${API}/addresses`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(address),
+    });
+  }
+};
+
 const capture = async () => {
   const outDir = dir(MODE);
   ensure(outDir);
@@ -122,6 +157,7 @@ const capture = async () => {
   const session = await makeSession();
   const cart = await sampleCart();
   await seedWishlist(session.token);
+  await seedAddresses(session.token);
   const browser = await chromium.launch();
   const problems = [];
 
