@@ -5,6 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './components/AdminLayout';
 import FloatingNav from './components/FloatingNav';
+import CartBubble from './components/CartBubble';
+import Footer from './components/Footer';
 import CartToast from './components/CartToast';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -16,7 +18,6 @@ import VerifyEmail from './pages/VerifyEmail';
 import Home from './pages/Home';
 import AboutPage from './pages/AboutPage';
 import OrderPage from './pages/OrderPage';
-import ContactPage from './pages/ContactPage';
 import Profile from './pages/Profile';
 import Cart from './pages/Cart';
 import MerchandisePage from './pages/MerchandisePage';
@@ -49,15 +50,24 @@ import './tailwind.css';
  * the customer navbar. Staff pages now go through `Admin` below instead, and
  * share nothing with this shell.
  *
- * `pb-[120px]` keeps the last of the page clear of the docked nav. It carries
- * `bg-dark` because a bare padding box is transparent, and the body underneath
- * is white -- without it every dark page ended in a white band. The light
- * About and Contact pages close with the dark footer, so the strip is
- * unnoticeable there.
+ * The footer is rendered here rather than per page. Only three of the fourteen
+ * customer pages had one, so the rest simply stopped -- the cart ended on bare
+ * #1a1a1a, the wishlist on #252525 -- which is what made the bottom of the site
+ * look unfinished and different everywhere you went. One footer for all of them
+ * means one ending.
+ *
+ * `pb-[120px]` then keeps that footer clear of the docked nav, in
+ * `bg-footer-deep` so the spacer is the same colour the footer ends on. A bare
+ * padding box is transparent, and showed the white body through.
  */
 const Customer = ({ children }) => (
   <ProtectedRoute>
-    <div className="min-h-screen bg-dark pb-[120px]">{children}</div>
+    <div className="flex min-h-screen flex-col bg-dark">
+      <div className="flex-1">{children}</div>
+      <Footer />
+      <div className="bg-footer-deep pb-[120px]" aria-hidden="true"></div>
+    </div>
+    <CartBubble />
     <FloatingNav />
     <CartToast />
   </ProtectedRoute>
@@ -115,11 +125,15 @@ function App() {
                 </Customer>
               }
             />
+            {/* Contact lives on the About page now. Kept as a route rather
+                than a redirect so the footer's "Contact Us" link and any
+                bookmarks land somewhere useful instead of 404-ing to the
+                landing page. */}
             <Route
               path="/contact"
               element={
                 <Customer>
-                  <ContactPage />
+                  <AboutPage />
                 </Customer>
               }
             />

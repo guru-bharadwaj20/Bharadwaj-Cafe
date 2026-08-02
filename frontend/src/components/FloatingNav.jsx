@@ -25,8 +25,8 @@ import {
  *
  * - The cart button lived in `.mobile-icons`, which style.css sets to
  *   `display: none` above 768px. On a desktop there was no way to reach the
- *   cart at all short of typing the URL. It is now a permanent item with a
- *   count badge.
+ *   cart at all short of typing the URL. It now has its own persistent bubble
+ *   in the opposite corner -- see `CartBubble`.
  *
  * The bar is translucent over a blur rather than a solid colour, so it picks
  * up whatever is behind it -- the maroon tint keeps it legible on the light
@@ -54,7 +54,7 @@ const menuLink = [
 const FloatingNav = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { getTotalItems, dismissLastAdded } = useCart();
+  const { dismissLastAdded } = useCart();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
@@ -79,7 +79,6 @@ const FloatingNav = () => {
     navigate('/');
   };
 
-  const count = getTotalItems();
   const link = ({ isActive }) => `${item} ${isActive ? itemActive : ''}`;
 
   return (
@@ -105,20 +104,11 @@ const FloatingNav = () => {
         Shop
       </NavLink>
 
-      <NavLink
-        to="/cart"
-        className={link}
-        aria-label={`Cart, ${count} item${count === 1 ? '' : 's'}`}
-      >
-        <span className="relative">
-          <i className={`fas fa-shopping-cart ${icon}`} aria-hidden="true"></i>
-          {count > 0 && (
-            <span className="absolute -right-2.5 -top-1.5 min-w-[18px] rounded-circle bg-secondary px-1 text-[10px] font-bold leading-[18px] text-primary">
-              {count}
-            </span>
-          )}
-        </span>
-        Cart
+      {/* About and Contact are one page now, and a first-class destination
+          rather than something buried in the account menu. */}
+      <NavLink to="/about" className={link}>
+        <i className={`fas fa-circle-info ${icon}`} aria-hidden="true"></i>
+        About
       </NavLink>
 
       <div className="relative" ref={menuRef}>
@@ -163,19 +153,10 @@ const FloatingNav = () => {
             <Link to="/loyalty" className={menuLink} onClick={() => setShowMenu(false)}>
               <i className="fa-solid fa-medal w-4" aria-hidden="true"></i>Loyalty
             </Link>
-            <Link to="/about" className={menuLink} onClick={() => setShowMenu(false)}>
-              <i className="fa-solid fa-circle-info w-4" aria-hidden="true"></i>About Us
-            </Link>
-            <Link to="/contact" className={menuLink} onClick={() => setShowMenu(false)}>
-              <i className="fa-solid fa-envelope w-4" aria-hidden="true"></i>Contact Us
-            </Link>
 
-            {user?.role === 'admin' && (
-              <Link to="/admin" className={menuLink} onClick={() => setShowMenu(false)}>
-                <i className="fa-solid fa-user-shield w-4" aria-hidden="true"></i>Admin Console
-              </Link>
-            )}
-
+            {/* No admin entry point here on purpose. The console is a separate
+                application reached at /admin/login; staff links in the customer
+                navigation are what made this bar wrap in the first place. */}
             <button
               className={`${menuLink} w-full cursor-pointer border-none bg-transparent text-left`}
               onClick={handleLogout}
