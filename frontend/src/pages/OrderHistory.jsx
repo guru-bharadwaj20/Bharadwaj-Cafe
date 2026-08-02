@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { btnPrimary } from '../styles/buttons';
 
 const OrderHistory = () => {
   const { user } = useAuth();
@@ -58,7 +59,7 @@ const OrderHistory = () => {
             <i className="fas fa-shopping-bag" aria-hidden="true"></i>
             <h2>No Orders Yet</h2>
             <p>Start exploring our menu and place your first order!</p>
-            <a href="/order" className="btn-primary">
+            <a href="/order" className={btnPrimary}>
               Browse Menu
             </a>
           </div>

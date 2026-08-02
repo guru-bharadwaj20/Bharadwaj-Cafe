@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { btnHeroPrimary, btnHeroSecondary } from '../styles/buttons';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -82,10 +83,10 @@ const Landing = () => {
                 authentic coffee experience in the heart of Karnataka.
               </p>
               <div className="hero-buttons">
-                <button onClick={() => navigate('/register')} className="btn btn-primary">
+                <button onClick={() => navigate('/register')} className={btnHeroPrimary}>
                   Get Started
                 </button>
-                <button onClick={() => navigate('/login')} className="btn btn-secondary">
+                <button onClick={() => navigate('/login')} className={btnHeroSecondary}>
                   Sign In
                 </button>
               </div>
