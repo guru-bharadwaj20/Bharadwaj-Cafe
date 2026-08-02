@@ -27,15 +27,25 @@ pages: each run registers a throwaway account, so the name on screen differs.
 | `wishlist.css` | `pages/WishlistPage.jsx` | 0.00% |
 | button rules in `cart.css` + `landing.css` | `styles/buttons.js` | 0.00% |
 | `.form-group` rules in `auth.css` | `styles/forms.js` | 0.00%, cart fixed |
+| `loyalty.css` | `pages/LoyaltyPage.jsx` | 0.00% |
+| `address.css` | `pages/AddressManagement.jsx` | intentional, see below |
 
 The chat widget is checked structurally rather than by pixels: its panel holds
 a live Gemini reply, so the text differs between runs. Panel size, message
 border-radius, alignment and colours were compared instead.
 
-## Remaining — 12 stylesheets
+The addresses route is the one migration that deliberately changes the page,
+because it was broken. It had no top offset and no background, so with the
+site header fixed at 90px the heading sat behind the navbar as white text on
+the default white page, and the "Add New Address" button — the only way to add
+one — could not be clicked at all. Its card actions were also coloured by
+`button:nth-child()`, so on the default address, where "Set as Default" is not
+rendered, every button shifted a position and Delete came out blue.
 
-`address` · `admin` · `analytics` · `auth` · `blog` · `cart` · `landing` ·
-`loyalty` · `order-history` · `profile` · `reviews` · `style`
+## Remaining — 10 stylesheets
+
+`admin` · `analytics` · `auth` · `blog` · `cart` · `landing` ·
+`order-history` · `profile` · `reviews` · `style`
 
 ## Traps
 
@@ -49,6 +59,17 @@ loaded. `border-2` therefore computes to a two-pixel border of style `none` —
 zero pixels wide. Always pair it with `border-solid`. Adding a global
 `*{border-style:solid}` instead was tried and reverted: it put borders on
 legacy elements that set a width without a style, changing eight pages.
+
+**…and a one-sided border needs the other three sides zeroed.** This is the
+sharp edge of the rule above and it has already caused two regressions.
+`border-solid` sets the style on *all four* sides; Preflight is what normally
+sets every side's width to 0, so without it the sides you did not name fall
+back to the CSS initial width `medium` — about 3px. `border-b border-solid`
+therefore draws a full box. Write `border-x-0 border-t-0 border-b
+border-solid`: those touch different properties from each other, so unlike
+`border-0 border-b` there is no stylesheet-order tie-break involved. The
+loyalty tier rows were 3px too tall this way, and the chat input row was
+carrying 3px on three sides for several commits before anyone measured it.
 
 **Conflicting utilities are resolved by stylesheet order, not class order.**
 Appending `h-[120px]` to a shared base already holding `h-[50px]` does not
@@ -106,8 +127,16 @@ Still outstanding:
 ## Suggested order for the rest
 
 1. ~~Lift `.form-group`~~ — done, in `styles/forms.js`.
-2. Self-contained pages, cheapest first: `blog.css`, `loyalty.css`,
-   `reviews.css`, `address.css`.
+2. ~~`loyalty.css`~~ — done. `address.css` next; it is self-contained and the
+   harness now opens its form.
+
+   **`blog.css` is blocked, not skipped.** There are no blog posts in the
+   database and the seeder only handles menu items, so `/blog` renders an empty
+   grid and `/blog/:slug` has nothing to open. Migrating it would leave the
+   card, badge, meta, grid and the entire detail page unverified — the wishlist
+   trap again. Creating posts needs an admin account, and the `ADMIN_EMAIL` and
+   `ADMIN_PASSWORD` in `backend/.env` do not authenticate, so that user does not
+   exist. Either seed posts first or accept that this file cannot be checked.
 3. `auth.css` — what remains after the form lift: the split-panel layout, the
    header, the divider and `.field-error`, across five components (`Login`,
    `Register`, `ForgotPassword`, `ResetPassword`, `VerifyEmail`).
@@ -151,6 +180,32 @@ a wrong answer because the number still looks authoritative:
 - **A blinking text caret** in whichever field was filled last, caught in
   roughly half the screenshots. Fixed by blurring before capture.
 
+- **The pulsing chat launcher and late-loading images.** The launcher animates
+  forever, so it was caught at a different point each run, and the header logo
+  arriving late shifted the layout under the capture. Fixed by waiting on
+  `document.images` and injecting a stylesheet that disables all animation and
+  transition before the screenshot.
+
 If a diff shows uniform ghosting across the entire page rather than a change
 in one region, suspect the harness before the CSS — and confirm it by
 capturing twice without touching the code.
+
+**Still outstanding:** `cart-checkout-mobile` reports around 0.9% between runs
+of identical code. It is confined to the mobile header — the logo ghosts
+vertically and the launcher still shows — while the page body is clean. Do not
+read a sub-1% result on that one capture as a real change until this is
+tracked down; when migrating `cart.css`, compare the body region.
+
+## Shared classes still to resolve
+
+`.form-actions` is declared bare in `profile.css` and `reviews.css`, so which
+one applies is decided by import order rather than by either page. It currently
+resolves to `gap: 10px` from reviews.css and `margin-top: 20px`, which
+`profile.css` now states explicitly rather than inheriting from the deleted
+address.css. Profile's own file asks for 15px and 30px and has never got
+either. Whether to keep the resolved values or honour profile's intent is a
+deliberate decision, and worth taking when profile.css is migrated.
+
+Note that `reviews.css` wins several of these ties despite
+`components/Reviews.jsx` never being imported — a stylesheet for an unmounted
+component is currently styling live pages.
