@@ -155,6 +155,14 @@ const capture = async () => {
           await page.waitForTimeout(600);
         }
         await page.evaluate(() => window.scrollTo(0, 0));
+
+        // Two sources of false positives, both measured: capturing before the
+        // webfonts land shifts every glyph a pixel or two and lights up the
+        // whole page, and a field left focused blinks a caret that lands in
+        // roughly half the screenshots.
+        await page.evaluate(() => document.fonts.ready);
+        await page.evaluate(() => document.activeElement?.blur());
+        await page.waitForTimeout(150);
         await page.screenshot({
           path: path.join(outDir, `${name}-${vp.name}.png`),
           fullPage: true,
