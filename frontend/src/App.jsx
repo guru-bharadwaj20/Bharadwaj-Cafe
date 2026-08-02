@@ -32,7 +32,6 @@ import './landing.css';
 import './profile.css';
 import './admin.css';
 import './order-history.css';
-import './search-filters.css';
 import './wishlist.css';
 import './address.css';
 import './loyalty.css';
