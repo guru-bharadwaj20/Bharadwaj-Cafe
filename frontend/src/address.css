@@ -64,6 +64,13 @@
   color: var(--white-color);
   margin-bottom: 5px;
   font-size: var(--font-size-n);
+  /*
+   * Stated rather than inherited. These labels were picking up their weight
+   * from auth.css's bare `.form-group label`, which has now moved into
+   * styles/forms.js; without this line they would drop to 400. Kept because
+   * the goal here is no visual change, not because 500 was ever chosen.
+   */
+  font-weight: var(--font-weight-medium);
 }
 
 .address-form input,

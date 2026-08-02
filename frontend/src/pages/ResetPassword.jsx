@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
+import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -76,9 +77,9 @@ const ResetPassword = () => {
             )}
 
             <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
-                <label htmlFor="password">
-                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="password" className={formLabel}>
+                  <i className={`fa-solid fa-lock ${formLabelIcon}`} aria-hidden="true"></i>
                   New Password
                 </label>
                 <input
@@ -88,14 +89,15 @@ const ResetPassword = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter new password"
+                  className={formInput}
                   required
                   minLength="6"
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="confirmPassword">
-                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="confirmPassword" className={formLabel}>
+                  <i className={`fa-solid fa-lock ${formLabelIcon}`} aria-hidden="true"></i>
                   Confirm Password
                 </label>
                 <input
@@ -105,6 +107,7 @@ const ResetPassword = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm new password"
+                  className={formInput}
                   required
                   minLength="6"
                 />
