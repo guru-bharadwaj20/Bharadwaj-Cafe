@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 import { IMG } from '../assets/cloudinary';
+import { errorMessage, fieldError, successMessage } from '../styles/messages';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -116,14 +117,14 @@ const Register = () => {
             </div>
 
             {errors.general && (
-              <div className="error-message">
+              <div className={errorMessage}>
                 <i className="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                 {errors.general}
               </div>
             )}
 
             {success && (
-              <div className="success-message">
+              <div className={successMessage}>
                 <i className="fa-solid fa-circle-check" aria-hidden="true"></i>
                 Successfully registered! Redirecting to login page...
               </div>
@@ -145,7 +146,7 @@ const Register = () => {
                   className={formInput}
                   required
                 />
-                {errors.name && <span className="field-error">{errors.name}</span>}
+                {errors.name && <span className={fieldError}>{errors.name}</span>}
               </div>
 
               <div className={formGroup}>
@@ -163,7 +164,7 @@ const Register = () => {
                   className={formInput}
                   required
                 />
-                {errors.email && <span className="field-error">{errors.email}</span>}
+                {errors.email && <span className={fieldError}>{errors.email}</span>}
               </div>
 
               <div className={formGroup}>
@@ -181,7 +182,7 @@ const Register = () => {
                   className={formInput}
                   required
                 />
-                {errors.password && <span className="field-error">{errors.password}</span>}
+                {errors.password && <span className={fieldError}>{errors.password}</span>}
               </div>
 
               <div className={formGroup}>
@@ -200,7 +201,7 @@ const Register = () => {
                   required
                 />
                 {errors.confirmPassword && (
-                  <span className="field-error">{errors.confirmPassword}</span>
+                  <span className={fieldError}>{errors.confirmPassword}</span>
                 )}
               </div>
 

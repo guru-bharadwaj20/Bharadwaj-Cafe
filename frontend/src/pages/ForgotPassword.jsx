@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../utils/api';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 import { IMG } from '../assets/cloudinary';
+import { errorMessage, successMessage } from '../styles/messages';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -43,7 +44,7 @@ const ForgotPassword = () => {
             </div>
 
             {status.message && (
-              <div className={`${status.type === 'success' ? 'success-message' : 'error-message'}`}>
+              <div className={status.type === 'success' ? successMessage : errorMessage}>
                 <i
                   className={`fa-solid ${status.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`}
                 ></i>

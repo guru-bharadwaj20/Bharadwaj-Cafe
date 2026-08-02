@@ -20,7 +20,13 @@ const AboutPage = () => {
   useEffect(() => {
     const id = hash ? hash.slice(1) : pathname === '/contact' ? 'contact' : null;
     if (!id) return;
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Honour prefers-reduced-motion: a smooth glide is motion, and some
+    // people ask not to be given any. It also makes the page deterministic
+    // for the screenshot harness, which emulates the same preference.
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
   }, [hash, pathname]);
 
   return (
