@@ -37,7 +37,6 @@ import './address.css';
 import './loyalty.css';
 import './reviews.css';
 import './blog.css';
-import './chat.css';
 import './analytics.css';
 
 // Last, so utilities beat same-specificity legacy rules during the migration.
