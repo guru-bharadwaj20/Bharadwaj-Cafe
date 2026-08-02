@@ -10,9 +10,8 @@ import { loadingContainer, spinner } from '../styles/feedback';
 /**
  * Wishlist.
  *
- * Migrated from wishlist.css. The loading state still uses `.loading-container`
- * and `.spinner`, which live in another stylesheet and are shared with the
- * account pages — they move when that file does.
+ * Migrated from wishlist.css. The loading state is shared with four other
+ * pages and lives in styles/feedback.js.
  */
 
 // Both amber call-to-action buttons lift on hover in exactly the same way.
