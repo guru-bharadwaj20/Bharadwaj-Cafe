@@ -658,69 +658,6 @@ export const api = {
     return response.json();
   },
 
-  // Blog APIs
-  getBlogs: async (filters = {}) => {
-    const params = new URLSearchParams(filters);
-    const response = await fetch(`${API_URL}/blogs?${params}`);
-    if (!response.ok) throw new Error('Failed to fetch blogs');
-    return response.json();
-  },
-
-  getBlogBySlug: async (slug) => {
-    const response = await fetch(`${API_URL}/blogs/${slug}`);
-    if (!response.ok) throw new Error('Failed to fetch blog');
-    return response.json();
-  },
-
-  createBlog: async (blogData, token) => {
-    const response = await fetch(`${API_URL}/blogs`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(blogData),
-    });
-    if (!response.ok) throw new Error('Failed to create blog');
-    return response.json();
-  },
-
-  updateBlog: async (blogId, blogData, token) => {
-    const response = await fetch(`${API_URL}/blogs/${blogId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(blogData),
-    });
-    if (!response.ok) throw new Error('Failed to update blog');
-    return response.json();
-  },
-
-  deleteBlog: async (blogId, token) => {
-    const response = await fetch(`${API_URL}/blogs/${blogId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) throw new Error('Failed to delete blog');
-    return response.json();
-  },
-
-  likeBlog: async (blogId, token) => {
-    const response = await fetch(`${API_URL}/blogs/${blogId}/like`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) throw new Error('Failed to like blog');
-    return response.json();
-  },
-
-  // Chat APIs
   getUserChat: async (token) => {
     const response = await fetch(`${API_URL}/chat`, {
       headers: {

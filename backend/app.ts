@@ -14,7 +14,6 @@ import adminRoutes from './routes/adminRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
-import blogRoutes from './routes/blogRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import loyaltyRoutes from './routes/loyaltyRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
@@ -89,7 +88,6 @@ export const createApp = ({ corsOptions }: CreateAppOptions = {}): Express => {
   app.use('/api/reviews', reviewRoutes);
   app.use('/api/addresses', addressRoutes);
   app.use('/api/wishlist', wishlistRoutes);
-  app.use('/api/blogs', blogRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/loyalty', loyaltyRoutes);
   app.use('/api/payments', paymentRoutes);

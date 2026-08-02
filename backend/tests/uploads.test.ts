@@ -100,7 +100,7 @@ describe('POST /api/uploads/signature', () => {
     const res = await request(app)
       .post('/api/uploads/signature')
       .set('Authorization', `Bearer ${token}`)
-      .send({ kind: 'blog' })
+      .send({ kind: 'menu' })
       .expect(200);
 
     expect(res.body.allowedFormats).toContain('webp');
@@ -136,8 +136,8 @@ describe('asset URL validation', () => {
   it('extracts the public id, including through transformations', () => {
     expect(publicIdFromUrl(ours)).toBe('bharadwaj-cafe/menu/latte');
 
-    const transformed = `https://res.cloudinary.com/${CLOUD}/image/upload/c_limit,w_800/v1700000000/bharadwaj-cafe/blog/post.jpg`;
-    expect(publicIdFromUrl(transformed)).toBe('bharadwaj-cafe/blog/post');
+    const transformed = `https://res.cloudinary.com/${CLOUD}/image/upload/c_limit,w_800/v1700000000/bharadwaj-cafe/menu/post.jpg`;
+    expect(publicIdFromUrl(transformed)).toBe('bharadwaj-cafe/menu/post');
 
     expect(publicIdFromUrl('https://evil.example.com/x.png')).toBeNull();
   });

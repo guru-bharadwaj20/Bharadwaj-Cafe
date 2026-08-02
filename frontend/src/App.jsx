@@ -29,7 +29,6 @@ import OrderHistory from './pages/OrderHistory';
 import WishlistPage from './pages/WishlistPage';
 import AddressManagement from './pages/AddressManagement';
 import LoyaltyPage from './pages/LoyaltyPage';
-import { BlogList, BlogDetail } from './pages/BlogPages';
 import ChatWidget from './components/ChatWidget';
 import './style.css';
 import './cart.css';
@@ -39,7 +38,6 @@ import './profile.css';
 import './admin.css';
 import './order-history.css';
 import './reviews.css';
-import './blog.css';
 import './analytics.css';
 
 // Last, so utilities beat same-specificity legacy rules during the migration.
@@ -193,22 +191,6 @@ function App() {
                 element={
                   <Customer>
                     <LoyaltyPage />
-                  </Customer>
-                }
-              />
-              <Route
-                path="/blog"
-                element={
-                  <Customer>
-                    <BlogList />
-                  </Customer>
-                }
-              />
-              <Route
-                path="/blog/:slug"
-                element={
-                  <Customer>
-                    <BlogDetail />
                   </Customer>
                 }
               />
