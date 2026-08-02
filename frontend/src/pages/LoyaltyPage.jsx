@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { useToast } from '../context/ToastContext';
+import { loadingContainer, spinner } from '../styles/feedback';
 
 /**
  * Loyalty rewards.
@@ -117,8 +118,8 @@ const LoyaltyPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-dark pb-[50px] pt-10">
-        <div className="loading-container">
-          <div className="spinner"></div>
+        <div className={loadingContainer}>
+          <div className={spinner}></div>
           <p>Loading loyalty info...</p>
         </div>
       </div>

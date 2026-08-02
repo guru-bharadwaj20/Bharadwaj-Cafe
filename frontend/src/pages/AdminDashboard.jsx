@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { resolveImage } from '../assets/cloudinary';
+import { loadingContainer, spinner } from '../styles/feedback';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -35,8 +36,8 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="admin-dashboard">
-        <div className="loading-container">
-          <div className="spinner"></div>
+        <div className={loadingContainer}>
+          <div className={spinner}></div>
           <p>Loading dashboard...</p>
         </div>
       </div>

@@ -4,6 +4,26 @@ import { api } from '../utils/api';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 import { IMG } from '../assets/cloudinary';
 import { errorMessage, successMessage } from '../styles/messages';
+import {
+  authPage,
+  authContainer,
+  authRightCentered,
+  authFormContainer,
+  authHeader,
+  authLogo,
+  authTitle,
+  authSubtitle,
+  authForm,
+  authBtn,
+  authDivider,
+  authDividerLabel,
+  authRedirect,
+  authRedirectText,
+  redirectLink,
+  backHome,
+  backLink,
+  backLinkIcon,
+} from '../styles/auth';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -33,14 +53,17 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="auth-page" id="main-content">
-      <div className="auth-container forgot-password-container">
-        <div className="auth-right center-form">
-          <div className="auth-form-container">
-            <div className="auth-header">
-              <img src={IMG.logo} alt="Bharadwaj's Cafe" className="auth-logo" />
-              <h1>Forgot Password?</h1>
-              <p>Enter your email to receive a password reset link</p>
+    <div className={authPage} id="main-content">
+      {/* No image panel on this page, so the form half is centred rather than
+          taking half the width. `.forgot-password-container` used to sit here
+          too; no stylesheet ever declared it. */}
+      <div className={authContainer}>
+        <div className={authRightCentered}>
+          <div className={authFormContainer}>
+            <div className={authHeader}>
+              <img src={IMG.logo} alt="Bharadwaj's Cafe" className={authLogo} />
+              <h1 className={authTitle}>Forgot Password?</h1>
+              <p className={authSubtitle}>Enter your email to receive a password reset link</p>
             </div>
 
             {status.message && (
@@ -52,7 +75,7 @@ const ForgotPassword = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className={authForm}>
               <div className={formGroup}>
                 <label htmlFor="email" className={formLabel}>
                   <i className={`fa-solid fa-envelope ${formLabelIcon}`} aria-hidden="true"></i>
@@ -70,27 +93,28 @@ const ForgotPassword = () => {
                 />
               </div>
 
-              <button type="submit" className="auth-btn" disabled={loading}>
+              <button type="submit" className={authBtn} disabled={loading}>
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
             </form>
 
-            <div className="auth-divider">
-              <span>OR</span>
+            <div className={authDivider}>
+              <span className={authDividerLabel}>OR</span>
             </div>
 
-            <div className="auth-redirect">
-              <p>
+            <div className={authRedirect}>
+              <p className={authRedirectText}>
                 Remember your password?{' '}
-                <Link to="/login" className="redirect-link">
+                <Link to="/login" className={redirectLink}>
                   Login here
                 </Link>
               </p>
             </div>
 
-            <div className="back-home">
-              <Link to="/" className="back-link">
-                <i className="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Home
+            <div className={backHome}>
+              <Link to="/" className={backLink}>
+                <i className={`fa-solid fa-arrow-left ${backLinkIcon}`} aria-hidden="true"></i> Back
+                to Home
               </Link>
             </div>
           </div>

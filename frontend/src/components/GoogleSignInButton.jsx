@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../utils/api';
+import { googleSignin } from '../styles/auth';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
 
@@ -103,7 +104,7 @@ const GoogleSignInButton = ({ onSuccess, onError, text = 'signin_with' }) => {
 
   return (
     <div
-      className="google-signin"
+      className={googleSignin}
       style={{ display: ready ? 'flex' : 'none' }}
       data-testid="google-signin"
     >

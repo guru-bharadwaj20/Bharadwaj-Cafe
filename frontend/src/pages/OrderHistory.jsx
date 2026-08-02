@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { btnPrimary } from '../styles/buttons';
+import { loadingContainer, spinner } from '../styles/feedback';
 
 const OrderHistory = () => {
   const { user } = useAuth();
@@ -39,8 +40,8 @@ const OrderHistory = () => {
   if (loading) {
     return (
       <div className="order-history-page">
-        <div className="loading-container">
-          <div className="spinner"></div>
+        <div className={loadingContainer}>
+          <div className={spinner}></div>
           <p>Loading your orders...</p>
         </div>
       </div>

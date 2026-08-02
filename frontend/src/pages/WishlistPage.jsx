@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { resolveImage } from '../assets/cloudinary';
+import { loadingContainer, spinner } from '../styles/feedback';
 
 /**
  * Wishlist.
@@ -71,8 +72,8 @@ const WishlistPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-dark pb-[50px] pt-10">
-        <div className="loading-container">
-          <div className="spinner"></div>
+        <div className={loadingContainer}>
+          <div className={spinner}></div>
           <p>Loading wishlist...</p>
         </div>
       </div>
