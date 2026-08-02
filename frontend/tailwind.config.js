@@ -11,13 +11,18 @@
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
 
-  // Preflight is Tailwind's own CSS reset. It stays off, because style.css
-  // already ships a reset that the twenty stylesheets here are written
-  // against — most visibly `img { width: 95% }`, which Preflight would
-  // replace with `display:block; max-width:100%` and quietly resize every
-  // image on every page that has not been migrated yet. Turning it on is the
-  // last step of the migration, not the first.
-  corePlugins: { preflight: false },
+  // Preflight is on. It was off for the whole migration, because style.css
+  // shipped a reset the twenty stylesheets were written against — most visibly
+  // `img { width: 95% }`, which Preflight replaces with `display:block;
+  // max-width:100%`. Every image that relied on that global now names its own
+  // width, so there is nothing left for the swap to move.
+  //
+  // Turning it on is also what fixes two traps that ran the whole migration:
+  // `border-*` utilities had no `border-style` and drew nothing without a
+  // `border-solid` beside them, and one-sided borders drew all four sides
+  // because the unnamed sides fell back to the initial `medium` width.
+  // Preflight declares `border-width: 0; border-style: solid` on every element,
+  // so both go away.
 
   theme: {
     extend: {

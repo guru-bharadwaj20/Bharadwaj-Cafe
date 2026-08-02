@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import NotificationToggle from '../components/NotificationToggle';
+import { sectionContent } from '../styles/layout';
 
 /*
  * Migrated from profile.css.
@@ -248,7 +249,7 @@ const Profile = () => {
 
   return (
     <div className={page} id="main-content">
-      <div className={`${container} section-content`}>
+      <div className={`${container} ${sectionContent}`}>
         <NotificationToggle />
         <div className={profileHeader}>
           <div className={avatar}>

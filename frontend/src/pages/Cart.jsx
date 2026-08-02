@@ -8,6 +8,7 @@ import { btnPrimary, btnSecondary } from '../styles/buttons';
 import { useToast } from '../context/ToastContext';
 import { resolveImage } from '../assets/cloudinary';
 import { errorMessage } from '../styles/messages';
+import { sectionContent, sectionTitleOnDark } from '../styles/layout';
 
 /*
  * Migrated from cart.css.
@@ -215,11 +216,8 @@ const Cart = () => {
   if (showCheckout) {
     return (
       <section className={cartSection}>
-        <div className="section-content">
-          {/* `.section-title` is maroon, which is right on the light About and
-              Contact sections and invisible here -- 1.08:1 against this page's
-              #1a1a1a. White matches how the other dark sections render it. */}
-          <h2 className="section-title text-white">Checkout</h2>
+        <div className={sectionContent}>
+          <h2 className={sectionTitleOnDark}>Checkout</h2>
           <div className={checkoutGrid}>
             <div className={panel}>
               <h3 className={panelTitle}>Order Summary</h3>
@@ -385,8 +383,8 @@ const Cart = () => {
 
   return (
     <section className={cartSection} id="main-content">
-      <div className="section-content">
-        <h2 className="section-title text-white">Your Cart</h2>
+      <div className={sectionContent}>
+        <h2 className={sectionTitleOnDark}>Your Cart</h2>
         {cartItems.length === 0 ? (
           <div className="px-5 py-[60px] text-center text-white">
             <i
@@ -423,7 +421,7 @@ const Cart = () => {
                         aria-live="polite"
                         aria-atomic="true"
                       >
-                        <span className="visually-hidden">Quantity: </span>
+                        <span className="sr-only">Quantity: </span>
                         {item.quantity}
                       </span>
                       <button

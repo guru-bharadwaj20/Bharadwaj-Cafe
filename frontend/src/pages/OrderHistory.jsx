@@ -4,6 +4,7 @@ import { api } from '../utils/api';
 import { btnPrimary } from '../styles/buttons';
 import { loadingContainer, spinner } from '../styles/feedback';
 import { statusColours } from '../styles/status';
+import { sectionContent } from '../styles/layout';
 
 /*
  * Order history.
@@ -177,7 +178,7 @@ const OrderHistory = () => {
 
   return (
     <div className={page} id="main-content">
-      <div className="section-content">
+      <div className={sectionContent}>
         <div className={header}>
           <h1 className={headerTitle}>
             <i className="fas fa-history" aria-hidden="true"></i> Order History
