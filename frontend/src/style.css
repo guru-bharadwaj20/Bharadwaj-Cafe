@@ -98,7 +98,17 @@ img {
   max-width: var(--site-max-width);
 }
 
-header {
+/*
+ * Scoped to the landing page's bar. This was a bare `header` selector, so it
+ * caught every <header> in the app: the analytics page's title row is a
+ * <header>, and it was being torn out of the flow, painted maroon, stretched
+ * to full width and dropped on top of the metric cards. That was the mess on
+ * the analytics screen, not anything in analytics.css.
+ *
+ * The customer site's bar is now components/FloatingNav.jsx and brings its own
+ * positioning, so the landing page is the only page this belongs to.
+ */
+.landing-header {
   position: fixed;
   width: 100%;
   z-index: 5;
