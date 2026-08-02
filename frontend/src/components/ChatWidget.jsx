@@ -17,7 +17,10 @@ const messageBase = 'max-w-[70%] break-words rounded-[12px] px-[15px] py-2.5';
 const messageVariant = {
   user: 'self-end rounded-br-[4px] bg-secondary text-black',
   admin: 'self-start rounded-bl-[4px] bg-[#3a3a3a] text-white',
-  assistant: '',
+  // Stated rather than inherited: this variant sets no background of its own,
+  // so with no colour it took the document default and rendered near-black on
+  // the panel's dark surface.
+  assistant: 'text-white',
 };
 
 const badgeBase =
@@ -119,8 +122,12 @@ const ChatWidget = () => {
         )}
       </button>
 
+      {/* `max-h` on the panel is what keeps its header on screen. It is
+          anchored to the bottom and 520px tall, so on a laptop viewport of
+          around 630px it ran off the top — and being fixed, scrolling could
+          not bring it back. It now shrinks to fit whatever height there is. */}
       {isOpen && (
-        <div className="fixed bottom-[100px] right-[30px] z-[998] flex h-[520px] w-[370px] flex-col overflow-hidden rounded-[20px] border border-solid border-[rgba(255,255,255,0.12)] bg-[#211216] shadow-[0_20px_60px_rgba(0,0,0,0.55)] max-[768px]:bottom-[90px] max-[768px]:right-4 max-[768px]:w-[calc(100%_-_32px)]">
+        <div className="fixed bottom-[100px] right-[30px] z-[998] flex h-[520px] max-h-[calc(100vh-130px)] w-[370px] flex-col overflow-hidden rounded-[20px] border border-solid border-[rgba(255,255,255,0.12)] bg-[#211216] shadow-[0_20px_60px_rgba(0,0,0,0.55)] max-[768px]:bottom-[90px] max-[768px]:right-4 max-[768px]:max-h-[calc(100vh-120px)] max-[768px]:w-[calc(100%_-_32px)]">
           {/* Maroon rather than a slab of amber: the old header was a flat
               orange bar with black text sitting on a grey void. */}
           <div className="flex items-center gap-3 border-x-0 border-b border-t-0 border-solid border-[rgba(255,255,255,0.1)] bg-primary p-4">
