@@ -41,7 +41,6 @@ const configure = (): void => {
 /** Where each kind of image lives. An arbitrary folder is never accepted. */
 const FOLDERS = {
   menu: 'bharadwaj-cafe/menu',
-  blog: 'bharadwaj-cafe/blog',
   review: 'bharadwaj-cafe/reviews',
 } as const;
 

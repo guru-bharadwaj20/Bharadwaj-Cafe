@@ -30,10 +30,10 @@ export const getUploadSignature: RequestHandler = asyncHandler((req, res) => {
   const { kind } = req.body as { kind?: unknown };
 
   if (!isUploadKind(kind)) {
-    throw new BadRequestError('kind must be one of: menu, blog, review');
+    throw new BadRequestError('kind must be one of: menu, review');
   }
 
-  // Only staff may upload menu and blog imagery; review photos are open to
+  // Only staff may upload menu imagery; review photos are open to
   // any signed-in customer.
   if (kind !== 'review' && req.user?.role !== 'admin') {
     throw new BadRequestError('Not authorized to upload this kind of image');
