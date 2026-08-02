@@ -120,7 +120,10 @@ const Cart = () => {
     return (
       <section className="cart-section">
         <div className="section-content">
-          <h2 className="section-title">Checkout</h2>
+          {/* `.section-title` is maroon, which is right on the light About and
+              Contact sections and invisible here -- 1.08:1 against this page's
+              #1a1a1a. White matches how the other dark sections render it. */}
+          <h2 className="section-title text-white">Checkout</h2>
           <div className="checkout-container">
             <div className="order-summary">
               <h3>Order Summary</h3>
@@ -264,7 +267,7 @@ const Cart = () => {
   return (
     <section className="cart-section" id="main-content">
       <div className="section-content">
-        <h2 className="section-title">Your Cart</h2>
+        <h2 className="section-title text-white">Your Cart</h2>
         {cartItems.length === 0 ? (
           <div className="empty-cart">
             <i className="fas fa-shopping-cart" aria-hidden="true"></i>
