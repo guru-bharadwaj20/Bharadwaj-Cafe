@@ -31,7 +31,6 @@ import AddressManagement from './pages/AddressManagement';
 import LoyaltyPage from './pages/LoyaltyPage';
 import ChatWidget from './components/ChatWidget';
 import './style.css';
-import './cart.css';
 import './landing.css';
 import './profile.css';
 import './admin.css';

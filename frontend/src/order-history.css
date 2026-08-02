@@ -139,11 +139,9 @@
   font-weight: bold;
 }
 
-.item-price {
-  color: var(--white-color);
-  min-width: 80px;
-  text-align: right;
-}
+/* `.item-price` was also declared in cart.css, with `color: ... !important`, so
+   these three declarations lost to it on this page. They now sit on the element
+   in pages/OrderHistory.jsx. */
 
 .order-details {
   display: grid;

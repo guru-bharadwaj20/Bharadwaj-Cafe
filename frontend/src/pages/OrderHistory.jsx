@@ -98,7 +98,15 @@ const OrderHistory = () => {
                           <span className="item-name">{item.name}</span>
                           <span className="item-quantity">x{item.quantity}</span>
                         </div>
-                        <span className="item-price">₹{item.price * item.quantity}</span>
+                        {/* `.item-price` was declared in cart.css as well as
+                            here, and cart.css marked its colour `!important`,
+                            so this line rendered amber, bold and 18px — the
+                            cart's styling — beside the already-amber quantity.
+                            These are order-history.css's own values, which the
+                            page never got to use. */}
+                        <span className="min-w-[80px] text-right text-white">
+                          ₹{item.price * item.quantity}
+                        </span>
                       </div>
                     ))}
                   </div>

@@ -69,7 +69,9 @@ describe('Cart', () => {
 
     // "₹300" appears twice (line total and subtotal), so each assertion is
     // scoped to its own summary row rather than searching the whole document.
-    const row = (label) => within(screen.getByText(label).closest('.summary-row'));
+    // Scoped by structure, not by class: this used to reach for `.summary-row`,
+    // which meant a styling change could fail an assertion about arithmetic.
+    const row = (label) => within(screen.getByText(label).closest('div'));
 
     expect(row('Subtotal:').getByText('₹300')).toBeInTheDocument();
     expect(row('Tax (5%):').getByText('₹15')).toBeInTheDocument();
