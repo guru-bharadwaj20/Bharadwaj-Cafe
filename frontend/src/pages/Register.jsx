@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
+import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -128,9 +129,9 @@ const Register = () => {
             )}
 
             <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
-                <label htmlFor="name">
-                  <i className="fa-solid fa-user" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="name" className={formLabel}>
+                  <i className={`fa-solid fa-user ${formLabelIcon}`} aria-hidden="true"></i>
                   Full Name
                 </label>
                 <input
@@ -140,14 +141,15 @@ const Register = () => {
                   placeholder="Enter your full name"
                   value={formData.name}
                   onChange={handleChange}
+                  className={formInput}
                   required
                 />
                 {errors.name && <span className="field-error">{errors.name}</span>}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="email">
-                  <i className="fa-solid fa-envelope" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="email" className={formLabel}>
+                  <i className={`fa-solid fa-envelope ${formLabelIcon}`} aria-hidden="true"></i>
                   Email Address
                 </label>
                 <input
@@ -157,14 +159,15 @@ const Register = () => {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
+                  className={formInput}
                   required
                 />
                 {errors.email && <span className="field-error">{errors.email}</span>}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="password">
-                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="password" className={formLabel}>
+                  <i className={`fa-solid fa-lock ${formLabelIcon}`} aria-hidden="true"></i>
                   New Password
                 </label>
                 <input
@@ -174,14 +177,15 @@ const Register = () => {
                   placeholder="Create a password (min. 6 characters)"
                   value={formData.password}
                   onChange={handleChange}
+                  className={formInput}
                   required
                 />
                 {errors.password && <span className="field-error">{errors.password}</span>}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="confirmPassword">
-                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="confirmPassword" className={formLabel}>
+                  <i className={`fa-solid fa-lock ${formLabelIcon}`} aria-hidden="true"></i>
                   Confirm Password
                 </label>
                 <input
@@ -191,6 +195,7 @@ const Register = () => {
                   placeholder="Re-enter your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  className={formInput}
                   required
                 />
                 {errors.confirmPassword && (

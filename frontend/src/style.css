@@ -34,6 +34,22 @@
   --site-max-width: 1300px;
 }
 
+/* The type scale steps down on narrow screens. This lived in about.css until
+   the Tailwind migration, where it was easy to mistake for a rule about the
+   About page — it is not, it retunes the tokens for the whole site, and every
+   page depends on it. It belongs here, next to the values it overrides.
+
+   The Tailwind theme reads these same variables, so utilities such as
+   `text-xxl` step down here too, with no duplicate breakpoint to maintain. */
+@media screen and (max-width: 900px) {
+  :root {
+    --font-size-m: 1rem;
+    --font-size-l: 1.3rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 1.8rem;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 90px;
@@ -82,7 +98,17 @@ img {
   max-width: var(--site-max-width);
 }
 
-header {
+/*
+ * Scoped to the landing page's bar. This was a bare `header` selector, so it
+ * caught every <header> in the app: the analytics page's title row is a
+ * <header>, and it was being torn out of the flow, painted maroon, stretched
+ * to full width and dropped on top of the metric cards. That was the mess on
+ * the analytics screen, not anything in analytics.css.
+ *
+ * The customer site's bar is now components/FloatingNav.jsx and brings its own
+ * positioning, so the landing page is the only page this belongs to.
+ */
+.landing-header {
   position: fixed;
   width: 100%;
   z-index: 5;

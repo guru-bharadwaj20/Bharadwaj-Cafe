@@ -1,0 +1,43 @@
+/**
+ * Tailwind's utilities.
+ *
+ * Imported after every legacy stylesheet on purpose. Utilities and the old
+ * class rules often have the same specificity, and in a tie the later rule
+ * wins — so a component that has been migrated gets its utilities honoured
+ * even while the stylesheet it used to depend on is still loaded.
+ *
+ * `@tailwind base` is absent: Preflight is disabled in tailwind.config.js
+ * while the two systems coexist. See the comment there.
+ */
+/*
+ * Preflight normally declares these. Without them every transform utility is
+ * silently dead: `translate-x-1/2` sets `--tw-translate-x` and then emits
+ *
+ *   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) ...
+ *
+ * where every other variable is undefined, so the function collapses to
+ * `translate(-50%, )`, the whole declaration is invalid, and the browser drops
+ * it. Computed transform comes back `none`.
+ *
+ * That is why the floating nav sat right of centre despite `-translate-x-1/2`,
+ * and why none of the migrated buttons lifted on hover any more -- pixel diffs
+ * never caught it because screenshots do not hover.
+ *
+ * Safe to declare globally, unlike the `border-style` reset that was tried and
+ * reverted: these are custom properties, so they change nothing on their own
+ * and only matter to elements that also carry a transform utility.
+ */
+*,
+::before,
+::after {
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+}
+
+@tailwind components;
+@tailwind utilities;

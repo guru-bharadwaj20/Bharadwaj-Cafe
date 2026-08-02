@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 
 const Reviews = ({ menuItemId }) => {
+  const { toast } = useToast();
   const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,9 +44,9 @@ const Reviews = ({ menuItemId }) => {
       setRating(5);
       setComment('');
       fetchReviews();
-      alert('Review submitted successfully!');
+      toast.success('Review submitted successfully!');
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to submit review');
+      toast.error(error.response?.data?.message || 'Failed to submit review');
     }
   };
 
@@ -63,7 +65,7 @@ const Reviews = ({ menuItemId }) => {
       await api.deleteReview(reviewId, user?.token);
       fetchReviews();
     } catch {
-      alert('Failed to delete review');
+      toast.error('Failed to delete review');
     }
   };
 

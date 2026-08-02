@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Cart from './Cart';
 import { CartProvider } from '../context/CartContext';
 import { AuthProvider } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
 import { api } from '../utils/api';
 import { openCheckout } from '../utils/razorpay';
 
@@ -39,9 +40,11 @@ const renderCart = () =>
   render(
     <MemoryRouter>
       <AuthProvider>
-        <CartProvider>
-          <Cart />
-        </CartProvider>
+        <ToastProvider>
+          <CartProvider>
+            <Cart />
+          </CartProvider>
+        </ToastProvider>
       </AuthProvider>
     </MemoryRouter>
   );

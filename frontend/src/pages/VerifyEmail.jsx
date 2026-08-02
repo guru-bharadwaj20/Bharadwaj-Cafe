@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
+import { btnPrimary, btnSecondary } from '../styles/buttons';
 
 const VerifyEmail = () => {
   const { token } = useParams();
@@ -63,10 +64,10 @@ const VerifyEmail = () => {
                   <h2>Verification Failed</h2>
                   <p>{status.message}</p>
                   <div className="action-buttons">
-                    <Link to="/register" className="btn-primary">
+                    <Link to="/register" className={btnPrimary}>
                       Register Again
                     </Link>
-                    <Link to="/login" className="btn-secondary">
+                    <Link to="/login" className={btnSecondary}>
                       Go to Login
                     </Link>
                   </div>

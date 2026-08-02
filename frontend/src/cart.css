@@ -1,6 +1,6 @@
 .cart-section {
   min-height: 100vh;
-  padding: 100px 0;
+  padding: 40px 0;
   background-color: #1a1a1a;
 }
 
@@ -168,36 +168,6 @@
   transform: translateY(-2px);
 }
 
-.btn-primary,
-.btn-secondary {
-  padding: 12px 30px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-primary {
-  background-color: #f3961c;
-  color: #000;
-}
-
-.btn-primary:hover {
-  background-color: #d67e0e;
-  transform: translateY(-2px);
-}
-
-.btn-secondary {
-  background-color: #444;
-  color: #fff;
-}
-
-.btn-secondary:hover {
-  background-color: #555;
-}
-
 /* Checkout Styles */
 .checkout-container {
   display: grid;
@@ -332,7 +302,13 @@
   width: 100%;
   padding: 12px;
   font: inherit;
-  color: inherit;
+  /*
+   * Stated, not inherited. Nothing on the ancestor chain sets a colour, so
+   * `color: inherit` resolved to the UA default black and put near-black text
+   * on this panel's 6%-white field. The sibling `.payment-form input` rule has
+   * always asked for #fff; these two were simply missed.
+   */
+  color: var(--white-color);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;

@@ -149,4 +149,26 @@ describe('with Redis configured', () => {
     expect(tea.body).toHaveLength(1);
     expect(tea.body[0].name).toBe('Tea One');
   });
+
+  it('keys the drinks menu separately from the merchandise shelf', async () => {
+    await createMenuItem({ name: 'Cached Coffee', description: 'A' });
+    await createMenuItem({
+      name: 'Cached Tote',
+      description: 'B',
+      category: 'accessories',
+      kind: 'merch',
+    });
+
+    // Order matters. The drinks request warms the cache first; if `kind` were
+    // left out of the key, both requests would be unfiltered and identical,
+    // so this second one would hit the first one's entry and put a latte on
+    // the merchandise page.
+    const drinks = await request(app).get('/api/menu').expect(200);
+    const merch = await request(app).get('/api/menu?kind=merch').expect(200);
+
+    expect(drinks.body).toHaveLength(1);
+    expect(drinks.body[0].name).toBe('Cached Coffee');
+    expect(merch.body).toHaveLength(1);
+    expect(merch.body[0].name).toBe('Cached Tote');
+  });
 });
