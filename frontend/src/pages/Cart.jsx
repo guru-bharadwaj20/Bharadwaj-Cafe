@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { openCheckout } from '../utils/razorpay';
 import { useNavigate } from 'react-router-dom';
+import { btnPrimary, btnSecondary } from '../styles/buttons';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
@@ -238,13 +239,13 @@ const Cart = () => {
                 <div className="checkout-buttons">
                   <button
                     type="button"
-                    className="btn-secondary"
+                    className={btnSecondary}
                     onClick={() => setShowCheckout(false)}
                     disabled={placing}
                   >
                     Back to Cart
                   </button>
-                  <button type="submit" className="btn-primary" disabled={placing}>
+                  <button type="submit" className={btnPrimary} disabled={placing}>
                     {placing
                       ? 'Processing...'
                       : payOnline && paymentsAvailable
@@ -268,7 +269,7 @@ const Cart = () => {
           <div className="empty-cart">
             <i className="fas fa-shopping-cart" aria-hidden="true"></i>
             <p>Your cart is empty</p>
-            <button className="btn-primary" onClick={() => navigate('/order')}>
+            <button className={btnPrimary} onClick={() => navigate('/order')}>
               Browse Menu
             </button>
           </div>
