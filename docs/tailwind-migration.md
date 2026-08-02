@@ -164,6 +164,21 @@ rather than assumed) and `addresses-form`. Add an `expand` step to `ROUTES` for
 any other UI hidden behind a button, or the run will report a confident 0.00%
 for a page it never actually rendered.
 
+**Capture every kind of user, not just every route.** Until the navigation
+rebuild this harness only ever signed in as a customer, so the staff links were
+never in a single screenshot — and the wrapped navbar and the wrecked analytics
+page went out under a run that reported 0.00% across the board. The admin
+routes are now captured in a session of their own, gated on
+`UISNAP_ADMIN_EMAIL` and `UISNAP_ADMIN_PASSWORD`:
+
+```
+UISNAP_ADMIN_EMAIL=... UISNAP_ADMIN_PASSWORD=... npm run ui:baseline
+```
+
+Without them the staff pages are skipped and the run says so. Create a staff
+account with `npm run create-admin` in `backend/`; it will not touch an
+existing user with that email.
+
 `reviews.css` is a special case: `components/Reviews.jsx` is not imported
 anywhere, so nothing it styles is reachable in the running app. Migrating that
 file cannot be verified by screenshot, and is probably not worth doing before
@@ -195,6 +210,42 @@ of identical code. It is confined to the mobile header — the logo ghosts
 vertically and the launcher still shows — while the page body is clean. Do not
 read a sub-1% result on that one capture as a real change until this is
 tracked down; when migrating `cart.css`, compare the body region.
+
+## The navigation rebuild
+
+The fixed top header is gone. `components/Header.jsx` was deleted and replaced
+by `components/FloatingNav.jsx`, a translucent bar docked at the bottom, and
+the staff links moved into a separate admin console at `/admin/*` behind
+`AdminRoute`. Three defects drove it, and all three were invisible to this
+harness because every run signed in as a customer:
+
+- **The bar wrapped for staff.** Seven links did not fit, so it grew to two
+  lines — taller than the 100px of clearance every page allowed — and painted
+  the headings on Order, Merchandise and Contact underneath itself.
+- **`header` was styled as a bare element selector** in `style.css`:
+  `position: fixed; width: 100%; z-index: 5; background: var(--primary-color)`.
+  That caught *every* `<header>` in the app. The analytics page's title row is
+  a `<header>`, so it was torn out of the flow, painted maroon and dropped over
+  the metric cards, hiding three of five labels and the "90 days" button. It is
+  now scoped to `.landing-header`.
+- **The cart was unreachable on desktop.** Its button lived in `.mobile-icons`,
+  which `style.css` hides above 768px, so adding an item produced no
+  confirmation and offered no way to the basket. The nav now carries a
+  permanent cart item with a count badge, and `components/CartToast.jsx`
+  confirms each add.
+
+Page paddings that existed only to clear the old header came down from 100px to
+40px. The `Customer` wrapper in `App.jsx` carries `bg-dark`, because a bare
+padding box is transparent and the white body showed through as a band under
+every dark page.
+
+**Opacity modifiers do not work on the themed colours.** `white`, `primary` and
+the rest map to `var(--*)`, so `text-white/75` compiles to
+`rgb(var(--white-color) / 0.75)`; the token holds `#fff` rather than the
+`255 255 255` triplet that syntax needs, the declaration is invalid, and the
+browser drops it. On an anchor that means no colour at all and the link falls
+back to UA blue — which is exactly how the first floating nav rendered. Use
+`styles/glass.js`, which keeps the alpha in literal rgba.
 
 ## Shared classes still to resolve
 
