@@ -19,7 +19,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "worker": "node dist/jobs/worker.js",
-    "worker:dev": "tsx watch jobs/worker.ts"
+    "worker:dev": "tsx watch jobs/worker.ts",
+    "upload-assets": "tsx scripts/uploadAssets.ts"
   },
   "dependencies": {
     "@google/genai": "^2.15.0",

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { btnHeroPrimary, btnHeroSecondary } from '../styles/buttons';
+import { IMG } from '../assets/cloudinary';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Landing = () => {
       {/* Landing Header */}
       <header className="landing-header">
         <nav className="navbar section-content">
-          <img src="img/logo.png" alt="Bharadwaj's Cafe" className="logo" />
+          <img src={IMG.logo} alt="Bharadwaj's Cafe" className="logo" />
           <ul className="nav-menu landing-nav">
             <button
               id="menu-close-button"
@@ -117,7 +118,7 @@ const Landing = () => {
               </p>
             </div>
             <div className="hero-image-section">
-              <img src="img/coffee-hero-section.png" alt="Coffee" className="landing-hero-img" />
+              <img src={IMG.coffeeHeroSection} alt="Coffee" className="landing-hero-img" />
             </div>
           </div>
         </section>
@@ -183,7 +184,7 @@ const Landing = () => {
               </div>
             </div>
             <div className="about-image">
-              <img src="img/about-image.jpg" alt="About Us" />
+              <img src={IMG.aboutImage} alt="About Us" />
             </div>
           </div>
         </section>

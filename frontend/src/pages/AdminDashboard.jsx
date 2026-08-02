@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { useToast } from '../context/ToastContext';
+import { resolveImage } from '../assets/cloudinary';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -390,7 +391,7 @@ const MenuManagement = ({ token }) => {
       <div className="menu-grid">
         {menuItems.map((item) => (
           <div key={item._id} className="menu-card">
-            <img src={item.image} alt={item.name} />
+            <img src={resolveImage(item.image)} alt={item.name} />
             <div className="menu-card-content">
               <h3>{item.name}</h3>
               <p>{item.description}</p>

@@ -1,3 +1,4 @@
+import { IMG } from '../assets/cloudinary';
 /**
  * About section.
  *
@@ -23,7 +24,7 @@ const About = () => {
       <div className="mx-auto flex max-w-site items-center justify-between gap-[50px] px-5 max-[900px]:flex-col-reverse max-[900px]:gap-10">
         <div>
           <img
-            src="img/about-image.jpg"
+            src={IMG.aboutImage}
             alt="About"
             className="h-[400px] w-[400px] rounded-circle object-cover max-[900px]:aspect-square max-[900px]:h-full max-[900px]:w-full max-[900px]:max-w-[280px]"
           />

@@ -58,8 +58,9 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title ?? "Bharadwaj's Cafe", {
       body: payload.body ?? '',
-      icon: '/img/logo.png',
-      badge: '/img/logo.png',
+      icon: 'https://res.cloudinary.com/juqwggy5/image/upload/v1785663432/bharadwaj-cafe/site/logo.png',
+      badge:
+        'https://res.cloudinary.com/juqwggy5/image/upload/v1785663432/bharadwaj-cafe/site/logo.png',
       // Same tag replaces an earlier notification rather than stacking.
       tag: payload.tag,
       data: { url: payload.url ?? '/' },

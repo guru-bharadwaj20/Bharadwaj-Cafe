@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { IMG } from '../assets/cloudinary';
 
 /**
  * Home hero.
@@ -28,7 +29,7 @@ const Hero = () => {
           </div>
         </div>
         <div className="hero-image-wrapper">
-          <img src="img/coffee-hero-section.png" alt="Hero image" className="hero-image" />
+          <img src={IMG.coffeeHeroSection} alt="Hero image" className="hero-image" />
         </div>
       </div>
     </section>

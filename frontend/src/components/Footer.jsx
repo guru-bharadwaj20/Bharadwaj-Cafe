@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { IMG } from '../assets/cloudinary';
 
 /**
  * Site footer.
@@ -13,7 +14,8 @@ import { Link } from 'react-router-dom';
 // the global .section-content rule, which is 20px padding on a 1300px cap.
 const shell = 'mx-auto w-full max-w-site px-5';
 
-const linkClass = 'text-n text-footer-link transition-colors duration-300 hover:text-secondary hover:underline';
+const linkClass =
+  'text-n text-footer-link transition-colors duration-300 hover:text-secondary hover:underline';
 
 const columns = [
   {
@@ -108,7 +110,7 @@ const Footer = () => {
       <div className="bg-footer-deep py-5 sm:py-[30px]">
         <div className={`${shell} flex flex-col items-center gap-5`}>
           <div className="mb-2.5">
-            <img src="img/logo.png" alt="Bharadwaj's Cafe Logo" className="h-[50px] w-auto" />
+            <img src={IMG.logo} alt="Bharadwaj's Cafe Logo" className="h-[50px] w-auto" />
           </div>
 
           <div className="flex flex-col items-center gap-[15px] text-center">

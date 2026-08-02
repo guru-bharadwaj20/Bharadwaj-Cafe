@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../utils/api';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
+import { IMG } from '../assets/cloudinary';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -36,7 +37,7 @@ const ForgotPassword = () => {
         <div className="auth-right center-form">
           <div className="auth-form-container">
             <div className="auth-header">
-              <img src="img/logo.png" alt="Bharadwaj's Cafe" className="auth-logo" />
+              <img src={IMG.logo} alt="Bharadwaj's Cafe" className="auth-logo" />
               <h1>Forgot Password?</h1>
               <p>Enter your email to receive a password reset link</p>
             </div>

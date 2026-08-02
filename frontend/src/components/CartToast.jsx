@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { glassMenu, textOnGlass, textOnGlassSoft, borderOnGlass } from '../styles/glass';
+import { resolveImage } from '../assets/cloudinary';
 
 /**
  * Confirmation that something reached the basket, with a way to go there.
@@ -45,7 +46,7 @@ const CartToast = () => {
     >
       {item.image && (
         <img
-          src={item.image}
+          src={resolveImage(item.image)}
           alt=""
           className="h-12 w-12 shrink-0 rounded-s object-cover"
           aria-hidden="true"

@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import SearchFilters from './SearchFilters';
 import { useToast } from '../context/ToastContext';
+import { resolveImage } from '../assets/cloudinary';
 import {
   addToCartBtn,
   addToCartBtnAdded,
@@ -114,7 +115,7 @@ const Order = () => {
                 >
                   <i className="fas fa-heart" aria-hidden="true"></i>
                 </button>
-                <img src={item.image} alt={item.name} className={shopImage} />
+                <img src={resolveImage(item.image)} alt={item.name} className={shopImage} />
                 <div className={shopDetails}>
                   <h3 className={shopName}>{item.name}</h3>
                   <p className={shopText}>{item.description}</p>

@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useToast } from '../context/ToastContext';
+import { resolveImage } from '../assets/cloudinary';
 
 /**
  * Wishlist.
@@ -128,7 +129,7 @@ const WishlistPage = () => {
                 </button>
 
                 <img
-                  src={item.menuItem.image}
+                  src={resolveImage(item.menuItem.image)}
                   alt={item.menuItem.name}
                   className="h-[200px] w-full object-cover"
                 />
