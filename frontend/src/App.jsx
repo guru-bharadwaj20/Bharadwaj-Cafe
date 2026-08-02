@@ -33,7 +33,6 @@ import './profile.css';
 import './admin.css';
 import './order-history.css';
 import './address.css';
-import './loyalty.css';
 import './reviews.css';
 import './blog.css';
 import './analytics.css';
