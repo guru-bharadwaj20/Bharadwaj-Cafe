@@ -14,7 +14,7 @@ Both servers must be running. Every route is captured at 1440px and 390px,
 signed in, with a seeded cart. Expect a permanent ~0.2% delta on the profile
 pages: each run registers a throwaway account, so the name on screen differs.
 
-## Done — 8 of 20 stylesheets
+## Done — 10 of 20 stylesheets
 
 | Stylesheet | Replaced by | Diff |
 | --- | --- | --- |
