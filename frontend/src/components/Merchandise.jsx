@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { useCart } from '../context/CartContext';
+import {
+  addToCartBtn,
+  addToCartBtnAdded,
+  merchBadge,
+  shopCard,
+  shopDetails,
+  shopFooter,
+  shopGrid,
+  shopImage,
+  shopName,
+  shopPrice,
+  shopSection,
+  shopStatus,
+  shopText,
+  shopTitle,
+} from '../styles/shop';
 
 /** 'home-decor' reads badly on a badge; the rest just need capitalising. */
 const categoryLabel = (category = '') =>
@@ -56,28 +72,28 @@ const Merchandise = () => {
   };
 
   return (
-    <section className="merchandise-section" id="merchandise">
-      <h2 className="section-title">Our Merchandise</h2>
-      <div className="section-content">
-        {loading && <p className="merchandise-status">Loading the shop...</p>}
-        {error && <p className="merchandise-status merchandise-error">{error}</p>}
+    <section className={shopSection} id="merchandise">
+      <h2 className={shopTitle}>Our Merchandise</h2>
+      <div className="mx-auto max-w-site px-5">
+        {loading && <p className={shopStatus}>Loading the shop...</p>}
+        {error && <p className={`${shopStatus} text-secondary`}>{error}</p>}
         {!loading && !error && items.length === 0 && (
-          <p className="merchandise-status">Nothing in the shop right now — check back soon.</p>
+          <p className={shopStatus}>Nothing in the shop right now — check back soon.</p>
         )}
 
         {items.length > 0 && (
-          <ul className="merchandise-list">
+          <ul className={shopGrid}>
             {items.map((item) => (
-              <li className="merchandise-item" key={item._id}>
-                <div className="merchandise-badge">{categoryLabel(item.category)}</div>
-                <img src={item.image} alt={item.name} className="merchandise-image" />
-                <div className="merchandise-details">
-                  <h3 className="name">{item.name}</h3>
-                  <p className="text">{item.description}</p>
-                  <div className="merchandise-footer">
-                    <p className="price">₹{item.price}</p>
+              <li className={shopCard} key={item._id}>
+                <div className={merchBadge}>{categoryLabel(item.category)}</div>
+                <img src={item.image} alt={item.name} className={shopImage} />
+                <div className={shopDetails}>
+                  <h3 className={shopName}>{item.name}</h3>
+                  <p className={shopText}>{item.description}</p>
+                  <div className={shopFooter}>
+                    <p className={shopPrice}>₹{item.price}</p>
                     <button
-                      className={`add-to-cart-btn ${addedItems[item._id] ? 'added' : ''}`}
+                      className={addedItems[item._id] ? addToCartBtnAdded : addToCartBtn}
                       onClick={() => handleAddToCart(item)}
                     >
                       {addedItems[item._id] ? (

@@ -27,8 +27,6 @@ import { BlogList, BlogDetail } from './pages/BlogPages';
 import ChatWidget from './components/ChatWidget';
 import './style.css';
 import './cart.css';
-import './merchandise.css';
-import './order.css';
 import './auth.css';
 import './landing.css';
 import './profile.css';

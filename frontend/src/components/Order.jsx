@@ -3,6 +3,26 @@ import { api } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import SearchFilters from './SearchFilters';
+import {
+  addToCartBtn,
+  addToCartBtnAdded,
+  dietaryTag,
+  dietaryTags,
+  ratingCount,
+  ratingRow,
+  shopCard,
+  shopDetails,
+  shopFooter,
+  shopGrid,
+  shopImage,
+  shopName,
+  shopPrice,
+  shopSection,
+  shopStatus,
+  shopText,
+  shopTitle,
+  wishlistBtn,
+} from '../styles/shop';
 
 const Order = () => {
   const { addToCart } = useCart();
@@ -63,10 +83,10 @@ const Order = () => {
 
   if (loading) {
     return (
-      <section className="order-section" id="order">
-        <h2 className="section-title">Our Menu</h2>
-        <div className="section-content">
-          <p style={{ textAlign: 'center', color: '#fff' }}>Loading menu...</p>
+      <section className={shopSection} id="order">
+        <h2 className={shopTitle}>Our Menu</h2>
+        <div className="mx-auto max-w-site px-5">
+          <p className={shopStatus}>Loading menu...</p>
         </div>
       </section>
     );
@@ -74,75 +94,73 @@ const Order = () => {
 
   if (error) {
     return (
-      <section className="order-section" id="order">
-        <h2 className="section-title">Our Menu</h2>
-        <div className="section-content">
-          <p style={{ textAlign: 'center', color: '#f3961c' }}>{error}</p>
+      <section className={shopSection} id="order">
+        <h2 className={shopTitle}>Our Menu</h2>
+        <div className="mx-auto max-w-site px-5">
+          <p className={`${shopStatus} text-secondary`}>{error}</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="order-section" id="order">
-      <h2 className="section-title">Our Menu</h2>
+    <section className={shopSection} id="order">
+      <h2 className={shopTitle}>Our Menu</h2>
       <SearchFilters onFilterChange={handleFilterChange} />
-      <div className="section-content">
+      <div className="mx-auto max-w-site px-5">
         {menuItems.length === 0 ? (
-          <p className="menu-empty">
-            No items match those filters. Try widening your search.
-          </p>
+          <p className={shopStatus}>No items match those filters. Try widening your search.</p>
         ) : (
-        <ul className="menu-list">
-          {menuItems.map((item) => (
-            <li className="menu-item" key={item._id}>
-              <button
-                className="btn-wishlist"
-                onClick={() => handleAddToWishlist(item._id)}
-                title="Add to Wishlist"
-              >
-                <i className="fas fa-heart" aria-hidden="true"></i>
-              </button>
-              <img src={item.image} alt={item.name} className="menu-image" />
-              <div className="menu-details">
-                <h3 className="name">{item.name}</h3>
-                <p className="text">{item.description}</p>
-                {item.dietary && item.dietary.length > 0 && (
-                  <div className="dietary-tags">
-                    {item.dietary.map((tag) => (
-                      <span key={tag} className="dietary-tag">
-                        {tag}
-                      </span>
-                    ))}
+          <ul className={shopGrid}>
+            {menuItems.map((item) => (
+              <li className={shopCard} key={item._id}>
+                <button
+                  className={wishlistBtn}
+                  onClick={() => handleAddToWishlist(item._id)}
+                  title="Add to Wishlist"
+                >
+                  <i className="fas fa-heart" aria-hidden="true"></i>
+                </button>
+                <img src={item.image} alt={item.name} className={shopImage} />
+                <div className={shopDetails}>
+                  <h3 className={shopName}>{item.name}</h3>
+                  <p className={shopText}>{item.description}</p>
+                  {item.dietary && item.dietary.length > 0 && (
+                    <div className={dietaryTags}>
+                      {item.dietary.map((tag) => (
+                        <span key={tag} className={dietaryTag}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {item.rating > 0 && (
+                    <div className={ratingRow}>
+                      <i className="fas fa-star" aria-hidden="true"></i> {item.rating.toFixed(1)}
+                      <span className={ratingCount}>({item.reviewCount} reviews)</span>
+                    </div>
+                  )}
+                  <div className={shopFooter}>
+                    <p className={shopPrice}>₹{item.price}</p>
+                    <button
+                      className={addedItems[item._id] ? addToCartBtnAdded : addToCartBtn}
+                      onClick={() => handleAddToCart(item)}
+                    >
+                      {addedItems[item._id] ? (
+                        <>
+                          <i className="fas fa-check" aria-hidden="true"></i> Added
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-cart-plus" aria-hidden="true"></i> Add to Cart
+                        </>
+                      )}
+                    </button>
                   </div>
-                )}
-                {item.rating > 0 && (
-                  <div className="rating">
-                    <i className="fas fa-star" aria-hidden="true"></i> {item.rating.toFixed(1)}
-                    <span>({item.reviewCount} reviews)</span>
-                  </div>
-                )}
-                <div className="menu-footer">
-                  <p className="price">₹{item.price}</p>
-                  <button
-                    className={`add-to-cart-btn ${addedItems[item._id] ? 'added' : ''}`}
-                    onClick={() => handleAddToCart(item)}
-                  >
-                    {addedItems[item._id] ? (
-                      <>
-                        <i className="fas fa-check" aria-hidden="true"></i> Added
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-cart-plus" aria-hidden="true"></i> Add to Cart
-                      </>
-                    )}
-                  </button>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </section>
