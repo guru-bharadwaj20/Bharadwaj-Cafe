@@ -24,7 +24,30 @@ const VIEWPORTS = [
   { name: 'mobile', width: 390, height: 844 },
 ];
 
-// Every route worth protecting, with whether it needs a signed-in user.
+/**
+ * Reveals UI that only exists after a click.
+ *
+ * The checkout form and the address form are behind buttons, so a plain
+ * navigation captures the collapsed page and proves nothing about either. The
+ * site header is fixed and swallows ordinary clicks, hence dispatchEvent.
+ */
+const expandCheckout = async (page) => {
+  await page.locator('button:has-text("Proceed to Pay")').first().dispatchEvent('click');
+  await page.waitForTimeout(700);
+  await page.locator('#orderType').selectOption('delivery');
+  // Typed values, so text/background contrast is captured rather than assumed.
+  await page.fill('#customerPhone', '9876543210');
+  await page.fill('#deliveryAddress', '12 MG Road, Bengaluru');
+  await page.fill('#specialInstructions', 'Less sugar');
+};
+
+const expandAddressForm = async (page) => {
+  await page.locator('button:has-text("Add New Address")').first().dispatchEvent('click');
+  await page.waitForTimeout(700);
+};
+
+// Every route worth protecting, with whether it needs a signed-in user and an
+// optional step to run before the screenshot.
 const ROUTES = [
   ['landing', '/', false],
   ['login', '/login', false],
@@ -36,10 +59,12 @@ const ROUTES = [
   ['merchandise', '/merchandise', true],
   ['contact', '/contact', true],
   ['cart', '/cart', true],
+  ['cart-checkout', '/cart', true, expandCheckout],
   ['profile', '/profile', true],
   ['order-history', '/order-history', true],
   ['wishlist', '/wishlist', true],
   ['addresses', '/addresses', true],
+  ['addresses-form', '/addresses', true, expandAddressForm],
   ['loyalty', '/loyalty', true],
   ['blog', '/blog', true],
 ];
@@ -120,11 +145,15 @@ const capture = async () => {
     const page = await context.newPage();
     page.on('pageerror', (e) => problems.push(`${vp.name} pageerror: ${e.message}`));
 
-    for (const [name, route] of ROUTES) {
+    for (const [name, route, , expand] of ROUTES) {
       try {
         await page.goto(`${APP}${route}`, { waitUntil: 'networkidle', timeout: 30000 });
         // Settle animations and any post-mount fetches.
         await page.waitForTimeout(1400);
+        if (expand) {
+          await expand(page);
+          await page.waitForTimeout(600);
+        }
         await page.evaluate(() => window.scrollTo(0, 0));
         await page.screenshot({
           path: path.join(outDir, `${name}-${vp.name}.png`),
