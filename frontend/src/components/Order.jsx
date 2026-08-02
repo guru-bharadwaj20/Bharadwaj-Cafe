@@ -81,34 +81,25 @@ const Order = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <section className={shopSection} id="order">
-        <h2 className={shopTitle}>Our Menu</h2>
-        <div className="mx-auto max-w-site px-5">
-          <p className={shopStatus}>Loading menu...</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className={shopSection} id="order">
-        <h2 className={shopTitle}>Our Menu</h2>
-        <div className="mx-auto max-w-site px-5">
-          <p className={`${shopStatus} text-secondary`}>{error}</p>
-        </div>
-      </section>
-    );
-  }
-
+  /*
+   * The filter bar stays mounted through loading and error states, and that is
+   * a bug fix rather than a tidy-up. Changing any filter sets `loading`, and
+   * while this component returned early for that the whole subtree came down
+   * with it — including `SearchFilters`, whose selections live in its own
+   * state. Every one of them was wiped on the way to the results: you could
+   * never hold two dietary filters at once, and the search box emptied itself
+   * mid-search.
+   */
   return (
     <section className={shopSection} id="order">
       <h2 className={shopTitle}>Our Menu</h2>
       <SearchFilters onFilterChange={handleFilterChange} />
       <div className="mx-auto max-w-site px-5">
-        {menuItems.length === 0 ? (
+        {loading ? (
+          <p className={shopStatus}>Loading menu...</p>
+        ) : error ? (
+          <p className={`${shopStatus} text-secondary`}>{error}</p>
+        ) : menuItems.length === 0 ? (
           <p className={shopStatus}>No items match those filters. Try widening your search.</p>
         ) : (
           <ul className={shopGrid}>
