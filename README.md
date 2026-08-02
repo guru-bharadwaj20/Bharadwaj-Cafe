@@ -8,10 +8,11 @@
 &nbsp;![react](https://img.shields.io/badge/react-18-61DAFB?logo=react&logoColor=black)
 &nbsp;![tests](https://img.shields.io/badge/tests-279%20passing-brightgreen)
 &nbsp;![images](https://img.shields.io/badge/images-Cloudinary%20%C2%B7%20none%20local-orange)
+&nbsp;![styling](https://img.shields.io/badge/styling-Tailwind%20%C2%B7%201%20stylesheet-06B6D4?logo=tailwindcss&logoColor=white)
 
 Customers browse a menu and merchandise catalogue, order, collect loyalty points and ask a Gemini-backed assistant for help. Staff get a separate console with a dashboard and analytics. React 18 + Vite, Express + TypeScript, MongoDB, Redis, Socket.IO.
 
-**The verification is the point of this repository.** Ordering apps are easy to demo and easy to fool yourself about. Most of the work here went into finding the things that looked correct in a screenshot and were broken in a browser — and into building a harness that could tell the difference, then catching that harness lying three times.
+**The verification is the point of this repository.** Ordering apps are easy to demo and easy to fool yourself about. Most of the work here went into finding the things that looked correct in a screenshot and were broken in a browser — into building a harness that could tell the difference, then catching that harness lying five times — and, latterly, into discovering that a whole class of fault produces *no* pixel diff at all, because the rule was never rendering to begin with.
 
 <p align="center">
   <img src="docs/image.png" alt="Bharadwaj's Cafe landing page" width="100%" />
@@ -32,7 +33,7 @@ Every row below was live in the app, and every one was found by measuring rather
 | **The admin dashboard was open** | Nothing visible at all | `/admin` sat behind a check for *any* signed-in user. The API enforced roles so no data leaked, but the pages rendered for customers |
 | **Analytics was wrecked** | Overlapping, unreadable | `style.css` styled the bare element selector `header`. The analytics title row *is* a `<header>`, so it was pulled out of the flow, painted maroon and dropped over the metric cards |
 | **No way to reach the cart** | Add-to-cart felt like a no-op | The cart button lived in `.mobile-icons`, which `style.css` hides above 768px. On desktop there was no confirmation *and* no link |
-| **Every CSS transform was dead** | Navbar 179px off-centre; nothing hovered | Preflight is off, so Tailwind's `--tw-translate-y`, `--tw-rotate` and the rest were never declared. `translate(-50%, )` is invalid and browsers drop the whole declaration |
+| **Every CSS transform was dead** | Navbar 179px off-centre; nothing hovered | Preflight was off for the migration, so Tailwind's `--tw-translate-y`, `--tw-rotate` and the rest were never declared. `translate(-50%, )` is invalid and browsers drop the whole declaration. Declared by hand until Preflight came on |
 | **The filter bar wiped itself** | Two filters never held at once | Changing a filter set `loading`; the page returned early, unmounting the filter component and destroying its state mid-search |
 
 ---
@@ -47,15 +48,19 @@ npm run ui:after        # after it
 npm run ui:diff         # per-page percentage of pixels changed
 ```
 
-It was wrong three times, and each time the number still looked authoritative.
+It has been wrong five times, and each time the number still looked authoritative.
 
 | It reported | Actually | Fix |
 |---|---|---|
 | `contact-desktop` **0.96%**, then **0.00%** on identical code | A webfont landing after the screenshot, shifting every glyph | await `document.fonts.ready` |
 | `cart-checkout-mobile` drifting ~1.4% run to run | A text caret caught mid-blink, plus the chat launcher's endless pulse | blur before capture, freeze all animation |
 | **0.00% across the board** — while shipping a visibly broken navbar | Every run signed in as a *customer*. The staff links were never in a single screenshot | capture an admin session too |
+| `/contact` at ~1% desktop, ~3% mobile, on a page nothing had touched | The page smooth-scrolls to its anchor, and a full-page screenshot draws fixed elements wherever the viewport is mid-glide | honour `prefers-reduced-motion`, and emulate it |
+| **Most of the site had changed size** | A 429. Enough captures back to back tripped the API limiter, every protected route bounced to `/login`, and every screenshot came out at viewport height | refuse to capture without a session |
 
-The third is the one worth remembering: a green board had been measuring the wrong kind of user for the entire project. It now captures both, seeds its own cart, wishlist and addresses, and opens the two forms that exist only after a click — because a route rendering an empty state proves nothing.
+Two are worth remembering. The customer-only session meant a green board had been measuring the wrong *kind of user* for the entire project. The 429 is worse: a comparison built on a failed login is not degraded, it is fabricated, and it read as a confident result. The harness now captures both kinds of user, seeds its own cart, wishlist and addresses, opens the two forms that exist only after a click, and throws rather than proceeding without a session.
+
+**A clean determinism re-run is still outstanding.** The rate limiter is what stopped it; the guard is in place and the next run on a cooled-down limiter is the check.
 
 **Two changes were built, measured, and withdrawn.** A global `*{border-style:solid}` (it put borders on eight pages) and a `bg-dark` page spacer (it left a seam against the footer). Both are written up in [docs/tailwind-migration.md](docs/tailwind-migration.md) rather than quietly deleted.
 
@@ -141,35 +146,58 @@ Customer and staff are **two separate applications** over one API. That is not t
 <details>
 <summary><b>Decisions worth explaining</b></summary>
 
-**No image lives in the repository.** All 31 are on Cloudinary, uploaded by [`backend/scripts/uploadAssets.ts`](backend/scripts/uploadAssets.ts), which derives a deterministic `public_id` from each path — re-running finds the existing asset instead of duplicating it. The URLs are committed in a manifest and stored on menu documents, so stability matters. Anything rendering a database-supplied URL passes through `resolveImage`, which maps a legacy `img/latte.png` onto the manifest rather than 404-ing. Measured effect: the service-worker precache fell from **37 entries / 11,429 KB to 5 / 423 KB**.
+**No image lives in the repository.** All 31 are on Cloudinary, uploaded by [`backend/scripts/uploadAssets.ts`](backend/scripts/uploadAssets.ts), which derives a deterministic `public_id` from each path — re-running finds the existing asset instead of duplicating it. The URLs are committed in a manifest and stored on menu documents, so stability matters. Anything rendering a database-supplied URL passes through `resolveImage`, which maps a legacy `img/latte.png` onto the manifest rather than 404-ing. Measured effect: the service-worker precache fell from **37 entries / 11,429 KB to 5 / 417 KB**.
 
 **Uploads never touch the API server.** Cloudinary is used with *signed direct uploads* — the browser uploads straight to Cloudinary and the server only signs the parameters (folder, timestamp, allowed formats). No multi-megabyte buffers in Node's memory, no timeout on a slow connection, and a leaked signature cannot be reused to upload anything, anywhere, forever.
 
 **The order total is computed server-side.** The client sends ids and quantities only. Prices shown during checkout are a preview; the server looks up current prices and calculates the total itself.
 
-**Shared styling lives in modules, not stylesheets.** `.btn-primary` was declared in two files and which one applied depended on import order — the cart's secondary button silently rendered as the landing page's. Those now live in [`styles/buttons.js`](frontend/src/styles/buttons.js), `forms.js` and `glass.js`, encoding what the browser *actually resolved to*, so lifting them changed nothing on screen.
+**Shared styling lives in modules, not stylesheets.** `.btn-primary` was declared in two files and which one applied depended on import order — the cart's secondary button silently rendered as the landing page's. Ten such patterns now live in [`frontend/src/styles/`](frontend/src/styles/), each encoding what the browser *actually resolved to* rather than what either file asked for, so lifting them changed nothing on screen. Where the resolved value was clearly not the intent, the difference is stated in the module and in the commit rather than quietly corrected.
 
 **`alert()` appears nowhere.** All 23 were replaced by in-page notifications. The browser dialog is modal, is labelled "localhost:5173 says", and has to be dismissed by hand — for something as small as "added to wishlist".
 </details>
 
 ---
 
-## Styling: 12 of 20 stylesheets integrated
+## Styling: 20 of 20 stylesheets integrated
 
-The site began as twenty hand-written stylesheets. They are being folded into Tailwind utilities **on the components themselves** — not concatenated into one CSS file — under the rule that the page must not change appearance, checked by pixel diff rather than asserted.
+The site began as twenty hand-written stylesheets. They are gone. Styling lives on the components as Tailwind utilities — **not concatenated into one CSS file** — and `src/tailwind.css` is the only stylesheet left, holding the three things a utility cannot express: the design tokens as custom properties, three global rules for elements no component owns (`html`, the `:focus-visible` ring, the reduced-motion override), and Tailwind itself.
 
-**Integrated:** `footer` · `about` · `contact` · `order` · `merchandise` · `search-filters` · `chat` · `wishlist` · `loyalty` · `address`, plus the shared button and form rules. `blog.css` and `reviews.css` were **deleted** — both styled features that were unreachable in the running app.
+The rule for the whole exercise was that the page must not change appearance, checked by pixel diff rather than asserted. Two of the twenty were **deleted** rather than migrated — `blog.css` and `reviews.css` both styled features unreachable in the running app — and 204 further lines of dead header CSS went with them, orphaned when the navigation rebuild deleted `components/Header.jsx`.
 
-**Remaining (8):** `style` · `landing` · `profile` · `order-history` · `admin` · `analytics` · `cart` · `auth`.
+**Preflight is now on.** It stayed off for the whole migration because `style.css` shipped a reset the twenty files were written against, most visibly `img { width: 95% }`. Every image that relied on that global names its own width now, so the swap moves nothing. Turning it on also ends the two traps below.
 
-Preflight stays **off** until the last one is gone: it would reset `img`, headings and lists underneath every page not yet migrated. Turning it on is its own commit with its own review.
+**CSS ships at 53.8 KB, down from 75.5 KB — 10.1 KB gzipped, from 13.5.**
 
-Four traps are documented in [docs/tailwind-migration.md](docs/tailwind-migration.md), each of which cost real time:
+Patterns shared across components live in [`frontend/src/styles/`](frontend/src/styles/) as plain modules: `buttons` · `forms` · `messages` · `glass` · `shop` · `auth` · `admin` · `feedback` · `status` · `layout`. Each exists because a class was declared in more than one stylesheet and which declaration applied depended on import order rather than on anything local.
 
-- **A one-sided border draws four sides.** `border-solid` sets the style on every side, and with Preflight off the unnamed ones fall back to `medium` (~3px). Write `border-x-0 border-t-0 border-b border-solid`.
+Traps, all documented with measurements in [docs/tailwind-migration.md](docs/tailwind-migration.md):
+
+- **A one-sided border draws four sides.** `border-solid` sets the style on every side, and with Preflight off the unnamed ones fall back to `medium` (~3px). Cost two regressions before it was understood; Preflight now makes it moot.
 - **Opacity modifiers break on themed colours.** `text-white/75` compiles to `rgb(var(--white-color) / 0.75)`; the token holds `#fff`, the declaration is invalid, and anchors fall back to **UA blue**.
-- **Conflicting utilities resolve by stylesheet order, not class order.** A textarea silently collapsed 120px → 50px — and passed at 0.00% on the first check.
+- **Conflicting utilities resolve by emission order, not class order.** `${base} w-auto` does not override a `w-full` inside `base`. Every shared constant here is split so no two strings set the same property.
+- **A dynamically built class name does not exist.** Tailwind finds classes by scanning source *text*, so `hover:${lift.split(' ').join(' hover:')}` generates nothing at all. Caught before shipping; every variant is spelled out in full.
+- **`hover:[&>td]:` is not "on hover, the cells".** Tailwind composes it as `.class > td:hover` — the one cell under the pointer — and `last:[&>td]:` as `> td:last-child`, the rightmost cell of *every* row. The pseudo has to go inside: `[&:hover>td]`. Both read plausibly and both were wrong.
 - **A selector can be broader than its name.** The bare `header` rule is the one that destroyed the analytics page.
+
+### What integrating them turned up
+
+Folding twenty stylesheets into the components meant reading every rule against the markup that actually renders it. That comparison found more broken pages than the pixel diffs ever did, because a rule that matches nothing produces no diff — it was never rendering in the first place.
+
+| Page | What was wrong |
+|---|---|
+| **Order history** | The stylesheet had been written against **different markup than shipped**. Fifteen classes the component renders (`.order-header`, `.order-body`, `.order-status-badge`, `.order-item`, `.modal-close`, …) were declared in no stylesheet in the project, while the file carried `.order-card-header`, `.order-card-body`, `.order-status` and friends, which nothing rendered. Same design, two sets of names. The heading was UA-default black on the dark page, the status badge was a plain coloured block, and the five-step order tracker — designed as a row with a progress rail through it — **stacked vertically**, `flex: 1` inert on a non-flex parent |
+| **Reset Password** | Its submit button was `.submit-button`, a class no stylesheet declares. A bare browser button where the other four auth pages show the amber one |
+| **Verify Email** | Everything except `.spinner` was undeclared. A column of unstyled text under a raw glyph. Its failure state offered a white-on-white button — correct on the dark pages it was written for, invisible on the white auth card, and only reachable via an expired link |
+| **Checkout** | The `<legend>` inherited its colour and nothing from `<body>` down sets one, so **"Payment" was black on #2a2a2a**, about 1.3:1. The two labels below it were white because a `label` selector caught them; a legend is not a label |
+| **Checkout** | `.payment-option` asked for `display: flex` and never got it — `.payment-form label` is (0,1,1) against its (0,1,0), so every option rendered as a block with its `gap` and alignment inert |
+| **Order history** | `.item-price` was declared in `cart.css` *and* `order-history.css`, and cart marked its colour `!important`. Line prices rendered in the cart's amber bold 18px next to the already-amber quantity; order-history's own white, right-aligned values lost every time |
+| **Admin dashboard** | `.loading` was declared nowhere, so three "Loading…" messages rendered in UA-default black on #252525 |
+| **Admin dashboard** | The tabs were styled by two stylesheets at once, silently taking `flex: 1`, `min-width: 200px`, `justify-content` and a font weight from the *account page's* file |
+| **Account** | The notification opt-in was written for a dark surface — a 6%-white panel and a white-on-transparent "on" button — and renders on `--light-pink-color`. The panel was invisible, and so was the button once you switched notifications on |
+| **Account** | 90px of mobile top padding, left over from clearing the fixed header the navigation rebuild removed. Every other page came down to 40px; this one was missed |
+
+Order status colours existed in **four** places: twice in `admin.css`, once in `order-history.css`, and once as a map inside a component — the only copy that shipped, and the one with no foreground colour, so `CONFIRMED` was black on `#2196f3`. They are one module now.
 
 ---
 
@@ -185,9 +213,10 @@ frontend/src/
   ├─ components/   FloatingNav · CartBubble · CartToast · ToastHost · AdminLayout · …
   ├─ pages/        customer routes, plus the separate admin console
   ├─ context/      Auth · Cart · Toast
-  ├─ styles/       buttons · forms · glass · shop — shared patterns
+  ├─ styles/       buttons · forms · messages · glass · shop · auth
+  │                admin · feedback · status · layout — shared patterns
   ├─ assets/       cloudinary.js — generated image manifest
-  └─ *.css         8 legacy stylesheets still to fold in
+  └─ tailwind.css  the only stylesheet: tokens, three globals, Tailwind
 scripts/           ui-snapshot.mjs — the visual-regression harness
 docs/              tailwind-migration.md, ADRs
 e2e/               Playwright end-to-end specs

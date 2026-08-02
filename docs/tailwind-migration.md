@@ -1,8 +1,13 @@
 # Tailwind migration
 
-Status of the move from twenty hand-written stylesheets to Tailwind utilities,
-and the traps found so far. The rule for the whole exercise is that the site
-must not change appearance, which is checked rather than asserted:
+**Complete: 20 of 20.** `src/tailwind.css` is the only stylesheet left. It
+holds the design tokens as custom properties, three global rules for elements
+no component owns (`html`, the `:focus-visible` ring, the reduced-motion
+override), and Tailwind itself. Everything else is utilities on components,
+with patterns shared across components living in `src/styles/*.js`.
+
+The rule for the whole exercise was that the site must not change appearance,
+checked rather than asserted:
 
 ```
 npm run ui:baseline   # before a batch
@@ -14,45 +19,89 @@ Both servers must be running. Every route is captured at 1440px and 390px,
 signed in, with a seeded cart. Expect a permanent ~0.2% delta on the profile
 pages: each run registers a throwaway account, so the name on screen differs.
 
-## Done — 10 of 20 stylesheets
+**Outstanding: a clean determinism re-run.** The API rate limiter stopped the
+last attempt (see the false positives below). The guard is in place; the next
+run on a cooled-down limiter is the check.
 
-| Stylesheet | Replaced by | Diff |
-| --- | --- | --- |
-| `footer.css` | `components/Footer.jsx` | 0.00% |
-| `about.css` | `components/About.jsx` | 0.00% |
-| `contact.css` | `components/Contact.jsx` | 0.00% |
-| `order.css`, `merchandise.css` | `styles/shop.js` | 0.00% |
-| `search-filters.css` | `components/SearchFilters.jsx` | 0.00% |
-| `chat.css` | `components/ChatWidget.jsx` | structural |
-| `wishlist.css` | `pages/WishlistPage.jsx` | 0.00% |
-| button rules in `cart.css` + `landing.css` | `styles/buttons.js` | 0.00% |
-| `.form-group` rules in `auth.css` | `styles/forms.js` | 0.00%, cart fixed |
-| `loyalty.css` | `pages/LoyaltyPage.jsx` | 0.00% |
-| `address.css` | `pages/AddressManagement.jsx` | intentional, see below |
+## What moved where
 
-The chat widget is checked structurally rather than by pixels: its panel holds
-a live Gemini reply, so the text differs between runs. Panel size, message
-border-radius, alignment and colours were compared instead.
+| Stylesheet | Replaced by |
+| --- | --- |
+| `footer.css` | `components/Footer.jsx` |
+| `about.css` | `components/About.jsx` |
+| `contact.css` | `components/Contact.jsx` |
+| `order.css`, `merchandise.css` | `styles/shop.js` |
+| `search-filters.css` | `components/SearchFilters.jsx` |
+| `chat.css` | `components/ChatWidget.jsx` |
+| `wishlist.css` | `pages/WishlistPage.jsx` |
+| `loyalty.css` | `pages/LoyaltyPage.jsx` |
+| `address.css` | `pages/AddressManagement.jsx` |
+| `auth.css` | `styles/auth.js`, `styles/forms.js`, `styles/messages.js` |
+| `cart.css` | `pages/Cart.jsx` |
+| `analytics.css` | `components/charts/Charts.jsx`, `pages/AnalyticsPage.jsx`, `viz-*` tokens |
+| `admin.css` | `styles/admin.js` |
+| `order-history.css` | `pages/OrderHistory.jsx`, `styles/status.js` |
+| `profile.css` | `pages/Profile.jsx`, `components/NotificationToggle.jsx` |
+| `landing.css` | `pages/Landing.jsx` |
+| `style.css` | `styles/layout.js`, `components/Hero.jsx`, tokens and globals in `tailwind.css` |
+| `blog.css`, `reviews.css` | **deleted** — both styled features unreachable in the running app |
 
-The addresses route is the one migration that deliberately changes the page,
-because it was broken. It had no top offset and no background, so with the
-site header fixed at 90px the heading sat behind the navbar as white text on
-the default white page, and the "Add New Address" button — the only way to add
-one — could not be clicked at all. Its card actions were also coloured by
-`button:nth-child()`, so on the default address, where "Set as Default" is not
-rendered, every button shifted a position and Delete came out blue.
+Shared modules in `src/styles/`: `buttons` · `forms` · `messages` · `glass` ·
+`shop` · `auth` · `admin` · `feedback` · `status` · `layout`. Each exists
+because a class was declared in more than one stylesheet, so which declaration
+applied depended on `App.jsx`'s import order rather than on anything local.
 
-## Remaining — 10 stylesheets
+`landing.css` and `style.css` had to move in the same commit: landing's mobile
+drawer rules were `.landing-header .navbar .nav-menu .nav-link`-shaped
+overrides of style.css's `.navbar .nav-menu .nav-link`, both (0,3,0) or higher,
+against a utility's (0,1,0). Whichever moved first would have lost to the other.
 
-`admin` · `analytics` · `auth` · `blog` · `cart` · `landing` ·
-`order-history` · `profile` · `reviews` · `style`
+Preflight came on in that same commit, because `@tailwind base` is what
+replaces the reset style.css was carrying. Splitting them would have left an
+intermediate commit with bullets on every list and default margins everywhere.
+
+A further 204 lines went with `style.css` without being migrated at all: the
+cart button, the user dropdown, `@keyframes dropdownFadeIn`, `.mobile-icons`
+and `.mobile-cart-btn` were the deleted `components/Header.jsx`'s, orphaned by
+the navigation rebuild and left behind styling nothing.
+
+## Faults found by reading the rules against the markup
+
+None of these produced a pixel diff, because the rules were never rendering.
+That is the main lesson of the second half of this migration: a screenshot
+comparison cannot see a rule that does not match anything.
+
+- **`order-history.css` had been written against different markup than
+  shipped.** Fifteen classes the component renders were declared nowhere;
+  seven the file declared were rendered by nothing. Same design, two sets of
+  names. The heading was UA-default black on the dark page, the status badge
+  was an unshaped colour block, and the five-step order tracker stacked
+  vertically because its flex row and progress rail were never in the markup.
+- **Reset Password's submit button was `.submit-button`**, declared nowhere —
+  a bare browser button where four sibling pages show the amber one.
+- **Verify Email was unstyled apart from `.spinner`**, and its failure state
+  offered a white-on-white button, only reachable through an expired link.
+- **The checkout `<legend>` was black on #2a2a2a**, about 1.3:1: it inherits
+  its colour and nothing from `<body>` down sets one.
+- **`.payment-option` asked for `display: flex` and never got it** — (0,1,0)
+  against `.payment-form label`'s (0,1,1).
+- **`.item-price` was declared in two files**, and cart.css's `!important`
+  colour beat order-history.css's on the order history page.
+- **`.loading` was declared nowhere**, so three admin messages were black on
+  #252525.
+- **The notification opt-in was built for a dark surface** and renders on
+  `--light-pink-color`: invisible panel, invisible "on" button.
+- **Order status colours existed in four places**, and the copy that shipped —
+  a map inside a component — set no foreground colour.
 
 ## Traps
 
 Each of these cost real time and would silently damage whatever is migrated
 next, so they are worth reading before continuing.
 
-**Preflight is off, so `border-*` utilities have no style.** Tailwind's border
+**(Historical — Preflight is on now, and both of these go away with it.)**
+
+**Preflight off meant `border-*` utilities had no style.** Tailwind's border
 utilities set a width and a colour but never `border-style`; that normally
 arrives with Preflight, which is disabled while the legacy stylesheets are
 loaded. `border-2` therefore computes to a two-pixel border of style `none` —
@@ -60,7 +109,7 @@ zero pixels wide. Always pair it with `border-solid`. Adding a global
 `*{border-style:solid}` instead was tried and reverted: it put borders on
 legacy elements that set a width without a style, changing eight pages.
 
-**…and a one-sided border needs the other three sides zeroed.** This is the
+**…and a one-sided border needed the other three sides zeroed.** This is the
 sharp edge of the rule above and it has already caused two regressions.
 `border-solid` sets the style on *all four* sides; Preflight is what normally
 sets every side's width to 0, so without it the sides you did not name fall
@@ -70,6 +119,29 @@ border-solid`: those touch different properties from each other, so unlike
 `border-0 border-b` there is no stylesheet-order tie-break involved. The
 loyalty tier rows were 3px too tall this way, and the chat input row was
 carrying 3px on three sides for several commits before anyone measured it.
+
+**A class name that does not exist in the source text is never generated.**
+Tailwind finds classes by scanning files as text, so
+`hover:${lift.split(' ').join(' hover:')}` produces nothing at all — the names
+only exist once the string is evaluated. Every variant is spelled out in full.
+
+**`hover:[&>td]:` is not "on hover, the cells".** Tailwind composes it as
+`.class > td:hover`, the one cell under the pointer, and `last:[&>td]:` as
+`> td:last-child`, the rightmost cell of every row rather than the cells of the
+last row. The pseudo-class has to go inside the arbitrary selector:
+`[&:hover>td]` and `[&:last-child>td]`. Both forms read plausibly and both of
+the wrong ones were briefly committed.
+
+**`tabular-nums` is dead with Preflight off,** for the same reason transforms
+were: it composes its value from five `--tw-numeric-*` variables that Preflight
+declares. Written as a raw `[font-variant-numeric:tabular-nums]` instead.
+
+**A `max-[900px]:` variant is not `@media (max-width: 900px)`.** The arbitrary
+form compiles to `not all and (min-width: 900px)`, which stops a hundredth of a
+pixel short. The three legacy widths are named screens — `to-900`, `to-768`,
+`to-600` — using `{ max: ... }`, which emits the query exactly. Verified in the
+built CSS that Tailwind emits them after the base utilities, and `to-600` after
+`to-900`, which is the cascade the source files relied on.
 
 **Conflicting utilities are resolved by stylesheet order, not class order.**
 Appending `h-[120px]` to a shared base already holding `h-[50px]` does not
@@ -206,7 +278,7 @@ in one region, suspect the harness before the CSS — and confirm it by
 capturing twice without touching the code.
 
 - **Smooth scrolling.** The about page scrolls to its contact anchor on mount,
-  and a full-page screenshot draws fixed elements � the nav, the cart bubble �
+  and a full-page screenshot draws fixed elements — the nav, the cart bubble —
   wherever the viewport is mid-glide: ~1% desktop, ~3% mobile, on a page nothing
   had touched. The page now honours `prefers-reduced-motion` and the harness
   emulates it.
