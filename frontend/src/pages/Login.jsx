@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
+import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -114,9 +115,9 @@ const Login = () => {
             )}
 
             <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
-                <label htmlFor="email">
-                  <i className="fa-solid fa-envelope" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="email" className={formLabel}>
+                  <i className={`fa-solid fa-envelope ${formLabelIcon}`} aria-hidden="true"></i>
                   Email Address
                 </label>
                 <input
@@ -126,13 +127,14 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
+                  className={formInput}
                   required
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="password">
-                  <i className="fa-solid fa-lock" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="password" className={formLabel}>
+                  <i className={`fa-solid fa-lock ${formLabelIcon}`} aria-hidden="true"></i>
                   Password
                 </label>
                 <input
@@ -142,6 +144,7 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
+                  className={formInput}
                   required
                 />
               </div>

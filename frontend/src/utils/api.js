@@ -18,6 +18,14 @@ export const api = {
     return response.json();
   },
 
+  // The merchandise shelf. Same collection as the menu, filtered server-side
+  // by kind, so these carry real ids the checkout can price.
+  getMerchandise: async () => {
+    const response = await fetch(`${API_URL}/menu?kind=merch`);
+    if (!response.ok) throw new Error('Failed to fetch merchandise');
+    return response.json();
+  },
+
   // Order APIs
   // The server prices the order from the live menu, so only item ids and
   // quantities are sent — never prices or totals.

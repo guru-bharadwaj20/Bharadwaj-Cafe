@@ -3,7 +3,7 @@
 .profile-page {
   min-height: 100vh;
   background: var(--light-pink-color);
-  padding: 100px 0 50px;
+  padding: 40px 0 50px;
 }
 
 .profile-container {
@@ -237,7 +237,18 @@
 .form-actions {
   display: flex;
   gap: 15px;
-  margin-top: 30px;
+  /*
+   * 20px, not the 30px this file used to ask for. `.form-actions` is declared
+   * bare in reviews.css too, and address.css declared it as well until it was
+   * migrated; address.css is imported later than this file, so its 20px is
+   * what these buttons have always rendered with. Stated here so removing
+   * address.css does not silently move the profile page. The gap is likewise
+   * overridden to 10px by reviews.css, which is imported later still.
+   *
+   * Whether 20px/10px is the wanted spacing is a separate, deliberate
+   * decision -- see docs/tailwind-migration.md.
+   */
+  margin-top: 20px;
 }
 
 .save-btn {

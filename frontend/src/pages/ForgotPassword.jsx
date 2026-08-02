@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../utils/api';
+import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -50,9 +51,9 @@ const ForgotPassword = () => {
             )}
 
             <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
-                <label htmlFor="email">
-                  <i className="fa-solid fa-envelope" aria-hidden="true"></i>
+              <div className={formGroup}>
+                <label htmlFor="email" className={formLabel}>
+                  <i className={`fa-solid fa-envelope ${formLabelIcon}`} aria-hidden="true"></i>
                   Email Address
                 </label>
                 <input
@@ -62,6 +63,7 @@ const ForgotPassword = () => {
                   placeholder="Enter your registered email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className={formInput}
                   required
                 />
               </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { btnHeroPrimary, btnHeroSecondary } from '../styles/buttons';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -60,6 +61,17 @@ const Landing = () => {
                 Register
               </button>
             </li>
+            {/* Staff door. Deliberately the quietest thing in the bar --
+                present so nobody has to be told the URL, but not competing
+                with the customer actions. */}
+            <li className="nav-item">
+              <button
+                onClick={() => navigate('/admin/login')}
+                className="nav-link flex items-center gap-2 text-s opacity-70 transition-opacity duration-200 hover:opacity-100"
+              >
+                <i className="fa-solid fa-user-shield" aria-hidden="true"></i> Staff
+              </button>
+            </li>
           </ul>
           <button
             id="menu-open-button"
@@ -82,13 +94,27 @@ const Landing = () => {
                 authentic coffee experience in the heart of Karnataka.
               </p>
               <div className="hero-buttons">
-                <button onClick={() => navigate('/register')} className="btn btn-primary">
+                <button onClick={() => navigate('/register')} className={btnHeroPrimary}>
                   Get Started
                 </button>
-                <button onClick={() => navigate('/login')} className="btn btn-secondary">
-                  Sign In
+                <button onClick={() => navigate('/login')} className={btnHeroSecondary}>
+                  Customer Login
                 </button>
               </div>
+
+              {/* The two doors, stated rather than implied. Customers are the
+                  common case and keep the buttons above; staff get a plain,
+                  clearly labelled link so nobody has to be handed a URL. */}
+              <p className="mt-5 flex flex-wrap items-center gap-2 text-s text-[rgba(255,255,255,0.7)]">
+                <i className="fa-solid fa-user-shield text-secondary" aria-hidden="true"></i>
+                Staff member?
+                <button
+                  onClick={() => navigate('/admin/login')}
+                  className="cursor-pointer border-none bg-transparent p-0 text-s font-bold text-secondary underline underline-offset-4 hover:text-white"
+                >
+                  Sign in to the admin console
+                </button>
+              </p>
             </div>
             <div className="hero-image-section">
               <img src="img/coffee-hero-section.png" alt="Coffee" className="landing-hero-img" />

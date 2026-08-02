@@ -66,3 +66,6 @@ backend/logs/
 *.pid
 *.seed
 *.pid.lock
+
+# Visual-regression captures from scripts/ui-snapshot.mjs
+.uisnap/

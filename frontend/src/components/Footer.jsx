@@ -1,132 +1,149 @@
 import { Link } from 'react-router-dom';
 
+/**
+ * Site footer.
+ *
+ * Migrated from footer.css to utilities. The original media queries were
+ * desktop-first (`max-width: 1024px`, `max-width: 640px`); these are the
+ * mobile-first inversion, so the *base* styles here are the small-screen ones
+ * and `sm:`/`lg:` add back what the wider layouts had.
+ */
+
+// One shared shell so the three bands line up on the same gutter. Replaces
+// the global .section-content rule, which is 20px padding on a 1300px cap.
+const shell = 'mx-auto w-full max-w-site px-5';
+
+const linkClass = 'text-n text-footer-link transition-colors duration-300 hover:text-secondary hover:underline';
+
+const columns = [
+  {
+    heading: 'Get to Know Us',
+    links: [
+      { label: 'About Us', to: '/about' },
+      { label: 'Contact Us', to: '/contact' },
+      { label: 'Careers', href: '#' },
+      { label: 'Our Story', href: '#' },
+    ],
+  },
+  {
+    heading: 'Our Menu',
+    links: [
+      { label: 'Coffee', to: '/order' },
+      { label: 'Snacks', href: '#' },
+      { label: 'Beverages', href: '#' },
+      { label: 'Specials', href: '#' },
+    ],
+  },
+  {
+    heading: 'Customer Service',
+    links: [
+      { label: 'Your Account', to: '/profile' },
+      { label: 'Your Cart', to: '/cart' },
+      { label: 'Help Center', href: '#' },
+      { label: 'Track Order', href: '#' },
+    ],
+  },
+  {
+    heading: 'Connect With Us',
+    links: [
+      { label: 'Facebook', href: 'https://facebook.com', external: true },
+      { label: 'Instagram', href: 'https://instagram.com', external: true },
+      { label: 'LinkedIn', href: 'https://linkedin.com', external: true },
+      { label: 'Twitter', href: 'https://twitter.com', external: true },
+    ],
+  },
+];
+
+const FooterLink = ({ link }) =>
+  link.to ? (
+    <Link to={link.to} className={linkClass}>
+      {link.label}
+    </Link>
+  ) : (
+    <a
+      href={link.href}
+      className={linkClass}
+      {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    >
+      {link.label}
+    </a>
+  );
+
 const Footer = () => {
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <footer className="footer-section">
-      {/* Back to Top */}
-      <div className="back-to-top" onClick={scrollToTop}>
-        <span>Back to top</span>
-      </div>
+    <footer className="w-full bg-dark">
+      <button
+        type="button"
+        onClick={scrollToTop}
+        className="w-full cursor-pointer bg-footer-slate py-[15px] text-center transition-colors duration-300 hover:bg-[#37475a]"
+      >
+        <span className="text-n font-medium text-white">Back to top</span>
+      </button>
 
-      {/* Main Footer Content */}
-      <div className="footer-main">
-        <div className="section-content">
-          <div className="footer-columns">
-            {/* Column 1 - Get to Know Us */}
-            <div className="footer-column">
-              <h3>Get to Know Us</h3>
-              <ul>
-                <li>
-                  <Link to="/about">About Us</Link>
-                </li>
-                <li>
-                  <Link to="/contact">Contact Us</Link>
-                </li>
-                <li>
-                  <a href="#">Careers</a>
-                </li>
-                <li>
-                  <a href="#">Our Story</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 2 - Menu */}
-            <div className="footer-column">
-              <h3>Our Menu</h3>
-              <ul>
-                <li>
-                  <Link to="/order">Coffee</Link>
-                </li>
-                <li>
-                  <a href="#">Snacks</a>
-                </li>
-                <li>
-                  <a href="#">Beverages</a>
-                </li>
-                <li>
-                  <a href="#">Specials</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3 - Customer Service */}
-            <div className="footer-column">
-              <h3>Customer Service</h3>
-              <ul>
-                <li>
-                  <Link to="/profile">Your Account</Link>
-                </li>
-                <li>
-                  <Link to="/cart">Your Cart</Link>
-                </li>
-                <li>
-                  <a href="#">Help Center</a>
-                </li>
-                <li>
-                  <a href="#">Track Order</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 4 - Connect With Us */}
-            <div className="footer-column">
-              <h3>Connect With Us</h3>
-              <ul>
-                <li>
-                  <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                    Facebook
-                  </a>
-                </li>
-                <li>
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                    Instagram
-                  </a>
-                </li>
-                <li>
-                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                    LinkedIn
-                  </a>
-                </li>
-                <li>
-                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                    Twitter
-                  </a>
-                </li>
-              </ul>
-            </div>
+      <div className="bg-footer-slate pb-5 pt-[30px] sm:pb-10 sm:pt-[50px]">
+        <div className={shell}>
+          <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-[30px] sm:grid-cols-2 lg:grid-cols-4 lg:gap-10">
+            {columns.map((column) => (
+              <div key={column.heading} className="text-center sm:text-left">
+                <h3 className="mb-5 text-m font-bold uppercase tracking-[0.5px] text-white">
+                  {column.heading}
+                </h3>
+                <ul className="m-0 list-none p-0">
+                  {column.links.map((link) => (
+                    <li key={link.label} className="mb-3">
+                      <FooterLink link={link} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Footer Bottom */}
-      <div className="footer-bottom">
-        <div className="section-content">
-          <div className="footer-logo">
-            <img src="img/logo.png" alt="Bharadwaj's Cafe Logo" />
+      <div className="bg-footer-deep py-5 sm:py-[30px]">
+        <div className={`${shell} flex flex-col items-center gap-5`}>
+          <div className="mb-2.5">
+            <img src="img/logo.png" alt="Bharadwaj's Cafe Logo" className="h-[50px] w-auto" />
           </div>
-          <div className="footer-bottom-content">
-            <div className="footer-links">
-              <Link to="/privacy">Privacy Policy</Link>
-              <span className="separator">|</span>
-              <Link to="/terms">Terms of Service</Link>
-              <span className="separator">|</span>
-              <Link to="/refund">Refund Policy</Link>
+
+          <div className="flex flex-col items-center gap-[15px] text-center">
+            <div className="flex flex-col flex-wrap items-center justify-center gap-2 sm:flex-row sm:gap-2.5">
+              <Link
+                to="/privacy"
+                className="text-s text-footer-link transition-colors duration-300 hover:text-secondary hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              <span className="mx-[5px] hidden text-[#555] sm:inline">|</span>
+              <Link
+                to="/terms"
+                className="text-s text-footer-link transition-colors duration-300 hover:text-secondary hover:underline"
+              >
+                Terms of Service
+              </Link>
+              <span className="mx-[5px] hidden text-[#555] sm:inline">|</span>
+              <Link
+                to="/refund"
+                className="text-s text-footer-link transition-colors duration-300 hover:text-secondary hover:underline"
+              >
+                Refund Policy
+              </Link>
             </div>
-            <div className="copyright">
-              <p>© 2025 Bharadwaj's Cafe. All rights reserved.</p>
+
+            <div className="text-s text-[#999]">
+              <p className="m-0">© 2025 Bharadwaj&apos;s Cafe. All rights reserved.</p>
             </div>
-            <div className="made-with-love">
-              <p>
-                Made with <i className="fas fa-heart" aria-hidden="true"></i> by{' '}
-                <span className="creator">Guru Bharadwaj</span>
+
+            <div className="mt-2.5">
+              <p className="m-0 flex items-center justify-center gap-2 text-s text-footer-link sm:text-n">
+                Made with{' '}
+                <i className="fas fa-heart animate-heartbeat text-[#e74c3c]" aria-hidden="true"></i>{' '}
+                by <span className="font-bold text-secondary">Guru Bharadwaj</span>
               </p>
             </div>
           </div>

@@ -4,8 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import { openCheckout } from '../utils/razorpay';
 import { useNavigate } from 'react-router-dom';
+import { btnPrimary, btnSecondary } from '../styles/buttons';
+import { useToast } from '../context/ToastContext';
 
 const Cart = () => {
+  const { toast } = useToast();
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -38,7 +41,7 @@ const Cart = () => {
 
   const handleProceedToPay = () => {
     if (cartItems.length === 0) {
-      alert('Your cart is empty!');
+      toast.error('Your cart is empty!');
       return;
     }
     setOrderError('');
@@ -119,7 +122,10 @@ const Cart = () => {
     return (
       <section className="cart-section">
         <div className="section-content">
-          <h2 className="section-title">Checkout</h2>
+          {/* `.section-title` is maroon, which is right on the light About and
+              Contact sections and invisible here -- 1.08:1 against this page's
+              #1a1a1a. White matches how the other dark sections render it. */}
+          <h2 className="section-title text-white">Checkout</h2>
           <div className="checkout-container">
             <div className="order-summary">
               <h3>Order Summary</h3>
@@ -238,13 +244,13 @@ const Cart = () => {
                 <div className="checkout-buttons">
                   <button
                     type="button"
-                    className="btn-secondary"
+                    className={btnSecondary}
                     onClick={() => setShowCheckout(false)}
                     disabled={placing}
                   >
                     Back to Cart
                   </button>
-                  <button type="submit" className="btn-primary" disabled={placing}>
+                  <button type="submit" className={btnPrimary} disabled={placing}>
                     {placing
                       ? 'Processing...'
                       : payOnline && paymentsAvailable
@@ -263,12 +269,12 @@ const Cart = () => {
   return (
     <section className="cart-section" id="main-content">
       <div className="section-content">
-        <h2 className="section-title">Your Cart</h2>
+        <h2 className="section-title text-white">Your Cart</h2>
         {cartItems.length === 0 ? (
           <div className="empty-cart">
             <i className="fas fa-shopping-cart" aria-hidden="true"></i>
             <p>Your cart is empty</p>
-            <button className="btn-primary" onClick={() => navigate('/order')}>
+            <button className={btnPrimary} onClick={() => navigate('/order')}>
               Browse Menu
             </button>
           </div>

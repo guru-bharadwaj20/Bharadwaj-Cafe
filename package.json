@@ -5,7 +5,10 @@
   "scripts": {
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "ui:baseline": "node scripts/ui-snapshot.mjs baseline",
+    "ui:after": "node scripts/ui-snapshot.mjs after",
+    "ui:diff": "node scripts/ui-snapshot.mjs diff"
   },
   "repository": {
     "type": "git",
@@ -21,5 +24,9 @@
   "devDependencies": {
     "@playwright/test": "^1.61.1"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0"
+  }
 }
