@@ -148,7 +148,7 @@ const AddressManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark pb-[50px] pt-[100px]" id="main-content">
+    <div className="min-h-screen bg-dark pb-[50px] pt-10" id="main-content">
       <div className="mx-auto max-w-[1000px] px-5">
         <div className="mb-[30px] flex items-center justify-between">
           <h2 className="text-xl text-white">My Addresses</h2>

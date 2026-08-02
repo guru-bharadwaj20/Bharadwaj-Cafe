@@ -114,7 +114,7 @@ const LoyaltyPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark pb-[50px] pt-[100px]">
+      <div className="min-h-screen bg-dark pb-[50px] pt-10">
         <div className="loading-container">
           <div className="spinner"></div>
           <p>Loading loyalty info...</p>
@@ -124,7 +124,7 @@ const LoyaltyPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark pb-[50px] pt-[100px]" id="main-content">
+    <div className="min-h-screen bg-dark pb-[50px] pt-10" id="main-content">
       <div className="mb-10 text-center text-white">
         <h1 className="mb-2.5 text-xxl text-secondary">Loyalty Rewards</h1>
         <p>Earn points with every purchase and unlock exclusive rewards</p>

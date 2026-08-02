@@ -66,7 +66,7 @@ const WishlistPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark pb-[50px] pt-[100px]">
+      <div className="min-h-screen bg-dark pb-[50px] pt-10">
         <div className="loading-container">
           <div className="spinner"></div>
           <p>Loading wishlist...</p>
@@ -76,7 +76,7 @@ const WishlistPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark pb-[50px] pt-[100px]" id="main-content">
+    <div className="min-h-screen bg-dark pb-[50px] pt-10" id="main-content">
       <div className="mb-10 text-center text-white">
         <h1 className="mb-2.5 text-xxl text-secondary">My Wishlist</h1>
         <p>Save your favorite items for later</p>

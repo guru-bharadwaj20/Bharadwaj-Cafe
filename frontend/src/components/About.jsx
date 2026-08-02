@@ -16,7 +16,10 @@ const socials = [
 
 const About = () => {
   return (
-    <section className="min-h-screen bg-light-pink py-[100px] max-[900px]:py-20" id="about">
+    <section
+      className="min-h-screen bg-light-pink pb-[100px] pt-10 max-[900px]:pb-20 max-[900px]:pt-8"
+      id="about"
+    >
       <div className="mx-auto flex max-w-site items-center justify-between gap-[50px] px-5 max-[900px]:flex-col-reverse max-[900px]:gap-10">
         <div>
           <img
