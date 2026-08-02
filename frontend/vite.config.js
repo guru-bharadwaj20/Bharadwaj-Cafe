@@ -2,6 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// The install icon. Cloudinary rather than a bundled file, so the deployment
+// ships no images of its own; kept as a literal because vite.config runs
+// before any app module and cannot import the manifest.
+const PWA_ICON = 'https://res.cloudinary.com/juqwggy5/image/upload/v1785663432/bharadwaj-cafe/site/logo.png';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -25,10 +30,13 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '/',
         scope: '/',
+        // Cloudinary, like every other image. These pointed at /img/logo.png,
+        // which no longer exists — the build would still have succeeded and
+        // the installed app would simply have had no icon.
         icons: [
-          { src: '/img/logo.png', sizes: '192x192', type: 'image/png' },
-          { src: '/img/logo.png', sizes: '512x512', type: 'image/png' },
-          { src: '/img/logo.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: PWA_ICON, sizes: '192x192', type: 'image/png' },
+          { src: PWA_ICON, sizes: '512x512', type: 'image/png' },
+          { src: PWA_ICON, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       devOptions: { enabled: false },

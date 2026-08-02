@@ -1,5 +1,22 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+/*
+ * The localhost fallback is right for development and catastrophic in
+ * production: a deployed bundle would quietly call the visitor's own machine
+ * and every request would fail with a network error that looks like the server
+ * being down. Vercel builds do not carry a .env, so this is easy to miss.
+ *
+ * Say so once, loudly, rather than leaving it to be diagnosed from failed
+ * fetches. Set VITE_API_URL in the deployment's environment variables.
+ */
+if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
+  console.error(
+    '[config] VITE_API_URL is not set. This build will call ' +
+      `${API_URL}, which is the visitor's own machine, and every request will fail. ` +
+      "Set VITE_API_URL to the backend's public URL and redeploy."
+  );
+}
+
 export const api = {
   // Menu APIs
   getMenu: async (filters = {}) => {
