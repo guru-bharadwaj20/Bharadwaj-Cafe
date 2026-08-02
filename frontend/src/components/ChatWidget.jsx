@@ -33,6 +33,9 @@ const badgeBase =
 const assistantContent =
   'border-y-0 border-l-[3px] border-r-0 border-solid border-secondary bg-[rgba(243,150,28,0.12)]';
 
+/** Openers for the empty state, so the first message is not a blank page. */
+const SUGGESTIONS = ["What's popular?", 'Do you have vegan options?', 'Where are you located?'];
+
 const ChatWidget = () => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -117,13 +120,26 @@ const ChatWidget = () => {
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-[100px] right-[30px] z-[998] flex h-[500px] w-[350px] flex-col overflow-hidden rounded-[12px] bg-[#2a2a2a] shadow-[0_10px_40px_rgba(0,0,0,0.5)] max-[768px]:bottom-[90px] max-[768px]:right-5 max-[768px]:w-[calc(100%_-_40px)]">
-          <div className="flex items-center justify-between bg-secondary p-[15px] text-black">
-            <h4 className="m-0 text-m">{chat?.escalated ? 'Chat with our team' : 'Ask us anything'}</h4>
+        <div className="fixed bottom-[100px] right-[30px] z-[998] flex h-[520px] w-[370px] flex-col overflow-hidden rounded-[20px] border border-solid border-[rgba(255,255,255,0.12)] bg-[#211216] shadow-[0_20px_60px_rgba(0,0,0,0.55)] max-[768px]:bottom-[90px] max-[768px]:right-4 max-[768px]:w-[calc(100%_-_32px)]">
+          {/* Maroon rather than a slab of amber: the old header was a flat
+              orange bar with black text sitting on a grey void. */}
+          <div className="flex items-center gap-3 border-x-0 border-b border-t-0 border-solid border-[rgba(255,255,255,0.1)] bg-primary p-4">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-circle bg-secondary text-[16px] text-primary">
+              <i className="fas fa-mug-hot" aria-hidden="true"></i>
+            </span>
+            <div className="min-w-0 flex-1">
+              <h4 className="m-0 truncate text-n font-bold text-white">
+                {chat?.escalated ? 'Chat with our team' : "Bharadwaj's Cafe"}
+              </h4>
+              <p className="flex items-center gap-1.5 text-[11px] text-[rgba(255,255,255,0.6)]">
+                <span className="inline-block h-1.5 w-1.5 rounded-circle bg-[#1baf7a]"></span>
+                {chat?.escalated ? 'A barista is with you' : 'Usually replies instantly'}
+              </p>
+            </div>
             <button
               onClick={() => setIsOpen(false)}
               aria-label="Close chat"
-              className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center border-none bg-none p-0 text-[20px] text-black"
+              className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-circle border-none bg-[rgba(255,255,255,0.1)] p-0 text-[14px] text-white transition-colors duration-200 hover:bg-[rgba(255,255,255,0.2)]"
             >
               <i className="fas fa-times" aria-hidden="true"></i>
             </button>
@@ -134,6 +150,33 @@ const ChatWidget = () => {
           <div
             className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-[15px]"
             role="log" aria-live="polite" aria-label="Conversation">
+            {/* An empty conversation used to be a grey void with nothing in it
+                and no hint of what this box was for. */}
+            {!chat?.messages?.length && (
+              <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
+                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-circle bg-[rgba(243,150,28,0.15)] text-[22px] text-secondary">
+                  <i className="fas fa-mug-hot" aria-hidden="true"></i>
+                </span>
+                <h5 className="mb-1.5 text-m font-bold text-white">
+                  Welcome to Bharadwaj&apos;s Cafe!
+                </h5>
+                <p className="mb-5 text-s leading-relaxed text-[rgba(255,255,255,0.6)]">
+                  Ask about our menu, track an order, or tell us how you like your coffee.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {SUGGESTIONS.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => setMessage(suggestion)}
+                      className="cursor-pointer rounded-m border border-solid border-[rgba(255,255,255,0.15)] bg-transparent px-3 py-1.5 text-s text-[rgba(255,255,255,0.75)] transition-colors duration-200 hover:border-secondary hover:text-white"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {chat?.messages.map((msg, index) => (
               <div key={index} className={`${messageBase} ${messageVariant[msg.sender] ?? ''}`}>
                 {msg.sender === 'assistant' && (
@@ -168,7 +211,7 @@ const ChatWidget = () => {
               aria-label="Your message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="flex-1 rounded-[20px] border border-solid border-[#3a3a3a] bg-[#1a1a1a] p-2.5 text-white outline-none"
+              className="flex-1 rounded-m border border-solid border-[rgba(255,255,255,0.12)] bg-[rgba(0,0,0,0.3)] px-4 py-2.5 text-s text-white placeholder:text-[rgba(255,255,255,0.35)] outline-none focus:border-secondary"
             />
             <button
               type="submit"
