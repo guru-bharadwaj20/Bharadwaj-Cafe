@@ -32,7 +32,6 @@ import LoyaltyPage from './pages/LoyaltyPage';
 import ChatWidget from './components/ChatWidget';
 import './style.css';
 import './landing.css';
-import './profile.css';
 
 // Last, so utilities beat same-specificity legacy rules during the migration.
 import './tailwind.css';
