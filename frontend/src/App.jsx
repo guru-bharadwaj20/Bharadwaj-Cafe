@@ -29,7 +29,6 @@ import './style.css';
 import './cart.css';
 import './merchandise.css';
 import './order.css';
-import './contact.css';
 import './auth.css';
 import './landing.css';
 import './profile.css';
