@@ -5,6 +5,10 @@ import { useAuth } from '../context/AuthContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 import { IMG } from '../assets/cloudinary';
+// Aliased: this component already has a `successMessage` state holding the
+// text, and an unaliased import is shadowed by it inside the component --
+// which silently made the banner's className the message string.
+import { errorMessage, successMessage as successBanner } from '../styles/messages';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -92,14 +96,14 @@ const Login = () => {
             </div>
 
             {successMessage && (
-              <div className="success-message">
+              <div className={successBanner}>
                 <i className="fa-solid fa-circle-check" aria-hidden="true"></i>
                 {successMessage}
               </div>
             )}
 
             {error && (
-              <div className="error-message">
+              <div className={errorMessage}>
                 <i className="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                 {error}
                 {needsVerification && (

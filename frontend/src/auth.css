@@ -99,29 +99,6 @@
   font-size: var(--font-size-s);
 }
 
-.error-message,
-.success-message {
-  padding: 12px 15px;
-  border-radius: var(--border-radius-s);
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: var(--font-size-s);
-}
-
-.error-message {
-  background: #fee;
-  color: #c33;
-  border: 1px solid #fcc;
-}
-
-.success-message {
-  background: #efe;
-  color: #3c3;
-  border: 1px solid #cfc;
-}
-
 .auth-form {
   margin-top: 25px;
 }
@@ -132,13 +109,6 @@
  * not just this file's, which is how the checkout form ended up with dark
  * labels on a dark panel and white text in a white input.
  */
-
-.field-error {
-  display: block;
-  color: #c33;
-  font-size: 0.85rem;
-  margin-top: 5px;
-}
 
 .form-footer {
   display: flex;

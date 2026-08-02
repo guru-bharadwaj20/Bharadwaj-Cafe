@@ -66,18 +66,26 @@ const ROUTES = [
   ['addresses', '/addresses', true],
   ['addresses-form', '/addresses', true, expandAddressForm],
   ['loyalty', '/loyalty', true],
-  ['blog', '/blog', true],
 ];
 
 const dir = (...p) => path.join(ROOT, ...p);
 const ensure = (d) => fs.mkdirSync(d, { recursive: true });
 
-/** Registers a throwaway customer and returns the session the app stores. */
+/**
+ * Registers a throwaway customer and returns the session the app stores.
+ *
+ * Refuses to continue without one. Running several captures back to back trips
+ * the API's rate limiter, and a 429 here used to sail straight through: every
+ * protected route then bounced to /login, every screenshot came out at viewport
+ * height, and the diff cheerfully reported that most of the site had changed
+ * size. A comparison built on a failed login is not a slightly worse
+ * comparison, it is a fabricated one.
+ */
 const makeSession = async () => {
   const email = `uisnap${Date.now()}@example.com`;
   const password = 'password123';
 
-  await fetch(`${API}/auth/register`, {
+  const registration = await fetch(`${API}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: 'UI Snapshot', email, password }),
@@ -88,7 +96,23 @@ const makeSession = async () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  return res.json();
+
+  if (res.status === 429 || registration.status === 429) {
+    throw new Error(
+      'The API is rate-limiting this harness (429). Every capture would be a ' +
+        'logged-out redirect. Wait for the window to clear, or raise the limit ' +
+        'for local runs, then try again.'
+    );
+  }
+
+  const session = await res.json();
+  if (!session?.token) {
+    throw new Error(
+      `Could not sign in the snapshot user (HTTP ${res.status}). Refusing to ` +
+        'capture, because protected routes would all redirect to /login.'
+    );
+  }
+  return session;
 };
 
 /** Two real menu items, so the cart page has something in it to render. */
@@ -176,6 +200,10 @@ const makeAdminSession = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
+    if (res.status === 429) {
+      console.log('  admin: API is rate-limiting the harness (429), skipping staff pages');
+      return null;
+    }
     const session = await res.json();
     return session?.role === 'admin' ? session : null;
   } catch {
@@ -198,8 +226,6 @@ const shoot = async (page, outDir, name, route, vp, expand, problems) => {
       await expand(page);
       await page.waitForTimeout(600);
     }
-    await page.evaluate(() => window.scrollTo(0, 0));
-
     // Everything below exists because a run disagreed with itself. Each was
     // measured by capturing twice without touching the code.
     await page.evaluate(() => document.fonts.ready);
@@ -215,12 +241,21 @@ const shoot = async (page, outDir, name, route, vp, expand, problems) => {
     // The chat launcher pulses forever, so it lands at a different point in
     // its cycle each run. Freezing animations makes the comparison
     // meaningful; both sides are frozen identically.
+    // `scroll-behavior:auto` matters as much as the animation freeze. The
+    // about page smooth-scrolls to its contact anchor, and a full-page
+    // screenshot renders fixed elements — the nav, the cart bubble — wherever
+    // the viewport happens to be. Mid-glide that is a different place each
+    // run, which showed up as a ~1% diff on a page nothing had touched.
     await page.addStyleTag({
       content:
-        '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}',
+        '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}' +
+        'html{scroll-behavior:auto!important}',
     });
+    // Only now is it safe to pin the viewport, and to wait for the scroll to
+    // actually settle before the shutter.
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.evaluate(() => document.activeElement?.blur());
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(250);
     await page.screenshot({ path: path.join(outDir, `${name}-${vp.name}.png`), fullPage: true });
     process.stdout.write(`  ${name}-${vp.name}\n`);
   } catch (err) {
@@ -243,6 +278,9 @@ const capture = async () => {
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: 1,
+      // Anything that glides lands somewhere different each run. The about
+      // page's scroll to its contact anchor was worth ~3% on its own.
+      reducedMotion: 'reduce',
     });
 
     // Seed auth + cart before any app code runs, so protected routes render

@@ -4,6 +4,7 @@ import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 import { IMG } from '../assets/cloudinary';
+import { errorMessage } from '../styles/messages';
 
 /**
  * Staff sign-in, separate from the customer form.
@@ -64,7 +65,7 @@ const AdminLogin = () => {
         </div>
 
         {error && (
-          <div className="error-message">
+          <div className={errorMessage}>
             <i className="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
             {error}
           </div>

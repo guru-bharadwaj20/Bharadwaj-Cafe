@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { btnPrimary, btnSecondary } from '../styles/buttons';
 import { useToast } from '../context/ToastContext';
 import { resolveImage } from '../assets/cloudinary';
+import { errorMessage } from '../styles/messages';
 
 const Cart = () => {
   const { toast } = useToast();
@@ -154,7 +155,7 @@ const Cart = () => {
               <h3>Order Details</h3>
 
               {orderError && (
-                <div className="error-message">
+                <div className={errorMessage}>
                   <i className="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {orderError}
                 </div>
               )}
