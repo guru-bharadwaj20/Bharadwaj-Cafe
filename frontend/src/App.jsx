@@ -49,11 +49,15 @@ import './tailwind.css';
  * the customer navbar. Staff pages now go through `Admin` below instead, and
  * share nothing with this shell.
  *
- * `pb-[120px]` keeps the last of the page clear of the docked nav.
+ * `pb-[120px]` keeps the last of the page clear of the docked nav. It carries
+ * `bg-dark` because a bare padding box is transparent, and the body underneath
+ * is white -- without it every dark page ended in a white band. The light
+ * About and Contact pages close with the dark footer, so the strip is
+ * unnoticeable there.
  */
 const Customer = ({ children }) => (
   <ProtectedRoute>
-    <div className="pb-[120px]">{children}</div>
+    <div className="min-h-screen bg-dark pb-[120px]">{children}</div>
     <FloatingNav />
     <CartToast />
   </ProtectedRoute>
