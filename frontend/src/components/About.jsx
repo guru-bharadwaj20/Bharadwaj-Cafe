@@ -1,4 +1,5 @@
 import { IMG } from '../assets/cloudinary';
+import { sectionTitle } from '../styles/layout';
 /**
  * About section.
  *
@@ -31,7 +32,7 @@ const About = () => {
         </div>
 
         <div className="max-w-[50%] max-[900px]:max-w-full">
-          <h2 className="section-title p-0">About Us</h2>
+          <h2 className={`${sectionTitle} p-0`}>About Us</h2>
           <p className="my-[30px] text-center text-m leading-[1.8] text-[#555] max-[900px]:mb-5 max-[900px]:mt-[30px]">
             At Bharadwaj&apos;s Coffee in Karnataka, India, we pride ourselves on being a go-to
             destination for coffee lovers and conversation seekers alike. We&apos;re dedicated to

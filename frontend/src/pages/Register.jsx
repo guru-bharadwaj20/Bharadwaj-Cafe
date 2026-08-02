@@ -261,7 +261,8 @@ const Register = () => {
 
             <div className={backHome}>
               <Link to="/" className={backLink}>
-                <i className={`fa-solid fa-arrow-left ${backLinkIcon}`} aria-hidden="true"></i> Back to Home
+                <i className={`fa-solid fa-arrow-left ${backLinkIcon}`} aria-hidden="true"></i> Back
+                to Home
               </Link>
             </div>
           </div>

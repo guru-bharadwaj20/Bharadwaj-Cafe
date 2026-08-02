@@ -51,7 +51,11 @@ export const shopCard = [
   'max-[640px]:max-w-full max-[640px]:flex-[1_1_100%]',
 ].join(' ');
 
-export const shopImage = 'mb-5 aspect-square max-w-[80%] rounded-[10px] object-contain';
+/* `w-[95%]` is the global `img { width: 95% }` from style.css, written on the
+   element now that the global is going. It is what these images have always
+   computed against; `max-w-[80%]` is the one that actually binds, but stating
+   the width keeps the port exact rather than merely equivalent-by-argument. */
+export const shopImage = 'mb-5 aspect-square w-[95%] max-w-[80%] rounded-[10px] object-contain';
 
 export const shopDetails = 'w-full';
 

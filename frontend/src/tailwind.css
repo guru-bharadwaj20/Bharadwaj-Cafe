@@ -1,56 +1,80 @@
 /**
- * Tailwind's utilities.
+ * The only stylesheet.
  *
- * Imported after every legacy stylesheet on purpose. Utilities and the old
- * class rules often have the same specificity, and in a tie the later rule
- * wins — so a component that has been migrated gets its utilities honoured
- * even while the stylesheet it used to depend on is still loaded.
+ * Twenty hand-written stylesheets went into components as Tailwind utilities;
+ * what is left here is the three things a utility cannot express, because none
+ * of them style an element:
  *
- * `@tailwind base` is absent: Preflight is disabled in tailwind.config.js
- * while the two systems coexist. See the comment there.
+ *   1. the design tokens, as custom properties
+ *   2. two global rules that must apply to elements no component owns
+ *   3. Tailwind itself
+ *
+ * Anything that describes how one element looks belongs on that element. If a
+ * rule is being added below, it is worth asking first why it cannot be.
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Miniver&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------- tokens -- */
+
 /*
- * Preflight normally declares these. Without them every transform utility is
- * silently dead: `translate-x-1/2` sets `--tw-translate-x` and then emits
- *
- *   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) ...
- *
- * where every other variable is undefined, so the function collapses to
- * `translate(-50%, )`, the whole declaration is invalid, and the browser drops
- * it. Computed transform comes back `none`.
- *
- * That is why the floating nav sat right of centre despite `-translate-x-1/2`,
- * and why none of the migrated buttons lifted on hover any more -- pixel diffs
- * never caught it because screenshots do not hover.
- *
- * Safe to declare globally, unlike the `border-style` reset that was tried and
- * reverted: these are custom properties, so they change nothing on their own
- * and only matter to elements that also carry a transform utility.
+ * The site's palette and scales. tailwind.config.js maps every one of these to
+ * a utility name -- `bg-primary` is `var(--primary-color)` to the byte -- which
+ * is what let components move off the stylesheets one at a time without the
+ * page shifting underneath the ones that had not moved yet.
  */
-*,
-::before,
-::after {
-  --tw-translate-x: 0;
-  --tw-translate-y: 0;
-  --tw-rotate: 0;
-  --tw-skew-x: 0;
-  --tw-skew-y: 0;
-  --tw-scale-x: 1;
-  --tw-scale-y: 1;
+:root {
+  --white-color: #fff;
+  --dark-color: #252525;
+  --primary-color: #3b141c;
+  --secondary-color: #f3961c;
+  --light-pink-color: #faf4f5;
+  --medium-gray-color: #ccc;
+
+  --font-size-s: 0.9rem;
+  --font-size-n: 1rem;
+  --font-size-m: 1.12rem;
+  --font-size-l: 1.5rem;
+  --font-size-xl: 2rem;
+  --font-size-xxl: 2.3rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --border-radius-s: 8px;
+  --border-radius-m: 30px;
+  --border-radius-circle: 50%;
+
+  --site-max-width: 1300px;
 }
 
 /*
- * The analytics dashboard's palette, which came here when analytics.css was
- * migrated.
+ * The type scale steps down on narrow screens. This retunes the tokens for the
+ * whole site rather than any one page, and because the Tailwind theme reads
+ * these same variables, `text-xxl` steps down here too with no duplicate
+ * breakpoint to keep in sync.
+ */
+@media screen and (max-width: 900px) {
+  :root {
+    --font-size-m: 1rem;
+    --font-size-l: 1.3rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 1.8rem;
+  }
+}
+
+/*
+ * The analytics dashboard's palette, from analytics.css.
  *
- * These are custom-property *declarations*, not styling: three blocks that set
- * the same ten variables to different values depending on the mode. No utility
- * can express that, because there is no element being styled -- which is the
- * same reason the site's own tokens live in a stylesheet rather than in a
- * component. `bg-viz-surface-1` and the rest read these; the mapping is in
- * tailwind.config.js.
- *
- * Dark is a separate validated palette, not an inversion of the light one:
+ * Three blocks setting the same ten names to different values for light,
+ * `prefers-color-scheme: dark` and an explicit `data-theme`. Dark is a separate
+ * validated palette, not an inversion of the light one:
  *   light  series-1 #2a78d6 on surface #fcfcfb
  *   dark   series-1 #3987e5 on surface #1a1a19
  * Both sets pass the lightness band, chroma floor, CVD separation,
@@ -96,5 +120,48 @@
   --grid: rgba(255, 255, 255, 0.1);
 }
 
-@tailwind components;
-@tailwind utilities;
+/* --------------------------------------------------------------- globals -- */
+
+@layer base {
+  /*
+   * Smooth in-page scrolling, offset so an anchor does not land under a fixed
+   * element. On <html>, which no component renders.
+   */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+  }
+
+  /*
+   * A visible focus ring on every interactive element, including the ones no
+   * component here writes -- anything rendered by a third-party script, and
+   * anything added later that forgets. `:focus-visible` rather than `:focus`,
+   * so it appears for keyboard users without ringing every mouse click.
+   */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /*
+   * Respect a reduced-motion preference. Animation can trigger nausea and
+   * migraine for people with vestibular disorders. `!important` against every
+   * element is the point: this has to beat whatever a component asked for.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

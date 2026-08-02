@@ -30,8 +30,6 @@ import WishlistPage from './pages/WishlistPage';
 import AddressManagement from './pages/AddressManagement';
 import LoyaltyPage from './pages/LoyaltyPage';
 import ChatWidget from './components/ChatWidget';
-import './style.css';
-import './landing.css';
 
 // Last, so utilities beat same-specificity legacy rules during the migration.
 import './tailwind.css';
@@ -81,7 +79,10 @@ function App() {
           <Router>
             {/* First focusable element on every page. Visually hidden until
               focused, so keyboard users can jump straight to the content. */}
-            <a href="#main-content" className="skip-link">
+            <a
+              href="#main-content"
+              className="absolute -top-[100px] left-2 z-[10000] rounded-b-md bg-secondary px-[18px] py-2.5 font-semibold text-primary no-underline transition-[top] duration-150 focus:top-0"
+            >
               Skip to main content
             </a>
             <Routes>
