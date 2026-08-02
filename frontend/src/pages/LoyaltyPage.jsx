@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 
 /**
  * Loyalty rewards.
@@ -43,6 +44,7 @@ const tierItem =
 const stepIcon = 'mb-[15px] text-[50px] text-secondary';
 
 const LoyaltyPage = () => {
+  const { toast } = useToast();
   const { user } = useAuth();
   const [loyaltyInfo, setLoyaltyInfo] = useState(null);
   const [rewards, setRewards] = useState([]);
@@ -73,22 +75,22 @@ const LoyaltyPage = () => {
     const points = parseInt(redeemPoints);
 
     if (points < 100) {
-      alert('Minimum 100 points required');
+      toast.error('Minimum 100 points required');
       return;
     }
 
     if (points > loyaltyInfo.points) {
-      alert('Insufficient points');
+      toast.error('Insufficient points');
       return;
     }
 
     try {
       const result = await api.redeemPoints({ points }, user?.token);
-      alert(result.message);
+      toast.success(result.message);
       setRedeemPoints('');
       fetchLoyaltyData();
     } catch {
-      alert('Failed to redeem points');
+      toast.error('Failed to redeem points');
     }
   };
 

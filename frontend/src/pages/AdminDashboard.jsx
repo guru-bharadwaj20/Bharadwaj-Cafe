@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -164,6 +165,7 @@ const AdminDashboard = () => {
 
 // Orders Management Component
 const OrdersManagement = ({ token }) => {
+  const { toast } = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -188,7 +190,7 @@ const OrdersManagement = ({ token }) => {
       fetchOrders();
     } catch (error) {
       console.error('Error updating order:', error);
-      alert('Failed to update order status');
+      toast.error('Failed to update order status');
     }
   };
 
@@ -239,7 +241,7 @@ const OrdersManagement = ({ token }) => {
                 </td>
                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <button className="btn-view" onClick={() => alert(`Order Details: ${order._id}`)}>
+                  <button className="btn-view" onClick={() => toast.info(`Order ${order._id}`)}>
                     <i className="fas fa-eye" aria-hidden="true"></i>
                   </button>
                 </td>
@@ -254,6 +256,7 @@ const OrdersManagement = ({ token }) => {
 
 // Users Management Component
 const UsersManagement = ({ token }) => {
+  const { toast } = useToast();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -280,7 +283,7 @@ const UsersManagement = ({ token }) => {
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Failed to delete user');
+      toast.error('Failed to delete user');
     }
   };
 
@@ -341,6 +344,7 @@ const UsersManagement = ({ token }) => {
 
 // Menu Management Component
 const MenuManagement = ({ token }) => {
+  const { toast } = useToast();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -367,7 +371,7 @@ const MenuManagement = ({ token }) => {
       fetchMenu();
     } catch (error) {
       console.error('Error deleting item:', error);
-      alert('Failed to delete menu item');
+      toast.error('Failed to delete menu item');
     }
   };
 

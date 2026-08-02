@@ -3,6 +3,7 @@ import { api } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import SearchFilters from './SearchFilters';
+import { useToast } from '../context/ToastContext';
 import {
   addToCartBtn,
   addToCartBtnAdded,
@@ -25,6 +26,7 @@ import {
 } from '../styles/shop';
 
 const Order = () => {
+  const { toast } = useToast();
   const { addToCart } = useCart();
   const { user } = useAuth();
   const [addedItems, setAddedItems] = useState({});
@@ -70,14 +72,14 @@ const Order = () => {
 
   const handleAddToWishlist = async (itemId) => {
     if (!user) {
-      alert('Please login to add to wishlist');
+      toast.error('Please login to add to wishlist');
       return;
     }
     try {
       await api.addToWishlist(itemId, user.token);
-      alert('Added to wishlist!');
+      toast.success('Added to wishlist!');
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
