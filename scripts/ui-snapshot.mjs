@@ -150,6 +150,84 @@ const seedAddresses = async (token) => {
   }
 };
 
+/**
+ * Signs in as staff, if credentials are available.
+ *
+ * Every run of this harness until now used a customer account, and that is
+ * precisely why the broken admin navigation shipped: with Dashboard and
+ * Analytics in it the bar wrapped onto a second line and pushed page headings
+ * under the fixed header, and no capture ever had those links in it. The admin
+ * routes are worth a screenshot for the same reason every other route is.
+ *
+ * Credentials come from the environment rather than the file, and the run
+ * carries on without the admin pages if they are missing — a missing staff
+ * password should not fail the whole comparison. Create one with:
+ *
+ *   ADMIN_EMAIL=... ADMIN_PASSWORD=... npm run create-admin   (in backend/)
+ */
+const makeAdminSession = async () => {
+  const email = process.env.UISNAP_ADMIN_EMAIL;
+  const password = process.env.UISNAP_ADMIN_PASSWORD;
+  if (!email || !password) return null;
+
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const session = await res.json();
+    return session?.role === 'admin' ? session : null;
+  } catch {
+    return null;
+  }
+};
+
+const ADMIN_ROUTES = [
+  ['admin-dashboard', '/admin'],
+  ['admin-analytics', '/admin/analytics'],
+];
+
+/** Navigates, settles the page and writes one screenshot. */
+const shoot = async (page, outDir, name, route, vp, expand, problems) => {
+  try {
+    await page.goto(`${APP}${route}`, { waitUntil: 'networkidle', timeout: 30000 });
+    // Settle animations and any post-mount fetches.
+    await page.waitForTimeout(1400);
+    if (expand) {
+      await expand(page);
+      await page.waitForTimeout(600);
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    // Everything below exists because a run disagreed with itself. Each was
+    // measured by capturing twice without touching the code.
+    await page.evaluate(() => document.fonts.ready);
+    // Late images shift the layout under the screenshot; the header logo was
+    // ghosting the whole mobile cart page this way.
+    await page.evaluate(() =>
+      Promise.all(
+        Array.from(document.images)
+          .filter((img) => !img.complete)
+          .map((img) => new Promise((res) => (img.onload = img.onerror = res)))
+      )
+    );
+    // The chat launcher pulses forever, so it lands at a different point in
+    // its cycle each run. Freezing animations makes the comparison
+    // meaningful; both sides are frozen identically.
+    await page.addStyleTag({
+      content:
+        '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}',
+    });
+    await page.evaluate(() => document.activeElement?.blur());
+    await page.waitForTimeout(150);
+    await page.screenshot({ path: path.join(outDir, `${name}-${vp.name}.png`), fullPage: true });
+    process.stdout.write(`  ${name}-${vp.name}\n`);
+  } catch (err) {
+    problems.push(`${name}-${vp.name}: ${err.message}`);
+  }
+};
+
 const capture = async () => {
   const outDir = dir(MODE);
   ensure(outDir);
@@ -182,47 +260,38 @@ const capture = async () => {
     page.on('pageerror', (e) => problems.push(`${vp.name} pageerror: ${e.message}`));
 
     for (const [name, route, , expand] of ROUTES) {
-      try {
-        await page.goto(`${APP}${route}`, { waitUntil: 'networkidle', timeout: 30000 });
-        // Settle animations and any post-mount fetches.
-        await page.waitForTimeout(1400);
-        if (expand) {
-          await expand(page);
-          await page.waitForTimeout(600);
-        }
-        await page.evaluate(() => window.scrollTo(0, 0));
-
-        // Everything below exists because a run disagreed with itself. Each
-        // was measured by capturing twice without touching the code.
-        await page.evaluate(() => document.fonts.ready);
-        // Late images shift the layout under the screenshot; the header logo
-        // was ghosting the whole mobile cart page this way.
-        await page.evaluate(() =>
-          Promise.all(
-            Array.from(document.images)
-              .filter((img) => !img.complete)
-              .map((img) => new Promise((res) => (img.onload = img.onerror = res)))
-          )
-        );
-        // The chat launcher pulses forever, so it lands at a different point
-        // in its cycle each run. Freezing animations makes the comparison
-        // meaningful; both sides are frozen identically.
-        await page.addStyleTag({
-          content:
-            '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}',
-        });
-        await page.evaluate(() => document.activeElement?.blur());
-        await page.waitForTimeout(150);
-        await page.screenshot({
-          path: path.join(outDir, `${name}-${vp.name}.png`),
-          fullPage: true,
-        });
-        process.stdout.write(`  ${name}-${vp.name}\n`);
-      } catch (err) {
-        problems.push(`${name}-${vp.name}: ${err.message}`);
-      }
+      await shoot(page, outDir, name, route, vp, expand, problems);
     }
     await context.close();
+  }
+
+  // Staff pages, in a session of their own.
+  const admin = await makeAdminSession();
+  if (!admin) {
+    problems.push(
+      'admin routes skipped: set UISNAP_ADMIN_EMAIL and UISNAP_ADMIN_PASSWORD to include them'
+    );
+  } else {
+    for (const vp of VIEWPORTS) {
+      const context = await browser.newContext({
+        viewport: { width: vp.width, height: vp.height },
+        deviceScaleFactor: 1,
+      });
+      await context.addInitScript(
+        ([s]) => {
+          localStorage.setItem('userInfo', JSON.stringify(s));
+          localStorage.setItem('token', s.token);
+        },
+        [admin]
+      );
+      const page = await context.newPage();
+      page.on('pageerror', (e) => problems.push(`${vp.name} pageerror: ${e.message}`));
+
+      for (const [name, route] of ADMIN_ROUTES) {
+        await shoot(page, outDir, name, route, vp, null, problems);
+      }
+      await context.close();
+    }
   }
 
   await browser.close();
