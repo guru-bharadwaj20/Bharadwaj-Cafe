@@ -107,98 +107,125 @@ const SearchFilters = ({ onFilterChange }) => {
     };
   }, []);
 
+  const activeCount =
+    dietary.length + (category ? 1 : 0) + (sortBy ? 1 : 0) + (minPrice || maxPrice ? 1 : 0);
+
   return (
-    <div className="mx-auto my-[30px] max-w-[1200px] px-5">
-      <div className="relative mb-5">
-        <i
-          className="fas fa-search absolute left-[15px] top-1/2 -translate-y-1/2 text-secondary"
-          aria-hidden="true"
-        ></i>
-        <input
-          type="text"
-          placeholder="Search menu items..."
-          value={search}
-          onChange={handleSearchChange}
-          className="w-full rounded-s border-2 border-solid border-[#3a3a3a] bg-[#2a2a2a] py-3 pl-[45px] pr-3 text-n text-white focus:border-secondary focus:outline-none"
-        />
-      </div>
-
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[15px] rounded-s bg-[#2a2a2a] p-5 max-[768px]:grid-cols-1">
-        <div>
-          <label className={groupLabel}>Category</label>
-          <select value={category} onChange={handleCategoryChange} className={selectClass}>
-            <option value="">All Categories</option>
-            <option value="coffee">Coffee</option>
-            <option value="tea">Tea</option>
-            <option value="snacks">Snacks</option>
-            <option value="pastries">Pastries</option>
-          </select>
+    <div className="mx-auto my-[30px] w-full max-w-[1200px] px-5">
+      <div className="rounded-[20px] border border-solid border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-4 sm:p-5">
+        {/* Search, as the one obviously primary control. */}
+        <div className="relative">
+          <i
+            className="fas fa-search pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.4)]"
+            aria-hidden="true"
+          ></i>
+          <input
+            type="text"
+            placeholder="Search menu items..."
+            value={search}
+            onChange={handleSearchChange}
+            aria-label="Search menu items"
+            className="w-full rounded-m border border-solid border-[rgba(255,255,255,0.1)] bg-[rgba(0,0,0,0.25)] py-3.5 pl-14 pr-4 text-n text-white placeholder:text-[rgba(255,255,255,0.35)] focus:border-secondary focus:outline-none"
+          />
         </div>
 
-        <div>
-          <label className={groupLabel}>Dietary</label>
-          <div className="flex flex-col gap-2">
-            {DIETARY.map((option) => (
-              // `text-s mb-2` are inherited by accident in the old CSS: the
-              // group-label rule matched these checkbox labels too, handing
-              // them a 0.9rem size and an 8px bottom margin that the
-              // checkbox-group rule never overrode. Both are load-bearing —
-              // the size alone leaves each row 8px short.
-              <label
+        {/* Dietary as toggles rather than a column of checkboxes: five stacked
+            rows were what made this panel taller than everything in it. */}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-s text-[rgba(255,255,255,0.45)]">Dietary</span>
+          {DIETARY.map((option) => {
+            const on = dietary.includes(option);
+            return (
+              <button
                 key={option}
-                className="mb-2 flex items-center gap-2 text-s font-normal text-white"
+                type="button"
+                value={option}
+                onClick={handleDietaryChange}
+                aria-pressed={on}
+                className={`cursor-pointer rounded-m border border-solid px-3.5 py-1.5 text-s transition-colors duration-200 ${
+                  on
+                    ? 'border-secondary bg-secondary font-semibold text-primary'
+                    : 'border-[rgba(255,255,255,0.15)] bg-transparent text-[rgba(255,255,255,0.75)] hover:border-[rgba(255,255,255,0.35)] hover:text-white'
+                }`}
               >
-                <input
-                  type="checkbox"
-                  value={option}
-                  checked={dietary.includes(option)}
-                  onChange={handleDietaryChange}
-                  className="h-4 w-4"
-                />
                 {option}
-              </label>
-            ))}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-end gap-3 border-x-0 border-b-0 border-t border-solid border-[rgba(255,255,255,0.08)] pt-4">
+          <div className="min-w-[150px] flex-1">
+            <label htmlFor="filter-category" className={groupLabel}>
+              Category
+            </label>
+            <select
+              id="filter-category"
+              value={category}
+              onChange={handleCategoryChange}
+              className={selectClass}
+            >
+              <option value="">All Categories</option>
+              <option value="coffee">Coffee</option>
+              <option value="tea">Tea</option>
+              <option value="snacks">Snacks</option>
+              <option value="pastries">Pastries</option>
+            </select>
           </div>
-        </div>
 
-        <div>
-          <label className={groupLabel}>Price Range</label>
-          <div className="flex items-center gap-2.5">
-            <input
-              type="number"
-              placeholder="Min"
-              value={minPrice}
-              onChange={(e) => handlePriceChange(e.target.value, maxPrice)}
-              className={priceInputClass}
-            />
-            <span>-</span>
-            <input
-              type="number"
-              placeholder="Max"
-              value={maxPrice}
-              onChange={(e) => handlePriceChange(minPrice, e.target.value)}
-              className={priceInputClass}
-            />
+          <div className="min-w-[150px] flex-1">
+            <label htmlFor="filter-sort" className={groupLabel}>
+              Sort by
+            </label>
+            <select
+              id="filter-sort"
+              value={sortBy}
+              onChange={handleSortChange}
+              className={selectClass}
+            >
+              <option value="">Default</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+              <option value="popular">Most Popular</option>
+            </select>
           </div>
-        </div>
 
-        <div>
-          <label className={groupLabel}>Sort By</label>
-          <select value={sortBy} onChange={handleSortChange} className={selectClass}>
-            <option value="">Default</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="rating">Highest Rated</option>
-            <option value="popular">Most Popular</option>
-          </select>
-        </div>
+          <div>
+            <span className={groupLabel}>Price</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                placeholder="Min"
+                aria-label="Minimum price"
+                value={minPrice}
+                onChange={(e) => handlePriceChange(e.target.value, maxPrice)}
+                className={priceInputClass}
+              />
+              <span className="text-[rgba(255,255,255,0.35)]">–</span>
+              <input
+                type="number"
+                placeholder="Max"
+                aria-label="Maximum price"
+                value={maxPrice}
+                onChange={(e) => handlePriceChange(minPrice, e.target.value)}
+                className={priceInputClass}
+              />
+            </div>
+          </div>
 
-        <button
-          className="cursor-pointer self-end rounded-[5px] border-none bg-[#f44336] px-5 py-2.5 text-white transition-all duration-300 hover:bg-[#d32f2f]"
-          onClick={clearFilters}
-        >
-          Clear Filters
-        </button>
+          {/* Only offered when there is something to clear, and quiet rather
+              than a red block competing with the menu itself. */}
+          {activeCount > 0 && (
+            <button
+              onClick={clearFilters}
+              className="ml-auto flex cursor-pointer items-center gap-2 rounded-m border border-solid border-[rgba(255,255,255,0.15)] bg-transparent px-4 py-2.5 text-s text-[rgba(255,255,255,0.75)] transition-colors duration-200 hover:border-[#f44336] hover:text-white"
+            >
+              <i className="fas fa-xmark" aria-hidden="true"></i>
+              Clear {activeCount} filter{activeCount === 1 ? '' : 's'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
