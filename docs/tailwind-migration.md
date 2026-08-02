@@ -26,6 +26,7 @@ pages: each run registers a throwaway account, so the name on screen differs.
 | `chat.css` | `components/ChatWidget.jsx` | structural |
 | `wishlist.css` | `pages/WishlistPage.jsx` | 0.00% |
 | button rules in `cart.css` + `landing.css` | `styles/buttons.js` | 0.00% |
+| `.form-group` rules in `auth.css` | `styles/forms.js` | 0.00%, cart fixed |
 
 The chat widget is checked structurally rather than by pixels: its panel holds
 a live Gemini reply, so the text differs between runs. Panel size, message
@@ -65,6 +66,16 @@ before deleting it.
 a `:root` block inside a 900px media query that retuned the type scale for the
 entire site. It now lives in `style.css` next to the tokens it overrides.
 
+**An unscoped declaration styles the whole app, and ties go to import order.**
+`auth.css` declared `.form-group` bare while the other four files scoped
+theirs. `.form-group label` and `.payment-form label` both score 0,1,1, and
+App.jsx imports auth.css after cart.css, so auth won every tie on the checkout
+form — dark labels on a dark panel, and a `#fafafa` input that kept cart's
+`color: #fff`, making typed text invisible. Nobody would find that by reading
+either file alone. Before deleting a shared rule, check what its removal
+*restores* as well as what it takes away: here the fix was simply letting
+cart.css style its own form again.
+
 ## Shared classes across stylesheets
 
 Some class names are declared in more than one stylesheet, so which declaration
@@ -78,11 +89,15 @@ while `cart.css` kept the box. The cart's secondary button rendered as
 landing's transparent white-bordered button rather than the solid grey
 `cart.css` asks for. Both now live in `styles/buttons.js`.
 
+`.form-group` is **now resolved** and turned out to be a narrower problem than
+its five declarations suggested: only `auth.css` declared it bare, and the
+other four are scoped (`.payment-form`, `.address-form`, `.edit-form`,
+`.review-form`). Those four can safely be migrated one at a time. The bare
+rules now live in `styles/forms.js`; see the trap above for what they were
+doing to the cart.
+
 Still outstanding:
 
-- `.form-group` — declared in `address.css`, `auth.css`, `cart.css`,
-  `profile.css` and `reviews.css`. Lift this next, the same way, before
-  migrating any of those five files individually.
 - `.loading-container` / `.spinner` — used by the wishlist and account pages,
   declared elsewhere.
 - `.section-title` — declared in `style.css` and overridden per section. The
@@ -90,14 +105,12 @@ Still outstanding:
 
 ## Suggested order for the rest
 
-1. **Lift `.form-group`** into a `styles/forms.js` module and update all five
-   callers in one commit, exactly as was done for the buttons. Encode what the
-   browser currently resolves to, then change it deliberately afterwards if
-   the resolution is not what you want.
+1. ~~Lift `.form-group`~~ — done, in `styles/forms.js`.
 2. Self-contained pages, cheapest first: `blog.css`, `loyalty.css`,
    `reviews.css`, `address.css`.
-3. `auth.css` — one stylesheet, five components (`Login`, `Register`,
-   `ForgotPassword`, `ResetPassword`, `VerifyEmail`).
+3. `auth.css` — what remains after the form lift: the split-panel layout, the
+   header, the divider and `.field-error`, across five components (`Login`,
+   `Register`, `ForgotPassword`, `ResetPassword`, `VerifyEmail`).
 4. `cart.css` and `landing.css` — their button rules are already gone, so
    what remains is page-local.
 5. `profile.css`, `order-history.css`, `admin.css`, `analytics.css`.
@@ -114,4 +127,30 @@ The harness signs in, seeds a cart and seeds a wishlist. A route that renders
 only an empty state proves almost nothing, so before migrating a data-driven
 page, check that the captured screenshot actually shows the component. Extend
 `seedWishlist` in `scripts/ui-snapshot.mjs` for the equivalent on other pages —
-orders, addresses, reviews and loyalty all currently capture empty.
+orders, reviews and loyalty all currently capture empty.
+
+It also captures two states that only exist after a click: `cart-checkout`
+(which types into the fields, so text-against-background contrast is recorded
+rather than assumed) and `addresses-form`. Add an `expand` step to `ROUTES` for
+any other UI hidden behind a button, or the run will report a confident 0.00%
+for a page it never actually rendered.
+
+`reviews.css` is a special case: `components/Reviews.jsx` is not imported
+anywhere, so nothing it styles is reachable in the running app. Migrating that
+file cannot be verified by screenshot, and is probably not worth doing before
+deciding whether the component should be mounted or deleted.
+
+## Two false positives worth knowing about
+
+The harness disagreed with itself before these were fixed, which is worse than
+a wrong answer because the number still looks authoritative:
+
+- **Webfonts landing after the screenshot.** Every glyph shifts a pixel or two
+  and the whole page lights up — `contact-desktop` read 0.96% on one run and
+  0.00% on the next with identical code. Fixed by awaiting `document.fonts.ready`.
+- **A blinking text caret** in whichever field was filled last, caught in
+  roughly half the screenshots. Fixed by blurring before capture.
+
+If a diff shows uniform ghosting across the entire page rather than a change
+in one region, suspect the harness before the CSS — and confirm it by
+capturing twice without touching the code.
