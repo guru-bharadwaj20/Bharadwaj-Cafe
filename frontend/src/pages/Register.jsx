@@ -6,6 +6,31 @@ import GoogleSignInButton from '../components/GoogleSignInButton';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 import { IMG } from '../assets/cloudinary';
 import { errorMessage, fieldError, successMessage } from '../styles/messages';
+import {
+  authPage,
+  authContainer,
+  authLeft,
+  authImage,
+  authOverlay,
+  authOverlayTitle,
+  authOverlayText,
+  authRight,
+  authFormContainer,
+  authHeader,
+  authLogo,
+  authTitle,
+  authSubtitle,
+  authForm,
+  authBtn,
+  authDivider,
+  authDividerLabel,
+  authRedirect,
+  authRedirectText,
+  redirectLink,
+  backHome,
+  backLink,
+  backLinkIcon,
+} from '../styles/auth';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -98,22 +123,22 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-page" id="main-content">
-      <div className="auth-container">
-        <div className="auth-left">
-          <img src={IMG.coffeeHeroSection} alt="Coffee" className="auth-image" />
-          <div className="auth-overlay">
-            <h2>Join Our Community!</h2>
-            <p>Create an account to start your coffee journey</p>
+    <div className={authPage} id="main-content">
+      <div className={authContainer}>
+        <div className={authLeft}>
+          <img src={IMG.coffeeHeroSection} alt="Coffee" className={authImage} />
+          <div className={authOverlay}>
+            <h2 className={authOverlayTitle}>Join Our Community!</h2>
+            <p className={authOverlayText}>Create an account to start your coffee journey</p>
           </div>
         </div>
 
-        <div className="auth-right">
-          <div className="auth-form-container">
-            <div className="auth-header">
-              <img src={IMG.logo} alt="Bharadwaj's Cafe" className="auth-logo" />
-              <h1>Create New Account</h1>
-              <p>Fill in the details to get started</p>
+        <div className={authRight}>
+          <div className={authFormContainer}>
+            <div className={authHeader}>
+              <img src={IMG.logo} alt="Bharadwaj's Cafe" className={authLogo} />
+              <h1 className={authTitle}>Create New Account</h1>
+              <p className={authSubtitle}>Fill in the details to get started</p>
             </div>
 
             {errors.general && (
@@ -130,7 +155,7 @@ const Register = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className={authForm}>
               <div className={formGroup}>
                 <label htmlFor="name" className={formLabel}>
                   <i className={`fa-solid fa-user ${formLabelIcon}`} aria-hidden="true"></i>
@@ -205,13 +230,13 @@ const Register = () => {
                 )}
               </div>
 
-              <button type="submit" className="auth-btn" disabled={loading}>
+              <button type="submit" className={authBtn} disabled={loading}>
                 {loading ? 'Creating Account...' : 'Register'}
               </button>
             </form>
 
-            <div className="auth-divider">
-              <span>OR</span>
+            <div className={authDivider}>
+              <span className={authDividerLabel}>OR</span>
             </div>
 
             {/* Signing up with Google needs no email confirmation step, so it
@@ -225,18 +250,18 @@ const Register = () => {
               onError={(message) => setErrors({ general: message })}
             />
 
-            <div className="auth-redirect">
-              <p>
+            <div className={authRedirect}>
+              <p className={authRedirectText}>
                 Already have an account?{' '}
-                <Link to="/login" className="redirect-link">
+                <Link to="/login" className={redirectLink}>
                   Login here
                 </Link>
               </p>
             </div>
 
-            <div className="back-home">
-              <Link to="/" className="back-link">
-                <i className="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Home
+            <div className={backHome}>
+              <Link to="/" className={backLink}>
+                <i className={`fa-solid fa-arrow-left ${backLinkIcon}`} aria-hidden="true"></i> Back to Home
               </Link>
             </div>
           </div>

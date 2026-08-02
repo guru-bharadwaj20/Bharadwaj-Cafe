@@ -4,6 +4,21 @@ import { api } from '../utils/api';
 import { formGroup, formLabel, formLabelIcon, formInput } from '../styles/forms';
 import { IMG } from '../assets/cloudinary';
 import { errorMessage, successMessage } from '../styles/messages';
+import {
+  authPage,
+  authContainer,
+  authRightCentered,
+  authFormContainer,
+  authHeader,
+  authLogo,
+  authTitle,
+  authSubtitle,
+  authForm,
+  authBtn,
+  authRedirect,
+  authRedirectText,
+  redirectLink,
+} from '../styles/auth';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -59,14 +74,14 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="auth-page" id="main-content">
-      <div className="auth-container reset-password-container">
-        <div className="auth-right center-form">
-          <div className="auth-form-container">
-            <div className="auth-header">
-              <img src={IMG.logo} alt="Bharadwaj's Cafe" className="auth-logo" />
-              <h1>Reset Password</h1>
-              <p>Enter your new password</p>
+    <div className={authPage} id="main-content">
+      <div className={authContainer}>
+        <div className={authRightCentered}>
+          <div className={authFormContainer}>
+            <div className={authHeader}>
+              <img src={IMG.logo} alt="Bharadwaj's Cafe" className={authLogo} />
+              <h1 className={authTitle}>Reset Password</h1>
+              <p className={authSubtitle}>Enter your new password</p>
             </div>
 
             {status.message && (
@@ -78,7 +93,7 @@ const ResetPassword = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className={authForm}>
               <div className={formGroup}>
                 <label htmlFor="password" className={formLabel}>
                   <i className={`fa-solid fa-lock ${formLabelIcon}`} aria-hidden="true"></i>
@@ -115,14 +130,24 @@ const ResetPassword = () => {
                 />
               </div>
 
-              <button type="submit" className="submit-button" disabled={loading}>
+              {/* Was `.submit-button`, and before that nothing at all: no
+                  stylesheet in the project declared that class, so the one
+                  button on this page rendered as a bare browser button while
+                  the other four auth pages showed the amber one. */}
+              <button type="submit" className={authBtn} disabled={loading}>
                 {loading ? 'Resetting...' : 'Reset Password'}
               </button>
             </form>
 
-            <div className="auth-footer">
-              <p>
-                Remember your password? <Link to="/login">Login here</Link>
+            {/* Likewise `.auth-footer`, with an unclassed link inside it, so
+                "Login here" came out as default browser blue. This is the same
+                markup the other four pages use. */}
+            <div className={authRedirect}>
+              <p className={authRedirectText}>
+                Remember your password?{' '}
+                <Link to="/login" className={redirectLink}>
+                  Login here
+                </Link>
               </p>
             </div>
           </div>

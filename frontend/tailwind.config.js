@@ -21,6 +21,25 @@ export default {
 
   theme: {
     extend: {
+      // The legacy stylesheets are written desktop-first: a base rule, then a
+      // `max-width` media query that narrows it. Tailwind is mobile-first, so
+      // faithfully porting those rules needs max-width variants, and the three
+      // widths below are the only ones the twenty stylesheets ever used.
+      //
+      // Named rather than written as `max-[900px]:` at each call site, because
+      // the arbitrary form compiles to `not all and (min-width: 900px)` — which
+      // stops one hundredth of a pixel short of 900 and would not match the
+      // rule it is replacing. `{ max: ... }` emits `(max-width: 900px)` exactly.
+      //
+      // Tailwind orders max-width screens widest-first, so `to-600` is emitted
+      // after `to-900` and still wins where both apply, exactly as the source
+      // files relied on their own ordering.
+      screens: {
+        'to-900': { max: '900px' },
+        'to-768': { max: '768px' },
+        'to-600': { max: '600px' },
+      },
+
       colors: {
         white: 'var(--white-color)',
         dark: 'var(--dark-color)',

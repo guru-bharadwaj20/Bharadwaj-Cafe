@@ -32,7 +32,6 @@ import LoyaltyPage from './pages/LoyaltyPage';
 import ChatWidget from './components/ChatWidget';
 import './style.css';
 import './cart.css';
-import './auth.css';
 import './landing.css';
 import './profile.css';
 import './admin.css';

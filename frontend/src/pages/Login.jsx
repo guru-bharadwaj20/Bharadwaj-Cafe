@@ -9,6 +9,34 @@ import { IMG } from '../assets/cloudinary';
 // text, and an unaliased import is shadowed by it inside the component --
 // which silently made the banner's className the message string.
 import { errorMessage, successMessage as successBanner } from '../styles/messages';
+import {
+  authPage,
+  authContainer,
+  authLeft,
+  authImage,
+  authOverlay,
+  authOverlayTitle,
+  authOverlayText,
+  authRight,
+  authFormContainer,
+  authHeader,
+  authLogo,
+  authTitle,
+  authSubtitle,
+  authForm,
+  authBtn,
+  formFooter,
+  forgotLink,
+  authDivider,
+  authDividerLabel,
+  authRedirect,
+  authRedirectText,
+  redirectLink,
+  backHome,
+  backLink,
+  backLinkIcon,
+  resendLink,
+} from '../styles/auth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -77,22 +105,22 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-page" id="main-content">
-      <div className="auth-container">
-        <div className="auth-left">
-          <img src={IMG.coffeeHeroSection} alt="Coffee" className="auth-image" />
-          <div className="auth-overlay">
-            <h2>Welcome Back!</h2>
-            <p>Login to explore our amazing coffee collection</p>
+    <div className={authPage} id="main-content">
+      <div className={authContainer}>
+        <div className={authLeft}>
+          <img src={IMG.coffeeHeroSection} alt="Coffee" className={authImage} />
+          <div className={authOverlay}>
+            <h2 className={authOverlayTitle}>Welcome Back!</h2>
+            <p className={authOverlayText}>Login to explore our amazing coffee collection</p>
           </div>
         </div>
 
-        <div className="auth-right">
-          <div className="auth-form-container">
-            <div className="auth-header">
-              <img src={IMG.logo} alt="Bharadwaj's Cafe" className="auth-logo" />
-              <h1>Login to Your Account</h1>
-              <p>Enter your credentials to continue</p>
+        <div className={authRight}>
+          <div className={authFormContainer}>
+            <div className={authHeader}>
+              <img src={IMG.logo} alt="Bharadwaj's Cafe" className={authLogo} />
+              <h1 className={authTitle}>Login to Your Account</h1>
+              <p className={authSubtitle}>Enter your credentials to continue</p>
             </div>
 
             {successMessage && (
@@ -109,7 +137,7 @@ const Login = () => {
                 {needsVerification && (
                   <button
                     type="button"
-                    className="resend-link"
+                    className={resendLink}
                     onClick={handleResendVerification}
                     disabled={loading}
                   >
@@ -119,7 +147,7 @@ const Login = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className={authForm}>
               <div className={formGroup}>
                 <label htmlFor="email" className={formLabel}>
                   <i className={`fa-solid fa-envelope ${formLabelIcon}`} aria-hidden="true"></i>
@@ -154,19 +182,19 @@ const Login = () => {
                 />
               </div>
 
-              <div className="form-footer">
-                <Link to="/forgot-password" className="forgot-link">
+              <div className={formFooter}>
+                <Link to="/forgot-password" className={forgotLink}>
                   Forgot Password?
                 </Link>
               </div>
 
-              <button type="submit" className="auth-btn" disabled={loading}>
+              <button type="submit" className={authBtn} disabled={loading}>
                 {loading ? 'Logging in...' : 'Login'}
               </button>
             </form>
 
-            <div className="auth-divider">
-              <span>OR</span>
+            <div className={authDivider}>
+              <span className={authDividerLabel}>OR</span>
             </div>
 
             <GoogleSignInButton
@@ -180,18 +208,19 @@ const Login = () => {
               }}
             />
 
-            <div className="auth-redirect">
-              <p>
+            <div className={authRedirect}>
+              <p className={authRedirectText}>
                 New user?{' '}
-                <Link to="/register" className="redirect-link">
+                <Link to="/register" className={redirectLink}>
                   Register here
                 </Link>
               </p>
             </div>
 
-            <div className="back-home">
-              <Link to="/" className="back-link">
-                <i className="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Home
+            <div className={backHome}>
+              <Link to="/" className={backLink}>
+                <i className={`fa-solid fa-arrow-left ${backLinkIcon}`} aria-hidden="true"></i> Back
+                to Home
               </Link>
             </div>
           </div>
