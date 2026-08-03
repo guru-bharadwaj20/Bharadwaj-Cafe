@@ -1,6 +1,6 @@
 # Bharadwaj's Cafe
 
-**A full-stack ordering platform for a speciality coffee house.**
+**A full-stack ordering platform for a speciality coffee house**
 
 [![CI](https://github.com/guru-bharadwaj20/Bharadwaj-Cafe/actions/workflows/ci.yml/badge.svg)](https://github.com/guru-bharadwaj20/Bharadwaj-Cafe/actions/workflows/ci.yml)
 &nbsp;![node](https://img.shields.io/badge/node-22.x-339933?logo=node.js&logoColor=white)
