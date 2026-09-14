@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/guru-bharadwaj20/Bharadwaj-Cafe#readme",
   "devDependencies": {
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.63.0"
   },
   "private": true,
   "dependencies": {
