@@ -55,7 +55,7 @@
     "@types/nodemailer": "^8.0.1",
     "@types/supertest": "^7.2.1",
     "@types/web-push": "^3.6.4",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^5.0.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.7.0",
